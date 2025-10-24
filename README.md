@@ -11,11 +11,62 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 - Download QR codes
 
 ## Prerequisites
-Before you begin, ensure you have the following installed:
+
+### Option 1: Docker (Recommended - Easiest Setup)
+- **Docker** - [Download](https://www.docker.com/get-started)
+- **Docker Compose** - Comes with Docker Desktop
+
+### Option 2: Manual Setup
 - **Node.js** (v14 or higher) - [Download](https://nodejs.org/)
 - **MongoDB** (MongoDB Compass or MongoDB Server) - [Download](https://www.mongodb.com/try/download/community)
 - **Visual Studio Code** - [Download](https://code.visualstudio.com/)
 - **Git** (optional) - [Download](https://git-scm.com/)
+
+## Quick Start with Docker 🐳
+
+The easiest way to run this project is using Docker. See [README.Docker.md](./README.Docker.md) for detailed Docker documentation.
+
+### Step 1: Setup Environment
+```bash
+cp .env.example .env
+# Edit .env and update the values (especially JWT_SECRET and admin credentials)
+```
+
+### Step 2: Start the Application
+
+**Using Make (Recommended):**
+```bash
+# Development mode with hot-reload
+make dev-up
+
+# Production mode
+make prod-up
+```
+
+**Using Docker Compose directly:**
+```bash
+# Development mode
+docker-compose -f docker-compose.dev.yml up -d
+
+# Production mode
+docker-compose up -d
+```
+
+### Step 3: Access the Application
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:5000
+- **MongoDB:** localhost:27017
+
+### Stop the Application
+```bash
+# Using Make
+make dev-down  # or make prod-down
+
+# Using Docker Compose
+docker-compose down
+```
+
+For more Docker commands and troubleshooting, see [README.Docker.md](./README.Docker.md)
 
 ## Project Structure
 ```
@@ -39,7 +90,9 @@ pet-management-system/
 └── README.md
 ```
 
-## Setup Instructions
+## Manual Setup Instructions
+
+> **Note:** If you're using Docker, you can skip this section. See "Quick Start with Docker" above.
 
 ### Step 1: Create Project Folder
 1. Open **File Explorer** and create a new folder called `pet-management-system`

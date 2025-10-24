@@ -3,25 +3,30 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 
 const MyPets = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedPet, setSelectedPet] = useState(null);
 
   useEffect(() => {
-    if (user) {
+    if (user && token) {
       fetchMyPets();
     }
-  }, [user]);
+  }, [user, token]);
 
   const fetchMyPets = async () => {
     try {
-      const response = await axios.get(`/api/users/${user.id}/pets`);
+      const response = await axios.get(`/api/users/${user.id}/pets`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setPets(response.data.pets);
       setLoading(false);
     } catch (error) {
-      setError('Failed to fetch pets');
+      console.error('Error fetching pets:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Failed to fetch pets');
       setLoading(false);
     }
   };

@@ -14,7 +14,7 @@ const UserDashboard = () => {
         <p><strong>Email:</strong> {user?.email}</p>
         <p><strong>Phone:</strong> {user?.phone}</p>
         <p><strong>NIC:</strong> {user?.nicNumber}</p>
-        <p><strong>Address:</strong> {user?.address.street}, {user?.address.city}, {user?.address.province}</p>
+        <p><strong>Address:</strong> {user?.address?.street}, {user?.address?.city}, {user?.address?.province}</p>
       </div>
 
       <div className="card">

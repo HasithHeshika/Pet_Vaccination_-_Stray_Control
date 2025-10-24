@@ -2,34 +2,19 @@ const QRCode = require('qrcode');
 
 const generateQRCode = async (petData) => {
   try {
-    // Create a data object with all pet details
-    const qrData = {
-      petId: petData.petId,
-      petName: petData.petName,
-      petType: petData.petType,
-      breed: petData.breed,
-      age: `${petData.age.years} years ${petData.age.months} months`,
-      gender: petData.gender,
-      color: petData.color,
-      microchipNumber: petData.microchipNumber || 'N/A',
-      ownerName: petData.ownerName,
-      ownerPhone: petData.ownerPhone,
-      ownerEmail: petData.ownerEmail,
-      registrationDate: petData.registrationDate,
-      profileUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pet/${petData.petId}`
-    };
-
-    // Convert to JSON string
-    const qrContent = JSON.stringify(qrData);
+    // Generate a user-friendly URL that points to the pet profile page
+    // When scanned, this will open a beautiful web page with all pet details
+    const profileUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pet-profile/${petData.petId}`;
 
     // Generate QR code as Data URL (base64 image)
-    const qrCodeDataURL = await QRCode.toDataURL(qrContent, {
+    const qrCodeDataURL = await QRCode.toDataURL(profileUrl, {
       width: 400,
       margin: 2,
       color: {
         dark: '#000000',
         light: '#FFFFFF'
-      }
+      },
+      errorCorrectionLevel: 'H' // High error correction for better scanning
     });
 
     return qrCodeDataURL;

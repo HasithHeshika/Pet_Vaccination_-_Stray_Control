@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
 const PetRegistration = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const { token } = useAuth();
   
   const [owner, setOwner] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,16 +47,23 @@ const PetRegistration = () => {
   };
 
   useEffect(() => {
-    fetchOwner();
-  }, [userId]);
+    if (token && userId) {
+      fetchOwner();
+    }
+  }, [userId, token]);
 
   const fetchOwner = async () => {
     try {
-      const response = await axios.get(`/api/users/${userId}`);
+      const response = await axios.get(`/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setOwner(response.data.user);
       setLoading(false);
     } catch (error) {
-      setError('Failed to fetch owner details');
+      console.error('Error fetching owner:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Failed to fetch owner details');
       setLoading(false);
     }
   };
@@ -109,10 +118,15 @@ const PetRegistration = () => {
         weight: parseFloat(formData.weight)
       };
 
-      const response = await axios.post('/api/pets/register', submitData);
+      const response = await axios.post('/api/pets/register', submitData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setRegisteredPet(response.data.pet);
       setSuccess(true);
     } catch (error) {
+      console.error('Error registering pet:', error.response?.data || error.message);
       setError(error.response?.data?.message || 'Failed to register pet');
     } finally {
       setSubmitting(false);

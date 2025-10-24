@@ -9,6 +9,7 @@ import UserList from './components/Admin/UserList';
 import PetRegistration from './components/Admin/PetRegistration';
 import UserDashboard from './components/User/UserDashboard';
 import MyPets from './components/User/MyPets';
+import PetProfile from './components/Public/PetProfile';
 import './App.css';
 
 // Protected Route Component
@@ -99,6 +100,9 @@ function AppContent() {
               </PublicRoute>
             } 
           />
+          
+          {/* Public Pet Profile - No authentication required */}
+          <Route path="/pet-profile/:petId" element={<PetProfile />} />
 
           {/* Admin Routes */}
           <Route

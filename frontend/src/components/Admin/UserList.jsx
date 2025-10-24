@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
 const UserList = () => {
@@ -7,18 +8,26 @@ const UserList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (token) {
+      fetchUsers();
+    }
+  }, [token]);
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/users');
+      const response = await axios.get('/api/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setUsers(response.data.users);
       setLoading(false);
     } catch (error) {
-      setError('Failed to fetch users');
+      console.error('Error fetching users:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Failed to fetch users');
       setLoading(false);
     }
   };

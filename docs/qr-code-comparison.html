@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Profile Example - Before & After</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2d3748;
+            font-size: 32px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .before, .after {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .before h2 {
+            color: #dc3545;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .after h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .json-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .preview {
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .preview-header .icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .preview-header h3 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+        }
+
+        .preview-header p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .preview-id {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .preview-id .id-label {
+            color: #6c757d;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+
+        .preview-id .id-value {
+            color: #667eea;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .preview-content {
+            padding: 25px;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .info-section h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section h4::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .medical-box {
+            background: #fff8f0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .medical-label {
+            color: #495057;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .medical-value {
+            color: #2d3748;
+            font-size: 13px;
+        }
+
+        .registration-stamp {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #28a745;
+        }
+
+        .stamp-icon {
+            width: 40px;
+            height: 40px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .stamp-text .stamp-label {
+            display: block;
+            color: #6c757d;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stamp-text .stamp-date {
+            display: block;
+            color: #2d3748;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .emergency-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .emergency-notice p {
+            color: #856404;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .benefits {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .benefits h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .benefit-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .benefit-item h3 {
+            color: #2d3748;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .benefit-item p {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 QR Code Improvement: Before & After</h1>
+
+        <div class="comparison">
+            <!-- BEFORE -->
+            <div class="before">
+                <h2>❌ Before - Raw JSON (Not User-Friendly)</h2>
+                <p style="margin-bottom: 15px; color: #6c757d;">When someone scanned the QR code, they would see this raw JSON data:</p>
+                <div class="json-code">{
+  "petId": "PETLX8H9G2ABCDEF",
+  "petName": "Max",
+  "petType": "Dog",
+  "breed": "Golden Retriever",
+  "age": "3 years 6 months",
+  "gender": "Male",
+  "color": "Golden",
+  "microchipNumber": "123456789",
+  "ownerName": "John Doe",
+  "ownerPhone": "+1234567890",
+  "ownerEmail": "john@example.com",
+  "registrationDate": "2024-10-24T10:30:00.000Z",
+  "profileUrl": "http://localhost:3000/pet/..."
+}</div>
+                <ul style="margin-top: 15px; color: #dc3545; line-height: 1.8;">
+                    <li>Hard to read and understand</li>
+                    <li>Requires technical knowledge</li>
+                    <li>Not mobile-friendly</li>
+                    <li>Looks unprofessional</li>
+                    <li>Difficult to find contact info quickly</li>
+                </ul>
+            </div>
+
+            <!-- AFTER -->
+            <div class="after">
+                <h2>✅ After - Beautiful Web Page (User-Friendly)</h2>
+                <p style="margin-bottom: 15px; color: #6c757d;">Now when someone scans the QR code, they see this beautiful page:</p>
+                <div class="preview">
+                    <div class="preview-header">
+                        <div class="icon">🐾</div>
+                        <h3>Pet Registration Certificate</h3>
+                        <p>Official Pet Vaccination & Stray Control System</p>
+                    </div>
+
+                    <div class="preview-id">
+                        <span class="id-label">Pet ID:</span>
+                        <span class="id-value">PETLX8H9G2ABCDEF</span>
+                    </div>
+
+                    <div class="preview-content">
+                        <div class="info-section">
+                            <h4>Pet Information</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Name</span>
+                                    <span class="info-value">Max</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Type</span>
+                                    <span class="info-value">Dog</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Breed</span>
+                                    <span class="info-value">Golden Retriever</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Age</span>
+                                    <span class="info-value">3 years 6 months</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Gender</span>
+                                    <span class="info-value">Male</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Color</span>
+                                    <span class="info-value">Golden</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Weight</span>
+                                    <span class="info-value">25 kg</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Microchip</span>
+                                    <span class="info-value">123456789</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <h4>Owner Information</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Name</span>
+                                    <span class="info-value">John Doe</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Email</span>
+                                    <span class="info-value">john@example.com</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Phone</span>
+                                    <span class="info-value">+1234567890</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <h4>Medical Information</h4>
+                            <div class="medical-box">
+                                <div class="medical-label">⚠️ Allergies</div>
+                                <div class="medical-value">Penicillin</div>
+                            </div>
+                            <div class="medical-box">
+                                <div class="medical-label">🏥 Existing Conditions</div>
+                                <div class="medical-value">Hip dysplasia</div>
+                            </div>
+                        </div>
+
+                        <div class="registration-stamp">
+                            <div class="stamp-icon">✓</div>
+                            <div class="stamp-text">
+                                <span class="stamp-label">Registered</span>
+                                <span class="stamp-date">October 24, 2024</span>
+                            </div>
+                        </div>
+
+                        <div class="emergency-notice">
+                            <p><strong>Lost Pet?</strong> If you found this pet, please contact the owner at the phone number or email listed above.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="benefits">
+            <h2>✨ Key Benefits of the New System</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <h3>📱 Works Everywhere</h3>
+                    <p>Compatible with all QR scanner apps, phone cameras, and devices. No special app needed!</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🎨 Professional Design</h3>
+                    <p>Beautiful, modern interface that looks official and trustworthy.</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🚨 Quick Contact</h3>
+                    <p>Owner contact information is prominently displayed for emergency situations.</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🏥 Medical Info</h3>
+                    <p>Important allergies and health conditions are clearly visible.</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>📱 Mobile Optimized</h3>
+                    <p>Perfectly formatted for smartphones, tablets, and desktops.</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🖨️ Print Friendly</h3>
+                    <p>Can be printed as an official pet registration certificate.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
