@@ -9,10 +9,10 @@ const AdminDashboard = () => {
       <div className="card">
         <h3>Quick Actions</h3>
         <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '15px' }}>
-          <Link to="/admin/users" className="btn btn-primary">
+          <Link to="/admin/users" className="btn btn-primary" style={{ width: 'auto', minWidth: '150px' }}>
             View All Users
           </Link>
-          <Link to="/admin/pets" className="btn btn-secondary">
+          <Link to="/admin/pets" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
             View All Pets
           </Link>
         </div>

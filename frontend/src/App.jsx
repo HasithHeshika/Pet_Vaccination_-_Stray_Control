@@ -6,6 +6,7 @@ import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import UserList from './components/Admin/UserList';
+import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
 import UserDashboard from './components/User/UserDashboard';
 import MyPets from './components/User/MyPets';
@@ -63,10 +64,10 @@ const HomePage = () => {
           and QR-based pet identification.
         </p>
         <div style={{ marginTop: '30px', display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/login" className="btn btn-primary" style={{ textDecoration: 'none' }}>
+          <a href="/login" className="btn btn-primary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
             Login
           </a>
-          <a href="/signup" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+          <a href="/signup" className="btn btn-secondary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
             Sign Up
           </a>
         </div>
@@ -118,6 +119,14 @@ function AppContent() {
             element={
               <ProtectedRoute adminOnly={true}>
                 <UserList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/pets"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AllPets />
               </ProtectedRoute>
             }
           />
