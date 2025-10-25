@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { generatePetPDF } from '../../utils/pdfGenerator';
 import axios from 'axios';
 
 const PetRegistration = () => {
@@ -46,13 +47,7 @@ const PetRegistration = () => {
     Hamster: ['Syrian', 'Dwarf', 'Roborovski', 'Other']
   };
 
-  useEffect(() => {
-    if (token && userId) {
-      fetchOwner();
-    }
-  }, [userId, token]);
-
-  const fetchOwner = async () => {
+  const fetchOwner = useCallback(async () => {
     try {
       const response = await axios.get(`/api/users/${userId}`, {
         headers: {
@@ -66,7 +61,13 @@ const PetRegistration = () => {
       setError(error.response?.data?.message || 'Failed to fetch owner details');
       setLoading(false);
     }
-  };
+  }, [userId, token]);
+
+  useEffect(() => {
+    if (token && userId) {
+      fetchOwner();
+    }
+  }, [userId, token, fetchOwner]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -142,6 +143,12 @@ const PetRegistration = () => {
     }
   };
 
+  const handleDownloadPDF = () => {
+    if (registeredPet) {
+      generatePetPDF(registeredPet);
+    }
+  };
+
   const handleRegisterAnother = () => {
     setSuccess(false);
     setRegisteredPet(null);
@@ -198,6 +205,9 @@ const PetRegistration = () => {
             <div style={{ marginTop: '15px', display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={handleDownloadQR} className="btn btn-primary">
                 Download QR Code
+              </button>
+              <button onClick={handleDownloadPDF} className="btn btn-primary">
+                📄 Download PDF
               </button>
               <button onClick={handleRegisterAnother} className="btn btn-secondary">
                 Register Another Pet

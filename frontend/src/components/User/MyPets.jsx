@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { generatePetPDF } from '../../utils/pdfGenerator';
 
 const MyPets = () => {
   const { user, token } = useAuth();
@@ -9,13 +10,7 @@ const MyPets = () => {
   const [error, setError] = useState('');
   const [selectedPet, setSelectedPet] = useState(null);
 
-  useEffect(() => {
-    if (user && token) {
-      fetchMyPets();
-    }
-  }, [user, token]);
-
-  const fetchMyPets = async () => {
+  const fetchMyPets = useCallback(async () => {
     try {
       const response = await axios.get(`/api/users/${user.id}/pets`, {
         headers: {
@@ -29,13 +24,25 @@ const MyPets = () => {
       setError(error.response?.data?.message || 'Failed to fetch pets');
       setLoading(false);
     }
-  };
+  }, [user, token]);
+
+  useEffect(() => {
+    if (user && token) {
+      fetchMyPets();
+    }
+  }, [user, token, fetchMyPets]);
 
   const handleDownloadQR = (pet) => {
     const link = document.createElement('a');
     link.href = pet.qrCode;
     link.download = `${pet.petName}_QRCode.png`;
     link.click();
+  };
+
+  const handleDownloadPDF = (pet) => {
+    if (pet) {
+      generatePetPDF(pet);
+    }
   };
 
   const handleViewDetails = (pet) => {
@@ -165,9 +172,12 @@ const MyPets = () => {
               />
             </div>
 
-            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={() => handleDownloadQR(selectedPet)} className="btn btn-primary">
                 Download QR Code
+              </button>
+              <button onClick={() => handleDownloadPDF(selectedPet)} className="btn btn-primary">
+                📄 Download PDF
               </button>
               <button onClick={handleCloseDetails} className="btn btn-secondary">
                 Close

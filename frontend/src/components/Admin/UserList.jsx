@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
@@ -10,13 +10,7 @@ const UserList = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  useEffect(() => {
-    if (token) {
-      fetchUsers();
-    }
-  }, [token]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await axios.get('/api/users', {
         headers: {
@@ -30,7 +24,13 @@ const UserList = () => {
       setError(error.response?.data?.message || 'Failed to fetch users');
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchUsers();
+    }
+  }, [token, fetchUsers]);
 
   const handleRegisterPet = (userId) => {
     navigate(`/admin/register-pet/${userId}`);

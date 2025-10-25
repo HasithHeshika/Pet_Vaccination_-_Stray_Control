@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { generatePetPDF } from '../../utils/pdfGenerator';
 import './PetProfile.css';
 
 const PetProfile = () => {
@@ -26,6 +27,12 @@ const PetProfile = () => {
 
     fetchPetDetails();
   }, [petId]);
+
+  const handleDownloadPDF = () => {
+    if (pet) {
+      generatePetPDF(pet);
+    }
+  };
 
   if (loading) {
     return (
@@ -199,6 +206,14 @@ const PetProfile = () => {
               <span className="stamp-date">{formatDate(pet.registrationDate)}</span>
             </div>
           </div>
+        </div>
+
+        {/* Download PDF Button */}
+        <div className="pdf-download-section">
+          <button onClick={handleDownloadPDF} className="btn-download-pdf">
+            📄 Download as PDF
+          </button>
+          <p className="download-hint">Save or print this pet's information for offline access</p>
         </div>
 
         {/* Emergency Contact Notice */}
