@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { generatePetPDF } from '../../utils/pdfGenerator';
 import axios from 'axios';
 
 const AllPets = () => {
@@ -10,13 +11,7 @@ const AllPets = () => {
   const [selectedPet, setSelectedPet] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      fetchAllPets();
-    }
-  }, [token]);
-
-  const fetchAllPets = async () => {
+  const fetchAllPets = useCallback(async () => {
     try {
       const response = await axios.get('/api/pets', {
         headers: {
@@ -30,7 +25,13 @@ const AllPets = () => {
       setError(error.response?.data?.message || 'Failed to fetch pets');
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchAllPets();
+    }
+  }, [token, fetchAllPets]);
 
   const handleViewDetails = (pet) => {
     setSelectedPet(pet);
@@ -48,6 +49,12 @@ const AllPets = () => {
       link.href = pet.qrCode;
       link.download = `${pet.petName}_QRCode.png`;
       link.click();
+    }
+  };
+
+  const handleDownloadPDF = (pet) => {
+    if (pet) {
+      generatePetPDF(pet);
     }
   };
 
@@ -231,12 +238,18 @@ const AllPets = () => {
                       alt="Pet QR Code" 
                       style={{ maxWidth: '250px', border: '2px solid #ddd', padding: '10px', borderRadius: '5px' }}
                     />
-                    <div style={{ marginTop: '10px' }}>
+                    <div style={{ marginTop: '10px', display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                       <button 
                         onClick={() => handleDownloadQR(selectedPet)}
                         className="btn btn-primary"
                       >
                         Download QR Code
+                      </button>
+                      <button 
+                        onClick={() => handleDownloadPDF(selectedPet)}
+                        className="btn btn-primary"
+                      >
+                        📄 Download PDF
                       </button>
                     </div>
                   </div>

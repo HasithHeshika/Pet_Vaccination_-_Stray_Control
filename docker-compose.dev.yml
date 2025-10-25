@@ -53,6 +53,7 @@ services:
       REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:5000}
       WATCHPACK_POLLING: "true"
       CHOKIDAR_USEPOLLING: "true"
+      GENERATE_SOURCEMAP: "false"
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
