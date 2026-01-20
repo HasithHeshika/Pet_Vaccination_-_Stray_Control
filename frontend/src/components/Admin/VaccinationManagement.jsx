@@ -111,7 +111,6 @@ const VaccinationManagement = () => {
         smsNotification: false
       });
       
-      // Refresh vaccinations list
       fetchPetAndVaccinations();
     } catch (err) {
       console.error('Error adding vaccination:', err);
@@ -391,3 +390,4 @@ const VaccinationManagement = () => {
 };
 
 export default VaccinationManagement;
+
