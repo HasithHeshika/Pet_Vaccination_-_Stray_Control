@@ -85,10 +85,10 @@ const VaccinationSchedule = () => {
 
   const getStatusColor = (nextDueDate) => {
     const days = getDaysDifference(nextDueDate);
-    if (days < 0) return '#dc3545'; // Overdue - red
-    if (days <= 7) return '#ffc107'; // Due soon - yellow
-    if (days <= 30) return '#17a2b8'; // Upcoming - blue
-    return '#28a745'; // Future - green
+    if (days < 0) return '#dc3545'; // Overdue- red
+    if (days <= 7) return '#ffc107'; // Due soon- yellow
+    if (days <= 30) return '#17a2b8'; // Upcoming- blue
+    return '#28a745'; // Future- green
   };
 
   const getStatusText = (nextDueDate) => {
@@ -268,3 +268,4 @@ const VaccinationSchedule = () => {
 };
 
 export default VaccinationSchedule;
+
