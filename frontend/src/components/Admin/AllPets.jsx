@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { generatePetPDF } from '../../utils/pdfGenerator';
-import axios from 'axios';
+import axios from '../../api/axios';
 
 const AllPets = () => {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -260,6 +262,12 @@ const AllPets = () => {
             </div>
 
             <div className="modal-footer">
+              <button 
+                onClick={() => navigate(`/admin/vaccinations/${selectedPet._id}`)}
+                className="btn btn-primary"
+              >
+                💉 Manage Vaccinations
+              </button>
               <button onClick={handleCloseModal} className="btn btn-secondary">
                 Close
               </button>
@@ -268,7 +276,7 @@ const AllPets = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .data-table {
           width: 100%;
           border-collapse: collapse;

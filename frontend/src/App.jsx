@@ -8,8 +8,10 @@ import AdminDashboard from './components/Admin/AdminDashboard';
 import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
+import VaccinationManagement from './components/Admin/VaccinationManagement';
 import UserDashboard from './components/User/UserDashboard';
 import MyPets from './components/User/MyPets';
+import VaccinationSchedule from './components/User/VaccinationSchedule';
 import PetProfile from './components/Public/PetProfile';
 import './App.css';
 
@@ -138,6 +140,14 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/vaccinations/:petId"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <VaccinationManagement />
+              </ProtectedRoute>
+            }
+          />
 
           {/* User Routes */}
           <Route
@@ -153,6 +163,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <MyPets />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/vaccinations"
+            element={
+              <ProtectedRoute>
+                <VaccinationSchedule />
               </ProtectedRoute>
             }
           />
