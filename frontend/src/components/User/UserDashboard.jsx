@@ -19,9 +19,14 @@ const UserDashboard = () => {
 
       <div className="card">
         <h3>Quick Actions</h3>
-        <Link to="/user/my-pets" className="btn btn-primary">
-          View My Pets
-        </Link>
+        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+          <Link to="/user/my-pets" className="btn btn-primary" style={{ width: 'auto', minWidth: '150px' }}>
+            View My Pets
+          </Link>
+          <Link to="/user/vaccinations" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
+            💉 Vaccination Schedule
+          </Link>
+        </div>
       </div>
 
       <div className="card">

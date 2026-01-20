@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../api/axios';
 import { generatePetPDF } from '../../utils/pdfGenerator';
 import './PetProfile.css';
 
@@ -14,7 +14,7 @@ const PetProfile = () => {
     const fetchPetDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/pets/petid/${petId}`);
+        const response = await axios.get(`/api/pets/${petId}`);
         setPet(response.data.pet);
         setError('');
       } catch (err) {

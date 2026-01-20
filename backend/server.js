@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const User = require('./models/User');
+const { scheduleVaccinationReminders } = require('./services/vaccinationScheduler');
 
 // Load environment variables
 dotenv.config();
@@ -59,6 +60,7 @@ const createAdminUser = async () => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/user'));
 app.use('/api/pets', require('./routes/pet'));
+app.use('/api/vaccinations', require('./routes/vaccination'));
 
 // Health check route
 app.get('/', (req, res) => {
@@ -79,6 +81,10 @@ const startServer = async () => {
     
     // Initialize admin user
     await createAdminUser();
+    
+    // Start vaccination reminder scheduler
+    scheduleVaccinationReminders();
+    console.log('Vaccination reminder scheduler initialized');
     
     // Start server
     const PORT = process.env.PORT || 5000;

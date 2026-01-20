@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { generatePetPDF } from '../../utils/pdfGenerator';
-import axios from 'axios';
+import axios from '../../api/axios';
 
 const PetRegistration = () => {
   const { userId } = useParams();
