@@ -13,7 +13,6 @@ const createTransporter = () => {
       }
     });
   } else {
-    // Development: Use console logging or ethereal
     return nodemailer.createTransporter({
       host: 'smtp.ethereal.email',
       port: 587,
@@ -252,8 +251,8 @@ const sendOverdueVaccinationEmail = async (vaccination, ownerEmail, ownerName, p
   }
 };
 
-// SMS notification placeholder (requires Twilio or similar service)
-const sendVaccinationReminderSMS = async (vaccination, phoneNumber, petName) => {  
+// SMS notification placeholder.
+const sendVaccinationReminderSMS = async (vaccination, phoneNumber, petName) => {
   console.log('SMS notification not yet implemented');
   console.log(`Would send SMS to ${phoneNumber} for ${petName}`);
   
@@ -265,3 +264,4 @@ module.exports = {
   sendOverdueVaccinationEmail,
   sendVaccinationReminderSMS
 };
+
