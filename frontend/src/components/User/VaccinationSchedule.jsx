@@ -114,7 +114,7 @@ const VaccinationSchedule = () => {
 
       {/* Upcoming Vaccinations Section */}
       <div className="card">
-        <h3>Upcoming Vaccinations (Next 30 Days)</h3>
+        <h3>Upcoming Vaccinations (Next Year)</h3>
         
         {pets.length > 1 && (
           <div style={{ marginBottom: '20px' }}>
