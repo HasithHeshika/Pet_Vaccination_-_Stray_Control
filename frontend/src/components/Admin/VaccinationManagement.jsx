@@ -127,6 +127,28 @@ const VaccinationManagement = () => {
     });
   };
 
+  const handleDelete = async (vaccinationId) => {
+    if (!window.confirm('Are you sure you want to delete this vaccination record? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/api/vaccinations/${vaccinationId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      setSuccess('Vaccination record deleted successfully!');
+      setError('');
+      
+      // Refresh vaccinations list
+      fetchPetAndVaccinations();
+    } catch (err) {
+      console.error('Error deleting vaccination:', err);
+      setError(err.response?.data?.message || 'Failed to delete vaccination record');
+      setSuccess('');
+    }
+  };
+
   const getStatusBadge = (status) => {
     const styles = {
       administered: { background: '#28a745', color: 'white' },
@@ -189,12 +211,14 @@ const VaccinationManagement = () => {
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h3>Vaccination Records ({vaccinations.length})</h3>
-          <button 
-            onClick={() => setShowForm(!showForm)}
-            className="btn btn-primary"
-          >
-            {showForm ? 'Cancel' : '+ Add Vaccination'}
-          </button>
+          {!showForm && (
+            <button 
+              onClick={() => setShowForm(true)}
+              className="btn btn-primary"
+            >
+              + Add Vaccination
+            </button>
+          )}
         </div>
 
         {showForm && (
@@ -361,6 +385,7 @@ const VaccinationManagement = () => {
                   <th>Veterinarian</th>
                   <th>Status</th>
                   <th>Reminder Sent</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -378,6 +403,23 @@ const VaccinationManagement = () => {
                       ) : (
                         <span style={{ color: '#6c757d' }}>Pending</span>
                       )}
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleDelete(vacc._id)}
+                        className="btn btn-danger btn-small"
+                        style={{
+                          fontSize: '12px',
+                          padding: '5px 10px',
+                          backgroundColor: '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🗑️ Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
