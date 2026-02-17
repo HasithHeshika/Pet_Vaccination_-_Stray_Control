@@ -55,15 +55,15 @@ const UserList = () => {
       ) : (
         <div className="card">
           <div className="table-container">
-            <table>
+            <table className="data-table">
               <thead>
                 <tr>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>NIC Number</th>
-                  <th>City</th>
-                  <th>Actions</th>
+                  <th style={{ width: '15%' }}>Full Name</th>
+                  <th style={{ width: '20%' }}>Email</th>
+                  <th style={{ width: '12%' }}>Phone</th>
+                  <th style={{ width: '13%' }}>NIC Number</th>
+                  <th style={{ width: '12%' }}>City</th>
+                  <th style={{ width: '28%' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,13 +74,20 @@ const UserList = () => {
                     <td>{user.phone}</td>
                     <td>{user.nicNumber}</td>
                     <td>{user.address.city}</td>
-                    <td>
+                    <td className="actions-cell">
                       <button
                         onClick={() => handleRegisterPet(user._id)}
                         className="btn btn-primary"
-                        style={{ padding: '6px 12px', fontSize: '14px' }}
+                        style={{ padding: '6px 12px', fontSize: '13px', marginRight: '8px', whiteSpace: 'nowrap' }}
                       >
-                        Register Pet
+                        REGISTER PET
+                      </button>
+                      <button
+                        onClick={() => navigate(`/admin/edit-user/${user._id}`)}
+                        className="btn btn-secondary"
+                        style={{ padding: '6px 12px', fontSize: '13px' }}
+                      >
+                        ✏️ Edit
                       </button>
                     </td>
                   </tr>

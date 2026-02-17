@@ -9,7 +9,9 @@ import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
 import VaccinationManagement from './components/Admin/VaccinationManagement';
+import EditUser from './components/Admin/EditUser';
 import UserDashboard from './components/User/UserDashboard';
+import EditProfile from './components/User/EditProfile';
 import MyPets from './components/User/MyPets';
 import VaccinationSchedule from './components/User/VaccinationSchedule';
 import PetProfile from './components/Public/PetProfile';
@@ -58,20 +60,29 @@ const HomePage = () => {
   }
 
   return (
-    <div className="dashboard">
-      <div className="card" style={{ textAlign: 'center', maxWidth: '600px', margin: '50px auto' }}>
-        <h1>🐾 Welcome to Pet Management System</h1>
-        <p style={{ fontSize: '18px', marginTop: '20px', lineHeight: '1.6' }}>
-          A comprehensive system for managing pet ownership records, vaccination schedules, 
-          and QR-based pet identification.
-        </p>
-        <div style={{ marginTop: '30px', display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/login" className="btn btn-primary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
-            Login
-          </a>
-          <a href="/signup" className="btn btn-secondary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
-            Sign Up
-          </a>
+    <div className="home-page">
+      <div className="hero-section">
+        <div className="hero-content">
+          <div className="hero-icon">🐾</div>
+          <h1 className="hero-title">Welcome to Pet Management System</h1>
+          <p className="hero-subtitle">
+            A comprehensive system for managing pet ownership records, vaccination schedules, 
+            and QR-based pet identification.
+          </p>
+          <div className="hero-buttons">
+            <a href="/login" className="btn btn-primary btn-large">
+              LOGIN
+            </a>
+            <a href="/signup" className="btn btn-secondary btn-large">
+              SIGN UP
+            </a>
+          </div>
+        </div>
+        <div className="pet-images">
+          <div className="pet-image pet-1">🐕</div>
+          <div className="pet-image pet-2">🐈</div>
+          <div className="pet-image pet-3">🦜</div>
+          <div className="pet-image pet-4">🐰</div>
         </div>
       </div>
     </div>
@@ -148,6 +159,14 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/edit-user/:userId"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <EditUser />
+              </ProtectedRoute>
+            }
+          />
 
           {/* User Routes */}
           <Route
@@ -171,6 +190,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <VaccinationSchedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/edit-profile"
+            element={
+              <ProtectedRoute>
+                <EditProfile />
               </ProtectedRoute>
             }
           />

@@ -9,12 +9,35 @@ const UserDashboard = () => {
     <div className="dashboard">
       <h1>Welcome, {user?.fullName}!</h1>
       
-      <div className="card">
-        <h3>My Account</h3>
-        <p><strong>Email:</strong> {user?.email}</p>
-        <p><strong>Phone:</strong> {user?.phone}</p>
-        <p><strong>NIC:</strong> {user?.nicNumber}</p>
-        <p><strong>Address:</strong> {user?.address?.street}, {user?.address?.city}, {user?.address?.province}</p>
+      <div className="card account-card">
+        <div className="account-header">
+          <div className="avatar-chip">{(user?.fullName || 'U').slice(0, 1)}</div>
+          <div>
+            <p className="eyebrow">My Account</p>
+            <h3>{user?.fullName}</h3>
+            <p className="muted">Stay on top of your info and keep vaccinations aligned.</p>
+          </div>
+          <div className="status-badge">Verified</div>
+        </div>
+
+        <div className="detail-grid">
+          <div className="detail-item">
+            <p className="label">Email</p>
+            <p className="value">{user?.email}</p>
+          </div>
+          <div className="detail-item">
+            <p className="label">Phone</p>
+            <p className="value">{user?.phone}</p>
+          </div>
+          <div className="detail-item">
+            <p className="label">NIC</p>
+            <p className="value">{user?.nicNumber}</p>
+          </div>
+          <div className="detail-item">
+            <p className="label">Address</p>
+            <p className="value">{user?.address?.street}, {user?.address?.city}, {user?.address?.province}</p>
+          </div>
+        </div>
       </div>
 
       <div className="card">
@@ -25,6 +48,9 @@ const UserDashboard = () => {
           </Link>
           <Link to="/user/vaccinations" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
             💉 Vaccination Schedule
+          </Link>
+          <Link to="/user/edit-profile" className="btn btn-success" style={{ width: 'auto', minWidth: '150px' }}>
+            ⚙️ Edit Profile
           </Link>
         </div>
       </div>

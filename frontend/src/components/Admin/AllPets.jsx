@@ -383,7 +383,7 @@ const AllPets = () => {
           padding: 20px;
           background: #f9f9f9;
           border-radius: 8px;
-          border-left: 4px solid #667eea;
+          border-left: 4px solid #4FC3F7;
         }
 
         .detail-section h3 {
