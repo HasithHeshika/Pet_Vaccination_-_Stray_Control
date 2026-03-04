@@ -1,7 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import LandingPage from './components/LandingPage';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import AdminDashboard from './components/Admin/AdminDashboard';
@@ -49,42 +51,31 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// Home Page Component
-const HomePage = () => {
-  const { isAuthenticated, isAdmin } = useAuth();
-
-  if (isAuthenticated) {
-    return <Navigate to={isAdmin ? '/admin/dashboard' : '/user/dashboard'} replace />;
-  }
-
-  return (
-    <div className="dashboard">
-      <div className="card" style={{ textAlign: 'center', maxWidth: '600px', margin: '50px auto' }}>
-        <h1>🐾 Welcome to Pet Management System</h1>
-        <p style={{ fontSize: '18px', marginTop: '20px', lineHeight: '1.6' }}>
-          A comprehensive system for managing pet ownership records, vaccination schedules, 
-          and QR-based pet identification.
-        </p>
-        <div style={{ marginTop: '30px', display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/login" className="btn btn-primary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
-            Login
-          </a>
-          <a href="/signup" className="btn btn-secondary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
-            Sign Up
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 function AppContent() {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const location = useLocation();
+
+  // Show Navbar on all pages except landing page when not authenticated
+  const showNavbar = isAuthenticated || location.pathname !== '/';
+
+  // Remove padding for landing page only
+  const isLandingPage = location.pathname === '/' && !isAuthenticated && !loading;
+
   return (
     <div className="app-container">
-      <Navbar />
-      <div className="main-content">
+      {showNavbar && <Navbar />}
+      <div className="main-content" style={isLandingPage ? { padding: 0, maxWidth: 'none' } : {}}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route 
+            path="/" 
+            element={
+              isAuthenticated ? (
+                <Navigate to={isAdmin ? '/admin/dashboard' : '/user/dashboard'} replace />
+              ) : (
+                <LandingPage />
+              )
+            } 
+          />
           
           {/* Public Routes */}
           <Route 
@@ -179,6 +170,7 @@ function AppContent() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+      <Footer />
     </div>
   );
 }
