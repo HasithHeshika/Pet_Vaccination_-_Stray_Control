@@ -1,7 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import LandingPage from './components/Public/LandingPage';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import AdminDashboard from './components/Admin/AdminDashboard';
@@ -51,51 +53,31 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// Home Page Component
-const HomePage = () => {
-  const { isAuthenticated, isAdmin } = useAuth();
-
-  if (isAuthenticated) {
-    return <Navigate to={isAdmin ? '/admin/dashboard' : '/user/dashboard'} replace />;
-  }
-
-  return (
-    <div className="home-page">
-      <div className="hero-section">
-        <div className="hero-content">
-          <div className="hero-icon">🐾</div>
-          <h1 className="hero-title">Welcome to Pet Management System</h1>
-          <p className="hero-subtitle">
-            A comprehensive system for managing pet ownership records, vaccination schedules, 
-            and QR-based pet identification.
-          </p>
-          <div className="hero-buttons">
-            <a href="/login" className="btn btn-primary btn-large">
-              LOGIN
-            </a>
-            <a href="/signup" className="btn btn-secondary btn-large">
-              SIGN UP
-            </a>
-          </div>
-        </div>
-        <div className="pet-images">
-          <div className="pet-image pet-1">🐕</div>
-          <div className="pet-image pet-2">🐈</div>
-          <div className="pet-image pet-3">🦜</div>
-          <div className="pet-image pet-4">🐰</div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 function AppContent() {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const location = useLocation();
+
+  // Show Navbar on all pages except landing page when not authenticated
+  const showNavbar = isAuthenticated || location.pathname !== '/';
+
+  // Remove padding for landing page only
+  const isLandingPage = location.pathname === '/' && !isAuthenticated && !loading;
+
   return (
     <div className="app-container">
-      <Navbar />
-      <div className="main-content">
+      {showNavbar && <Navbar />}
+      <div className="main-content" style={isLandingPage ? { padding: 0, maxWidth: 'none' } : {}}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route 
+            path="/" 
+            element={
+              isAuthenticated ? (
+                <Navigate to={isAdmin ? '/admin/dashboard' : '/user/dashboard'} replace />
+              ) : (
+                <LandingPage />
+              )
+            } 
+          />
           
           {/* Public Routes */}
           <Route 
@@ -206,6 +188,7 @@ function AppContent() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+      <Footer />
     </div>
   );
 }
