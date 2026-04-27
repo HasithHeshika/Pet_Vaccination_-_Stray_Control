@@ -42,8 +42,9 @@ const Login = () => {
   };
 
   return (
-    <div className="form-container">
-      <h2>Login</h2>
+    <div className="auth-page">
+      <div className="form-container">
+        <h2>🐾 Login</h2>
       
       {error && <div className="error-message">{error}</div>}
       
@@ -78,8 +79,9 @@ const Login = () => {
       </form>
 
       <Link to="/signup" className="link">
-        Don't have an account? Sign up here
+        Don't have an account? Sign up
       </Link>
+      </div>
     </div>
   );
 };
