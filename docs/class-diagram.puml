@@ -1,0 +1,169 @@
+@startuml Pet_Management_System_Class_Diagram
+
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam backgroundColor #FEFEFE
+skinparam roundcorner 10
+
+' Title
+title Pet Vaccination & Stray Control System\nClass Diagram (Actual Implementation)
+
+' Enumerations
+enum PetType {
+  Dog
+  Cat
+  Bird
+  Rabbit
+  Hamster
+  Other
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum VaccinationStatus {
+  scheduled
+  administered
+  overdue
+  cancelled
+}
+
+enum VaccineType {
+  Rabies
+  DHPP
+  Bordetella
+  Leptospirosis
+  LymeDisease
+  CanineInfluenza
+  FVRCP
+  FeLV
+  FIV
+  Other
+}
+
+' Main Classes
+class User {
+  - ObjectId _id
+  - String fullName
+  - String email
+  - String password
+  - String phone
+  - Address address
+  - String nicNumber
+  - Boolean isAdmin
+  - Date createdAt
+  __
+  + comparePassword(String): Boolean
+}
+
+class Address <<embedded>> {
+  - String street
+  - String city
+  - String province
+  - String postalCode
+}
+
+class Pet {
+  - ObjectId _id
+  - String petId
+  - ObjectId owner
+  - String petName
+  - PetType petType
+  - String petTypeOther
+  - String breed
+  - String breedOther
+  - Age age
+  - Gender gender
+  - String color
+  - Number weight
+  - String microchipNumber
+  - MedicalHistory medicalHistory
+  - String photoUrl
+  - String qrCode
+  - Date registrationDate
+}
+
+class Age <<embedded>> {
+  - Number years
+  - Number months
+}
+
+class MedicalHistory <<embedded>> {
+  - String allergies
+  - String existingConditions
+  - String specialNotes
+}
+
+class Vaccination {
+  - ObjectId _id
+  - ObjectId pet
+  - VaccineType vaccineType
+  - String vaccineName
+  - Date dateAdministered
+  - Date nextDueDate
+  - String veterinarianName
+  - String clinicName
+  - String batchNumber
+  - String notes
+  - VaccinationStatus status
+  - Boolean reminderSent
+  - Date reminderSentDate
+  - NotificationPreference notificationPreference
+  - ObjectId createdBy
+  - Date createdAt
+  - Date updatedAt
+  __
+  + isOverdue(): Boolean
+}
+
+class NotificationPreference <<embedded>> {
+  - Boolean email
+  - Boolean sms
+}
+
+' Relationships
+User "1" *-- "1" Address : contains
+User "1" -- "0..*" Pet : owns >
+Pet "1" *-- "1" Age : contains
+Pet "1" *-- "1" MedicalHistory : contains
+Pet "1" -- "0..*" Vaccination : has >
+Vaccination "0..*" -- "1" User : createdBy <
+Vaccination "1" *-- "1" NotificationPreference : contains
+
+Pet ..> PetType : <<uses>>
+Pet ..> Gender : <<uses>>
+Vaccination ..> VaccineType : <<uses>>
+Vaccination ..> VaccinationStatus : <<uses>>
+
+note right of User
+  **Authentication:**
+  - Password auto-hashed on save
+  - JWT tokens (7-day expiration)
+  - isAdmin flag for elevated permissions
+end note
+
+note right of Pet
+  **Auto-generated:**
+  - petId (unique identifier)
+  - qrCode (for identification)
+  
+  **Features:**
+  - Public QR-based pet profiles
+  - Lost & found tracking
+end note
+
+note right of Vaccination
+  **Automated System:**
+  - Daily scheduler (9 AM)
+  - Email reminders (7 days before)
+  - Auto status updates (overdue)
+  
+  **Indexes:**
+  - pet + nextDueDate
+  - nextDueDate + status
+  - reminderSent + nextDueDate
+end note
+
+@enduml

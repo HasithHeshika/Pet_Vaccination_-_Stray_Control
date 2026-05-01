@@ -74,8 +74,9 @@ const Signup = () => {
   };
 
   return (
-    <div className="form-container" style={{ maxWidth: '600px' }}>
-      <h2>Sign Up</h2>
+    <div className="auth-page">
+      <div className="form-container" style={{ maxWidth: '600px' }}>
+        <h2>🐾 Sign Up</h2>
       
       {error && <div className="error-message">{error}</div>}
       
@@ -219,8 +220,9 @@ const Signup = () => {
       </form>
 
       <Link to="/login" className="link">
-        Already have an account? Login here
+        Already have an account? Login
       </Link>
+      </div>
     </div>
   );
 };
