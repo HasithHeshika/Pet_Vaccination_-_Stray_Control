@@ -63,13 +63,13 @@ function AppContent() {
   // Show Navbar on all pages except landing page when not authenticated
   const showNavbar = isAuthenticated || location.pathname !== '/';
 
-  // Remove padding for landing page only
-  const isLandingPage = location.pathname === '/' && !isAuthenticated && !loading;
+  // Remove padding for landing, login, and signup pages to allow full-width backgrounds
+  const isFullWidthPage = ['/', '/login', '/signup'].includes(location.pathname);
 
   return (
     <div className="app-container">
       {showNavbar && <Navbar />}
-      <div className="main-content" style={isLandingPage ? { padding: 0, maxWidth: 'none' } : {}}>
+      <div className="main-content" style={isFullWidthPage ? { padding: 0, maxWidth: 'none' } : {}}>
         <Routes>
           <Route 
             path="/" 

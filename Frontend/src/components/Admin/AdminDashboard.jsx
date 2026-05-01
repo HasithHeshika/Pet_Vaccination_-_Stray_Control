@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../../utils/api';
+import axios from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
 import DashboardSummaryCards from './StrayReports/DashboardSummaryCards';
 import ReportsCharts from './StrayReports/ReportsCharts';
 import RecentStrayReportsTable from './StrayReports/RecentStrayReportsTable';
@@ -17,34 +19,47 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [lostReports, setLostReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
+
+  const loadReports = async (isMounted = true) => {
+    try {
+      const [strayRes, lostRes] = await Promise.all([
+        apiRequest('/api/stray-reports', { headers: { Authorization: `Bearer ${token}` } }).catch(() => []),
+        apiRequest('/api/lost-and-found', { headers: { Authorization: `Bearer ${token}` } }).catch(() => [])
+      ]);
+
+      const liveReports = normalizeReports(strayRes);
+      const liveLostReports = Array.isArray(lostRes) ? lostRes : [];
+
+      if (isMounted) {
+        setReports(liveReports);
+        setLostReports(liveLostReports);
+      }
+    } catch (error) {
+      console.error('Failed to load reports:', error);
+    } finally {
+      if (isMounted) setLoading(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
-
-    const loadReports = async () => {
-      try {
-        const [strayRes, lostRes] = await Promise.all([
-          apiRequest('/api/stray-reports').catch(() => []),
-          apiRequest('/api/lost-and-found').catch(() => [])
-        ]);
-
-        const liveReports = normalizeReports(strayRes);
-        const liveLostReports = Array.isArray(lostRes) ? lostRes : [];
-
-        if (isMounted) {
-          setReports(liveReports);
-          setLostReports(liveLostReports);
-        }
-      } catch (error) {
-        console.error('Failed to load stray reports:', error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    loadReports();
+    loadReports(isMounted);
     return () => { isMounted = false; };
-  }, []);
+  }, [token]);
+
+  const handleUpdateStrayStatus = async (id, newStatus) => {
+    try {
+      await axios.patch(`/api/stray-reports/${id}/status`, 
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Refresh reports after update
+      loadReports(true);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to update stray report status');
+    }
+  };
 
   const sortedReports = useMemo(() => {
     return [...reports].sort(
@@ -88,6 +103,10 @@ const AdminDashboard = () => {
           Stray Reports Status
         </span>
 
+        <Link to="/report-stray" className="btn btn-small" style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}>
+          🚨 Report a Stray
+        </Link>
+
         <Link to="/admin/users" className="btn btn-secondary btn-small">
           View Users
         </Link>
@@ -102,7 +121,10 @@ const AdminDashboard = () => {
       {summary.total > 0 && <ReportsCharts statusCounts={summary} />}
 
       {sortedReports.length > 0 && (
-        <RecentStrayReportsTable reports={sortedReports} />
+        <RecentStrayReportsTable 
+          reports={sortedReports} 
+          onUpdateStatus={handleUpdateStrayStatus} 
+        />
       )}
 
       {lostReports.length > 0 && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -22,6 +22,11 @@ const Signup = () => {
   
   const { signup } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.classList.add('auth-bg-override');
+    return () => document.body.classList.remove('auth-bg-override');
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

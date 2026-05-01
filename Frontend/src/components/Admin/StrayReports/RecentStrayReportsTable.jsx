@@ -11,7 +11,7 @@ const formatDate = (dateValue) => new Date(dateValue).toLocaleString('en-LK', {
   timeStyle: 'short'
 });
 
-const RecentStrayReportsTable = ({ reports }) => {
+const RecentStrayReportsTable = ({ reports, onUpdateStatus }) => {
   return (
     <div className="card table-card">
       <h3>Recent Stray Reports</h3>
@@ -24,6 +24,7 @@ const RecentStrayReportsTable = ({ reports }) => {
               <th>Status</th>
               <th>Reported By</th>
               <th>Reported At</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -38,6 +39,18 @@ const RecentStrayReportsTable = ({ reports }) => {
                 </td>
                 <td>{report.reportedBy?.fullName || 'Anonymous'}</td>
                 <td>{formatDate(report.reportedAt)}</td>
+                <td>
+                  <select 
+                    value={report.status} 
+                    onChange={(e) => onUpdateStatus && onUpdateStatus(report._id, e.target.value)}
+                    className="form-control"
+                    style={{ padding: '4px', fontSize: '12px', width: 'auto' }}
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                </td>
               </tr>
             ))}
           </tbody>

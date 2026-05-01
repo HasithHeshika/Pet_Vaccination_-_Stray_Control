@@ -8,6 +8,8 @@ const {
 } = require('../controllers/strayReportController');
 
 const router = express.Router();
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -35,19 +37,21 @@ router.post(
 
 // @route   GET /api/stray-reports
 // @desc    Get all stray reports
-// @access  Public
-router.get('/', getStrayReports);
+// @access  Private/Admin
+router.get('/', auth, admin, getStrayReports);
 
 // @route   GET /api/stray-reports/:id
 // @desc    Get a single stray report
-// @access  Public
-router.get('/:id', getStrayReportById);
+// @access  Private/Admin
+router.get('/:id', auth, admin, getStrayReportById);
 
 // @route   PATCH /api/stray-reports/:id/status
 // @desc    Update report status
-// @access  Public (can be secured later without changing the API shape)
+// @access  Private/Admin
 router.patch(
   '/:id/status',
+  auth,
+  admin,
   [
     body('status').isIn(['pending', 'in-progress', 'resolved']).withMessage('Invalid status')
   ],

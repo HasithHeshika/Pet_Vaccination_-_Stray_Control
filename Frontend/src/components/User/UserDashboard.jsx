@@ -49,6 +49,9 @@ const UserDashboard = () => {
           <Link to="/user/vaccinations" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
             💉 Vaccination Schedule
           </Link>
+          <Link to="/report-stray" className="btn" style={{ width: 'auto', minWidth: '150px', backgroundColor: '#000', color: '#fff', border: 'none' }}>
+            🚨 Report a Stray
+          </Link>
           <Link to="/user/edit-profile" className="btn btn-success" style={{ width: 'auto', minWidth: '150px' }}>
             ⚙️ Edit Profile
           </Link>

@@ -26,6 +26,9 @@ const Navbar = () => {
           
           {isAuthenticated ? (
             <>
+              <Link to={user?.isAdmin ? "/admin/dashboard" : "/user/dashboard"} className="navbar-link" style={{ fontWeight: 'bold' }}>
+                My Dashboard
+              </Link>
               <span className="navbar-user">
                 Welcome, {user?.fullName} {user?.isAdmin && '(Admin)'}
               </span>

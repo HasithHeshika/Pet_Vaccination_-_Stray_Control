@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +12,11 @@ const Login = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.classList.add('auth-bg-override');
+    return () => document.body.classList.remove('auth-bg-override');
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -28,12 +33,7 @@ const Login = () => {
     const result = await login(formData.email, formData.password);
     
     if (result.success) {
-      // Redirect based on user role using the returned user data
-      if (result.user?.isAdmin) {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/user/dashboard');
-      }
+      navigate('/');
     } else {
       setError(result.message);
     }
