@@ -24,7 +24,7 @@ import './App.css';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -43,7 +43,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
     return <div className="loading">Loading...</div>;
