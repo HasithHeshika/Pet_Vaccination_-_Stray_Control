@@ -133,6 +133,18 @@ const AllPets = () => {
             </div>
             
             <div className="modal-body">
+              {/* Pet Photo Section */}
+              {selectedPet.photoUrl && (
+                <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+                  <img 
+                    src={selectedPet.photoUrl} 
+                    alt={selectedPet.petName} 
+                    style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                </div>
+              )}
+
               {/* Pet Information Section */}
               <div className="detail-section">
                 <h3>🐾 Pet Information</h3>

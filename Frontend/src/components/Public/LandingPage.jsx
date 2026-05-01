@@ -5,222 +5,90 @@ import './LandingPage.css';
 const LandingPage = () => {
   return (
     <div className="landing-page">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">
-              🐾 Pet Ownership, Vaccination & Stray Control System
-            </h1>
-            <p className="hero-subtitle">
-              A comprehensive digital platform for managing pet registrations, 
-              vaccination tracking, and stray animal reporting. Ensuring responsible 
-              pet ownership and community safety.
-            </p>
-            <div className="hero-buttons">
-              <Link to="/signup" className="btn btn-primary btn-large">
-                Get Started
-              </Link>
-              <Link to="/login" className="btn btn-secondary btn-large">
-                Login
-              </Link>
+      {/* Modern Hero Section */}
+      <section className="modern-hero">
+        <div className="hero-text-content">
+          <h1 className="hero-title">
+            [Your Main Heading Here]
+          </h1>
+          <p className="hero-subtitle">
+            [Enter your detailed subtitle or description here to explain your system's purpose and value proposition.]
+          </p>
+          <div className="hero-buttons">
+            <Link to="/signup" className="btn-modern btn-black">
+              [Primary Action]
+            </Link>
+            <Link to="/lost-and-found" className="btn-modern btn-outline">
+              <span className="play-icon">🔍</span> [Secondary Action]
+            </Link>
+          </div>
+        </div>
+
+        {/* Hero Image Container */}
+        <div className="hero-image-wrapper">
+          {/* Replace this src with your actual hero image URL */}
+          <img 
+            src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=80" 
+            alt="Hero image placeholder" 
+            className="hero-cat-img"
+          />
+        </div>
+
+        {/* Floating Glass Panel */}
+        <div className="hero-glass-panel">
+          <div className="glass-card left-glass-card">
+            <div className="glass-text">
+              <h4>[Glass Card Title]</h4>
+              <p className="glass-sub">[Glass Card Subtitle or Details]</p>
+              <p className="glass-highlight">[Highlight Text]</p>
+            </div>
+            <div className="glass-card-img">
+              {/* Replace with actual small image */}
+              <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=200&q=80" alt="Feature placeholder" />
             </div>
           </div>
-          <div className="hero-image">
-            <img 
-              src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600&h=500&fit=crop" 
-              alt="Happy pets" 
-              className="hero-img"
-            />
+
+          <div className="glass-card right-glass-card">
+            <h4>[Second Card Title]</h4>
+            <div className="expert-avatars">
+              {/* Replace with your actual icons, avatars, or remove this section */}
+              <div className="avatar placeholder-avatar"></div>
+              <div className="avatar placeholder-avatar"></div>
+              <div className="avatar placeholder-avatar"></div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Modern Features Section */}
       <section className="features-section">
-        <h2 className="section-title">Our Key Features</h2>
+        <h2 className="section-title">[Features Section Title]</h2>
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">
-              <img 
-                src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop" 
-                alt="Pet Registration" 
-                className="feature-img"
-              />
+            <div className="feature-img-wrapper">
+              {/* Replace with actual feature image */}
+              <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop" alt="Feature 1" />
             </div>
-            <h3>Pet Registration</h3>
-            <ul className="feature-list">
-              <li>Secure owner-pet record creation</li>
-              <li>QR code-based identification</li>
-              <li>Lost-and-found pet tracking</li>
-              <li>Digital pet profiles</li>
-            </ul>
+            <h3>[Feature 1 Title]</h3>
+            <p>[Detailed description for feature 1 goes here.]</p>
           </div>
 
           <div className="feature-card">
-            <div className="feature-icon">
-              <img 
-                src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=300&fit=crop" 
-                alt="Vaccination Management" 
-                className="feature-img"
-              />
+            <div className="feature-img-wrapper">
+              {/* Replace with actual feature image */}
+              <img src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=300&fit=crop" alt="Feature 2" />
             </div>
-            <h3>Vaccination Management</h3>
-            <ul className="feature-list">
-              <li>Automated vaccination reminders</li>
-              <li>Complete vaccination history</li>
-              <li>Veterinarian access for updates</li>
-              <li>Reduce rabies risk through tracking</li>
-            </ul>
+            <h3>[Feature 2 Title]</h3>
+            <p>[Detailed description for feature 2 goes here.]</p>
           </div>
 
           <div className="feature-card">
-            <div className="feature-icon">
-              <img 
-                src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=300&fit=crop" 
-                alt="Stray Animal Control" 
-                className="feature-img"
-              />
+            <div className="feature-img-wrapper">
+              {/* Replace with actual feature image */}
+              <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=300&fit=crop" alt="Feature 3" />
             </div>
-            <h3>Stray Animal Reporting</h3>
-            <ul className="feature-list">
-              <li>Easy stray sighting reporting</li>
-              <li>Municipal dashboards for monitoring</li>
-              <li>Track stray populations effectively</li>
-              <li>Community safety enhancement</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Problems & Solutions Section */}
-      <section className="problem-solution-section">
-        <div className="content-wrapper">
-          <div className="problem-side">
-            <h2>The Problem</h2>
-            <div className="problem-list">
-              <div className="problem-item">
-                <span className="problem-icon">❌</span>
-                <p>Low registration rates leading to ineffective tracking</p>
-              </div>
-              <div className="problem-item">
-                <span className="problem-icon">❌</span>
-                <p>Increased risk of rabies due to missed vaccinations</p>
-              </div>
-              <div className="problem-item">
-                <span className="problem-icon">❌</span>
-                <p>Difficulty monitoring stray animal populations</p>
-              </div>
-              <div className="problem-item">
-                <span className="problem-icon">❌</span>
-                <p>Poor communication between owners, vets, and authorities</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="solution-side">
-            <h2>Our Solution</h2>
-            <div className="solution-list">
-              <div className="solution-item">
-                <span className="solution-icon">✅</span>
-                <p>Centralized digital registration system</p>
-              </div>
-              <div className="solution-item">
-                <span className="solution-icon">✅</span>
-                <p>Automated reminders and vaccination tracking</p>
-              </div>
-              <div className="solution-item">
-                <span className="solution-icon">✅</span>
-                <p>Real-time stray animal monitoring dashboards</p>
-              </div>
-              <div className="solution-item">
-                <span className="solution-icon">✅</span>
-                <p>Integrated platform for all stakeholders</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="benefits-section">
-        <h2 className="section-title">Who Benefits?</h2>
-        <div className="benefits-grid">
-          <div className="benefit-card">
-            <div className="benefit-icon">👨‍👩‍👧‍👦</div>
-            <h3>Pet Owners</h3>
-            <p>
-              Easy registration, vaccination reminders, digital health records, 
-              and lost pet tracking
-            </p>
-          </div>
-
-          <div className="benefit-card">
-            <div className="benefit-icon">👨‍⚕️</div>
-            <h3>Veterinarians</h3>
-            <p>
-              Direct access to update pet health records and vaccination status 
-              in real-time
-            </p>
-          </div>
-
-          <div className="benefit-card">
-            <div className="benefit-icon">🏛️</div>
-            <h3>Authorities</h3>
-            <p>
-              Comprehensive dashboards for tracking compliance and managing 
-              stray populations
-            </p>
-          </div>
-
-          <div className="benefit-card">
-            <div className="benefit-icon">🏢</div>
-            <h3>Breeders</h3>
-            <p>
-              Licensing management, compliance monitoring, and breeder 
-              registration system
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="stats-section">
-        <div className="stats-grid">
-          <div className="stat-card">
-            <h3 className="stat-number">🔒</h3>
-            <p className="stat-label">Secure QR-Based Identification</p>
-          </div>
-          <div className="stat-card">
-            <h3 className="stat-number">📱</h3>
-            <p className="stat-label">User-Friendly Mobile Access</p>
-          </div>
-          <div className="stat-card">
-            <h3 className="stat-number">🔔</h3>
-            <p className="stat-label">Automated Reminders</p>
-          </div>
-          <div className="stat-card">
-            <h3 className="stat-number">📊</h3>
-            <p className="stat-label">Real-Time Dashboards</p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="cta-section">
-        <div className="cta-content">
-          <h2>Ready to Get Started?</h2>
-          <p>
-            Join us in promoting responsible pet ownership and community safety. 
-            Register your pet today and stay on top of vaccination schedules.
-          </p>
-          <div className="cta-buttons">
-            <Link to="/signup" className="btn btn-primary btn-large">
-              Create Account
-            </Link>
-            <Link to="/login" className="btn btn-outline btn-large">
-              Already have an account? Login
-            </Link>
+            <h3>[Feature 3 Title]</h3>
+            <p>[Detailed description for feature 3 goes here.]</p>
           </div>
         </div>
       </section>

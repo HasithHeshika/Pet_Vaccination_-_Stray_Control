@@ -96,7 +96,12 @@ const PetProfile = () => {
         {/* Pet Photo */}
         {pet.photoUrl && (
           <div className="pet-photo-section">
-            <img src={pet.photoUrl} alt={pet.petName} className="pet-photo" />
+            <img 
+              src={pet.photoUrl} 
+              alt={pet.petName} 
+              className="pet-photo" 
+              onError={(e) => e.target.style.display = 'none'}
+            />
           </div>
         )}
 
