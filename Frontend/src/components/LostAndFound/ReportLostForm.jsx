@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
 import './LostFound.css';
 
 const ReportLostForm = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { token } = useAuth();
+  const isEditMode = Boolean(id);
+
   const [formData, setFormData] = useState({
     petName: '',
     breed: '',
@@ -13,9 +18,40 @@ const ReportLostForm = () => {
     lastSeenDate: '',
     description: '',
     contactInfo: '',
+    imageUrl: '',
+    status: 'Lost', // only relevant if editing, but good to have
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchReport = async () => {
+        try {
+          const res = await axios.get(`/api/lost-and-found/${id}`);
+          const data = res.data;
+          
+          // Format the date for the input type="date"
+          const formattedDate = data.lastSeenDate ? new Date(data.lastSeenDate).toISOString().split('T')[0] : '';
+          
+          setFormData({
+            petName: data.petName || '',
+            breed: data.breed || '',
+            color: data.color || '',
+            lastSeenLocation: data.lastSeenLocation || '',
+            lastSeenDate: formattedDate,
+            description: data.description || '',
+            contactInfo: data.contactInfo || '',
+            imageUrl: data.imageUrl || '',
+            status: data.status || 'Lost',
+          });
+        } catch (err) {
+          setError('Failed to fetch the report for editing.');
+        }
+      };
+      fetchReport();
+    }
+  }, [id, isEditMode]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,21 +63,26 @@ const ReportLostForm = () => {
     setError('');
 
     try {
-      // Mock API post for Sprint 4 frontend phase
-      console.log('Submitted:', formData);
-      setTimeout(() => {
-        setLoading(false);
-        navigate('/lost-and-found');
-      }, 1000);
+      if (isEditMode) {
+        await axios.put(`/api/lost-and-found/${id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } else {
+        await axios.post('/api/lost-and-found', formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+      setLoading(false);
+      navigate('/lost-and-found');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to submit report. Please try again.');
+      setError(err.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'submit'} report. Please try again.`);
       setLoading(false);
     }
   };
 
   return (
     <div className="report-lost-container">
-      <h2>Report a Missing Pet</h2>
+      <h2>{isEditMode ? 'Edit Missing Pet Report' : 'Report a Missing Pet'}</h2>
       <p>Please provide as much detail as possible to help identify your pet.</p>
       
       {error && <div className="error-message">{error}</div>}
@@ -110,6 +151,23 @@ const ReportLostForm = () => {
           />
         </div>
 
+        {isEditMode && (
+          <div className="form-group">
+            <label>Report Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="form-control"
+            >
+              <option value="Lost">Lost (Still Missing)</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Found">Found</option>
+              <option value="Resolved">Resolved (Reunited!)</option>
+            </select>
+          </div>
+        )}
+
         <div className="form-group">
           <label>Additional Description</label>
           <textarea
@@ -120,6 +178,18 @@ const ReportLostForm = () => {
             className="form-control"
             placeholder="Describe any collar, tags, behaviors, etc."
           ></textarea>
+        </div>
+
+        <div className="form-group">
+          <label>Photo URL (Optional)</label>
+          <input
+            type="text"
+            name="imageUrl"
+            value={formData.imageUrl}
+            onChange={handleChange}
+            className="form-control"
+            placeholder="https://example.com/pet-image.jpg"
+          />
         </div>
 
         <div className="form-group">

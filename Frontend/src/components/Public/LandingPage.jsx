@@ -15,11 +15,11 @@ const LandingPage = () => {
             [Enter your detailed subtitle or description here to explain your system's purpose and value proposition.]
           </p>
           <div className="hero-buttons">
-            <Link to="/signup" className="btn-modern btn-black">
-              [Primary Action]
+            <Link to="/report-stray" className="btn-modern btn-black">
+              Report a Stray Animal
             </Link>
             <Link to="/lost-and-found" className="btn-modern btn-outline">
-              <span className="play-icon">🔍</span> [Secondary Action]
+              <span className="play-icon">🔍</span> Lost & Found
             </Link>
           </div>
         </div>

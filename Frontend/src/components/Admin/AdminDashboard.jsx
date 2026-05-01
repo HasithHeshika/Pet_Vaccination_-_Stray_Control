@@ -4,7 +4,7 @@ import { apiRequest } from '../../utils/api';
 import DashboardSummaryCards from './StrayReports/DashboardSummaryCards';
 import ReportsCharts from './StrayReports/ReportsCharts';
 import RecentStrayReportsTable from './StrayReports/RecentStrayReportsTable';
-import { mockStrayReports } from './StrayReports/mockStrayReports';
+import RecentLostReportsTable from './StrayReports/RecentLostReportsTable';
 import './AdminDashboard.css';
 
 const normalizeReports = (response) => {
@@ -14,8 +14,8 @@ const normalizeReports = (response) => {
 };
 
 const AdminDashboard = () => {
-  const [reports, setReports] = useState(mockStrayReports);
-  const [source, setSource] = useState('mock');
+  const [reports, setReports] = useState([]);
+  const [lostReports, setLostReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,21 +23,20 @@ const AdminDashboard = () => {
 
     const loadReports = async () => {
       try {
-        const response = await apiRequest('/api/stray-reports');
-        const liveReports = normalizeReports(response);
+        const [strayRes, lostRes] = await Promise.all([
+          apiRequest('/api/stray-reports').catch(() => []),
+          apiRequest('/api/lost-and-found').catch(() => [])
+        ]);
 
-        if (isMounted && liveReports.length > 0) {
+        const liveReports = normalizeReports(strayRes);
+        const liveLostReports = Array.isArray(lostRes) ? lostRes : [];
+
+        if (isMounted) {
           setReports(liveReports);
-          setSource('live');
-        } else if (isMounted) {
-          setReports(mockStrayReports);
-          setSource('mock');
+          setLostReports(liveLostReports);
         }
       } catch (error) {
-        if (isMounted) {
-          setReports(mockStrayReports);
-          setSource('mock');
-        }
+        console.error('Failed to load stray reports:', error);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -54,7 +53,7 @@ const AdminDashboard = () => {
   }, [reports]);
 
   const summary = useMemo(() => {
-    return sortedReports.reduce(
+    const straySummary = sortedReports.reduce(
       (acc, report) => {
         if (report.status === 'resolved') acc.resolved++;
         if (report.status === 'in-progress') acc.inProgress++;
@@ -64,7 +63,17 @@ const AdminDashboard = () => {
       },
       { total: 0, pending: 0, inProgress: 0, resolved: 0 }
     );
-  }, [sortedReports]);
+
+    return lostReports.reduce(
+      (acc, report) => {
+        if (report.status === 'Found') acc.resolved++;
+        if (report.status === 'Lost') acc.pending++;
+        acc.total++;
+        return acc;
+      },
+      straySummary
+    );
+  }, [sortedReports, lostReports]);
 
   return (
     <div className="dashboard admin-dashboard">
@@ -76,7 +85,7 @@ const AdminDashboard = () => {
 
       <div className="dashboard-toolbar">
         <span className="dashboard-chip">
-          Data source: {loading ? 'loading...' : source}
+          Stray Reports Status
         </span>
 
         <Link to="/admin/users" className="btn btn-secondary btn-small">
@@ -90,14 +99,14 @@ const AdminDashboard = () => {
 
       <DashboardSummaryCards {...summary} />
 
-      <ReportsCharts statusCounts={summary} />
+      {summary.total > 0 && <ReportsCharts statusCounts={summary} />}
 
-      {sortedReports.length > 0 ? (
+      {sortedReports.length > 0 && (
         <RecentStrayReportsTable reports={sortedReports} />
-      ) : (
-        <div className="card empty-state">
-          No stray reports are available yet.
-        </div>
+      )}
+
+      {lostReports.length > 0 && (
+        <RecentLostReportsTable reports={lostReports} />
       )}
     </div>
   );

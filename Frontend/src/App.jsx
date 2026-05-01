@@ -19,6 +19,7 @@ import VaccinationSchedule from './components/User/VaccinationSchedule';
 import PetProfile from './components/Public/PetProfile';
 import LostFoundFeed from './components/LostAndFound/LostFoundFeed';
 import ReportLostForm from './components/LostAndFound/ReportLostForm';
+import ReportStrayForm from './components/Stray/ReportStrayForm';
 import './App.css';
 
 // Protected Route Component
@@ -102,10 +103,21 @@ function AppContent() {
           {/* Public Pet Profile - No authentication required */}
           <Route path="/pet-profile/:petId" element={<PetProfile />} />
 
+          {/* Public Stray Report */}
+          <Route path="/report-stray" element={<ReportStrayForm />} />
+
           {/* Lost and Found Routes */}
           <Route path="/lost-and-found" element={<LostFoundFeed />} />
           <Route
             path="/lost-and-found/report"
+            element={
+              <ProtectedRoute>
+                <ReportLostForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lost-and-found/edit/:id"
             element={
               <ProtectedRoute>
                 <ReportLostForm />
