@@ -57,7 +57,7 @@ const PublicRoute = ({ children }) => {
 };
 
 function AppContent() {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const location = useLocation();
 
   // Show Navbar on all pages except landing page when not authenticated
