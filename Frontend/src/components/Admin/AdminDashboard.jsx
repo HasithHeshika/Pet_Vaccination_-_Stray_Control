@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../../utils/api';
 import axios from '../../api/axios';
@@ -18,10 +18,9 @@ const normalizeReports = (response) => {
 const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [lostReports, setLostReports] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
-  const loadReports = async (isMounted = true) => {
+  const loadReports = useCallback(async (isMounted = true) => {
     try {
       const [strayRes, lostRes] = await Promise.all([
         apiRequest('/api/stray-reports', { headers: { Authorization: `Bearer ${token}` } }).catch(() => []),
@@ -37,16 +36,14 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Failed to load reports:', error);
-    } finally {
-      if (isMounted) setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     let isMounted = true;
     loadReports(isMounted);
     return () => { isMounted = false; };
-  }, [token]);
+  }, [loadReports]);
 
   const handleUpdateStrayStatus = async (id, newStatus) => {
     try {
