@@ -61,6 +61,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/user'));
 app.use('/api/pets', require('./routes/pet'));
 app.use('/api/vaccinations', require('./routes/vaccination'));
+app.use('/api/lost-and-found', require('./routes/lostAndFound'));
 
 // Health check route
 app.get('/', (req, res) => {

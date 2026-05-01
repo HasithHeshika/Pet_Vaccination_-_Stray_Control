@@ -1,0 +1,298 @@
+{
+  "info": {
+    "name": "Lost & Found Pet Management API",
+    "description": "Collection for testing Lost and Found pet reporting APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Lost & Found Posts",
+      "item": [
+        {
+          "name": "Get All Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts?page=1&limit=10&type=all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "type",
+                  "value": "all",
+                  "description": "all, lost, or found"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts", "{{postId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/search?query=dog&city=Colombo&petSpecies=dog",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "dog"
+                },
+                {
+                  "key": "city",
+                  "value": "Colombo"
+                },
+                {
+                  "key": "petSpecies",
+                  "value": "dog"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Lost Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"postType\": \"lost\",\n  \"title\": \"Lost Golden Retriever\",\n  \"description\": \"Lost a friendly golden retriever near Galle Face. Last seen on Monday morning.\",\n  \"phone\": \"0771234567\",\n  \"petDetails\": {\n    \"species\": \"dog\",\n    \"breed\": \"Golden Retriever\",\n    \"color\": \"Golden\",\n    \"size\": \"large\",\n    \"age\": \"5 years\",\n    \"distinguishingFeatures\": \"White patch on chest, collar with blue tag\"\n  },\n  \"location\": {\n    \"address\": \"Galle Face Green, Colombo\",\n    \"city\": \"Colombo\",\n    \"latitude\": 6.9271,\n    \"longitude\": 79.8456,\n    \"area\": \"Colombo 03\"\n  },\n  \"dateOfIncident\": \"2026-04-28T10:00:00Z\",\n  \"lastSeenTime\": \"10:30 AM\",\n  \"tags\": [\"urgent\", \"microchip\"],\n  \"reward\": {\n    \"amount\": 5000,\n    \"currency\": \"LKR\",\n    \"offered\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts"]
+            }
+          }
+        },
+        {
+          "name": "Create Found Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"postType\": \"found\",\n  \"title\": \"Found a stray dog in Nugegoda\",\n  \"description\": \"Found this cute brown dog wandering near the market. Looks healthy and well-behaved.\",\n  \"phone\": \"0789876543\",\n  \"petDetails\": {\n    \"species\": \"dog\",\n    \"breed\": \"Mixed\",\n    \"color\": \"Brown\",\n    \"size\": \"medium\",\n    \"age\": \"Unknown\",\n    \"distinguishingFeatures\": \"Small scar on right ear\"\n  },\n  \"location\": {\n    \"address\": \"Market Street, Nugegoda\",\n    \"city\": \"Nugegoda\",\n    \"latitude\": 6.9271,\n    \"longitude\": 79.8456\n  },\n  \"dateOfIncident\": \"2026-05-01T14:30:00Z\",\n  \"lastSeenTime\": \"2:30 PM\",\n  \"tags\": [\"stray\", \"friendly\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts"]
+            }
+          }
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lost Golden Retriever - UPDATED INFO\",\n  \"description\": \"Updated description with new sightings\",\n  \"tags\": [\"urgent\", \"microchip\", \"last-seen-kandy\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts", "{{postId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts", "{{postId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Post Responses & Actions",
+      "item": [
+        {
+          "name": "Add Response/Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"I think I saw this dog near the railway station yesterday!\",\n  \"contact\": \"0771234567\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts/{{postId}}/responses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts", "{{postId}}", "responses"]
+            }
+          }
+        },
+        {
+          "name": "Mark Post as Resolved",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matchedPostId\": \"{{matchedPostId}}\",\n  \"notes\": \"Pet was successfully reunited with owner\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts/{{postId}}/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts", "{{postId}}", "resolve"]
+            }
+          }
+        },
+        {
+          "name": "Flag/Report Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Suspicious post - may be spam\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts/{{postId}}/flag",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts", "{{postId}}", "flag"]
+            }
+          }
+        },
+        {
+          "name": "Get User's Posts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/user/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "user", "posts"]
+            }
+          }
+        },
+        {
+          "name": "Get Matching Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lost-and-found/posts/{{postId}}/matches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lost-and-found", "posts", "{{postId}}", "matches"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "postId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "matchedPostId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
