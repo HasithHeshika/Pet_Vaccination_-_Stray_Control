@@ -20,6 +20,10 @@ const Navbar = () => {
         </Link>
         
         <div className="navbar-menu">
+          <Link to="/lost-and-found" className="navbar-link">
+            Lost & Found
+          </Link>
+          
           {isAuthenticated ? (
             <>
               <span className="navbar-user">

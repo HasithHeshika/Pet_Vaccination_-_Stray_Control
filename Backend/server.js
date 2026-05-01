@@ -62,6 +62,7 @@ app.use('/api/users', require('./routes/user'));
 app.use('/api/pets', require('./routes/pet'));
 app.use('/api/vaccinations', require('./routes/vaccination'));
 app.use('/api/stray-reports', require('./routes/strayReport'));
+app.use('/api/licenses', require('./routes/license'));
 
 // Health check route
 app.get('/', (req, res) => {

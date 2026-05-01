@@ -20,7 +20,7 @@ services:
   # Backend API (Development mode with hot reload)
   backend:
     build:
-      context: ./backend
+      context: ./Backend
       dockerfile: Dockerfile.dev
     container_name: pet-management-backend-dev
     restart: unless-stopped
@@ -36,7 +36,7 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - ./backend:/app
+      - ./Backend:/app
       - /app/node_modules
     networks:
       - pet-management-network-dev
@@ -45,7 +45,7 @@ services:
   # Frontend (Development mode with hot reload)
   frontend:
     build:
-      context: ./frontend
+      context: ./Frontend
       dockerfile: Dockerfile.dev
     container_name: pet-management-frontend-dev
     restart: unless-stopped
@@ -59,7 +59,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./frontend:/app
+      - ./Frontend:/app
       - /app/node_modules
     networks:
       - pet-management-network-dev
