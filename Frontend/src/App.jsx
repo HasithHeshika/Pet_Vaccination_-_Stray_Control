@@ -7,6 +7,8 @@ import LandingPage from './components/Public/LandingPage';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import AuthorityDashboard from './components/Admin/AuthorityDashboard';
+import VeterinarianDashboard from './components/Admin/VeterinarianDashboard';
 import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
@@ -136,6 +138,22 @@ function AppContent() {
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/authority"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AuthorityDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/veterinarian"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <VeterinarianDashboard />
               </ProtectedRoute>
             }
           />

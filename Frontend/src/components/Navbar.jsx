@@ -30,7 +30,16 @@ const Navbar = () => {
               <Link to={user?.isAdmin ? '/admin/dashboard' : '/user/dashboard'} className="navbar-link" style={{ fontWeight: 'bold' }}>
                 My Dashboard
               </Link>
-              {!user?.isAdmin && (
+              {user?.isAdmin ? (
+                <>
+                  <Link to="/admin/veterinarian" className="navbar-link">
+                    Veterinarian
+                  </Link>
+                  <Link to="/admin/authority" className="navbar-link">
+                    Authority
+                  </Link>
+                </>
+              ) : (
                 <Link to="/breeder/dashboard" className="navbar-link">
                   Breeder Licensing
                 </Link>

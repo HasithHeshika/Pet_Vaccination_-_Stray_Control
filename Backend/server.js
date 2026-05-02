@@ -64,6 +64,7 @@ app.use('/api/vaccinations', require('./routes/vaccination'));
 app.use('/api/stray-reports', require('./routes/strayReport'));
 app.use('/api/lost-and-found', require('./routes/lostReport'));
 app.use('/api/licenses', require('./routes/license'));
+app.use('/api/authority', require('./routes/authority'));
 
 // Health check route
 app.get('/', (req, res) => {
