@@ -32,6 +32,9 @@ build/
 dist/
 *.tsbuildinfo
 
+# Runtime uploads
+backend/uploads/
+
 # Testing
 coverage/
 .nyc_output/

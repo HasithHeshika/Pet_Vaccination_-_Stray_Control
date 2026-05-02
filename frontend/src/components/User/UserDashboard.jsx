@@ -26,6 +26,9 @@ const UserDashboard = () => {
           <Link to="/user/vaccinations" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
             Vaccination Schedule
           </Link>
+          <Link to="/breeder/dashboard" className="btn btn-secondary" style={{ width: 'auto', minWidth: '180px' }}>
+            Breeder Licensing
+          </Link>
         </div>
       </div>
 

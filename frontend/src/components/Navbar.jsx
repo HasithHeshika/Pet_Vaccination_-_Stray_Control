@@ -23,6 +23,17 @@ const Navbar = () => {
         <div className="navbar-menu">
           {isAuthenticated ? (
             <>
+              {user?.isAdmin ? (
+                <>
+                  <Link to="/admin/dashboard" className="navbar-link">Admin</Link>
+                  <Link to="/admin/breeder-licenses" className="navbar-link">Breeder Licenses</Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/user/dashboard" className="navbar-link">Dashboard</Link>
+                  <Link to="/breeder/dashboard" className="navbar-link">Breeder Licensing</Link>
+                </>
+              )}
               <span className="navbar-user">
                 Welcome, {user?.fullName} {user?.isAdmin && '(Admin)'}
               </span>

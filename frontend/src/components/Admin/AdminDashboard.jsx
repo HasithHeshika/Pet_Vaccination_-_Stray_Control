@@ -15,12 +15,15 @@ const AdminDashboard = () => {
           <Link to="/admin/pets" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
             View All Pets
           </Link>
+          <Link to="/admin/breeder-licenses" className="btn btn-secondary" style={{ width: 'auto', minWidth: '190px' }}>
+            Breeder Licensing
+          </Link>
         </div>
       </div>
 
       <div className="card">
         <h3>System Information</h3>
-        <p>Welcome to the Pet Management System Admin Panel. Use the navigation above to manage users and register pets.</p>
+        <p>Welcome to the Pet Management System Admin Panel. Use the navigation above to manage users, register pets, review breeder license applications, and maintain compliance oversight.</p>
       </div>
     </div>
   );

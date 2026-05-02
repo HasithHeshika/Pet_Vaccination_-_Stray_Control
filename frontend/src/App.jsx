@@ -11,9 +11,14 @@ import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
 import VaccinationManagement from './components/Admin/VaccinationManagement';
+import BreederLicensingAuthority from './components/Admin/BreederLicensingAuthority';
 import UserDashboard from './components/User/UserDashboard';
 import MyPets from './components/User/MyPets';
 import VaccinationSchedule from './components/User/VaccinationSchedule';
+import BreederDashboard from './components/Breeder/BreederDashboard';
+import LicenseApplicationForm from './components/Breeder/LicenseApplicationForm';
+import LicenseRenewal from './components/Breeder/LicenseRenewal';
+import ApplicationStatus from './components/Breeder/ApplicationStatus';
 import PetProfile from './components/Public/PetProfile';
 import './App.css';
 
@@ -139,6 +144,14 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/breeder-licenses"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <BreederLicensingAuthority />
+              </ProtectedRoute>
+            }
+          />
 
           {/* User Routes */}
           <Route
@@ -162,6 +175,38 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <VaccinationSchedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/dashboard"
+            element={
+              <ProtectedRoute>
+                <BreederDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/apply"
+            element={
+              <ProtectedRoute>
+                <LicenseApplicationForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/renew"
+            element={
+              <ProtectedRoute>
+                <LicenseRenewal />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationStatus />
               </ProtectedRoute>
             }
           />
