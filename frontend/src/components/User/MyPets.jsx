@@ -111,7 +111,7 @@ const MyPets = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
+            background: 'rgba(48, 32, 24, 0.58)',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -168,7 +168,7 @@ const MyPets = () => {
               <img 
                 src={selectedPet.qrCode} 
                 alt="Pet QR Code" 
-                style={{ maxWidth: '250px', border: '2px solid #ddd', padding: '10px' }}
+                style={{ maxWidth: '250px', border: '2px solid rgba(87, 50, 31, 0.18)', padding: '10px', borderRadius: '8px' }}
               />
             </div>
 
@@ -177,7 +177,7 @@ const MyPets = () => {
                 Download QR Code
               </button>
               <button onClick={() => handleDownloadPDF(selectedPet)} className="btn btn-primary">
-                📄 Download PDF
+                Download PDF
               </button>
               <button onClick={handleCloseDetails} className="btn btn-secondary">
                 Close

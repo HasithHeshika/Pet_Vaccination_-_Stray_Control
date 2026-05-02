@@ -16,9 +16,10 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          🐾 Pet Management System
+          <span className="brand-mark" aria-hidden="true"></span>
+          <span>Pet Care Registry</span>
         </Link>
-        
+
         <div className="navbar-menu">
           {isAuthenticated ? (
             <>

@@ -135,7 +135,7 @@ const AllPets = () => {
             <div className="modal-body">
               {/* Pet Information Section */}
               <div className="detail-section">
-                <h3>🐾 Pet Information</h3>
+                <h3>Pet Information</h3>
                 <div className="detail-grid">
                   <div className="detail-item">
                     <strong>Pet ID:</strong>
@@ -184,7 +184,7 @@ const AllPets = () => {
 
               {/* Owner Information Section */}
               <div className="detail-section">
-                <h3>👤 Owner Information</h3>
+                <h3>Owner Information</h3>
                 <div className="detail-grid">
                   <div className="detail-item">
                     <strong>Owner Name:</strong>
@@ -206,7 +206,7 @@ const AllPets = () => {
                 selectedPet.medicalHistory?.existingConditions || 
                 selectedPet.medicalHistory?.specialNotes) && (
                 <div className="detail-section">
-                  <h3>🏥 Medical History</h3>
+                  <h3>Medical History</h3>
                   <div className="detail-grid">
                     {selectedPet.medicalHistory?.allergies && (
                       <div className="detail-item full-width">
@@ -232,13 +232,13 @@ const AllPets = () => {
 
               {/* QR Code Section */}
               <div className="detail-section">
-                <h3>📱 QR Code</h3>
+                <h3>QR Code</h3>
                 {selectedPet.qrCode ? (
                   <div style={{ textAlign: 'center' }}>
                     <img 
                       src={selectedPet.qrCode} 
                       alt="Pet QR Code" 
-                      style={{ maxWidth: '250px', border: '2px solid #ddd', padding: '10px', borderRadius: '5px' }}
+                      style={{ maxWidth: '250px', border: '2px solid rgba(87, 50, 31, 0.18)', padding: '10px', borderRadius: '8px' }}
                     />
                     <div style={{ marginTop: '10px', display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                       <button 
@@ -251,7 +251,7 @@ const AllPets = () => {
                         onClick={() => handleDownloadPDF(selectedPet)}
                         className="btn btn-primary"
                       >
-                        📄 Download PDF
+                        Download PDF
                       </button>
                     </div>
                   </div>
@@ -266,7 +266,7 @@ const AllPets = () => {
                 onClick={() => navigate(`/admin/vaccinations/${selectedPet._id}`)}
                 className="btn btn-primary"
               >
-                💉 Manage Vaccinations
+                Manage Vaccinations
               </button>
               <button onClick={handleCloseModal} className="btn btn-secondary">
                 Close
@@ -287,19 +287,19 @@ const AllPets = () => {
         .data-table td {
           padding: 12px 15px;
           text-align: left;
-          border-bottom: 1px solid #ddd;
+          border-bottom: 1px solid rgba(87, 50, 31, 0.12);
         }
 
         .data-table th {
-          background-color: #f8f9fa;
-          color: #333;
+          background-color: #f0d7bd;
+          color: #57321f;
           font-weight: 600;
           white-space: nowrap;
-          border-bottom: 2px solid #ddd;
+          border-bottom: 2px solid rgba(87, 50, 31, 0.16);
         }
 
         .data-table tbody tr:hover {
-          background-color: #f5f5f5;
+          background-color: #fff4e8;
         }
 
         .data-table tbody tr:last-child td {
@@ -312,7 +312,7 @@ const AllPets = () => {
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: rgba(0, 0, 0, 0.7);
+          background-color: rgba(48, 32, 24, 0.68);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -328,7 +328,7 @@ const AllPets = () => {
           width: 100%;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 18px 45px rgba(87, 50, 31, 0.18);
         }
 
         .modal-header {
@@ -336,22 +336,22 @@ const AllPets = () => {
           justify-content: space-between;
           align-items: center;
           padding: 20px 25px;
-          border-bottom: 2px solid #f0f0f0;
-          background-color: #f8f9fa;
-          color: #333;
+          border-bottom: 2px solid rgba(87, 50, 31, 0.12);
+          background-color: #f1d8c0;
+          color: #57321f;
           border-radius: 10px 10px 0 0;
         }
 
         .modal-header h2 {
           margin: 0;
           font-size: 24px;
-          color: #333;
+          color: #57321f;
         }
 
         .modal-close {
           background: transparent;
           border: none;
-          color: #333;
+          color: #57321f;
           font-size: 32px;
           cursor: pointer;
           line-height: 1;
@@ -373,7 +373,7 @@ const AllPets = () => {
 
         .modal-footer {
           padding: 15px 25px;
-          border-top: 2px solid #f0f0f0;
+          border-top: 2px solid rgba(87, 50, 31, 0.12);
           display: flex;
           justify-content: flex-end;
         }
@@ -381,15 +381,15 @@ const AllPets = () => {
         .detail-section {
           margin-bottom: 25px;
           padding: 20px;
-          background: #f9f9f9;
+          background: #fff6eb;
           border-radius: 8px;
-          border-left: 4px solid #667eea;
+          border-left: 4px solid #b45d38;
         }
 
         .detail-section h3 {
           margin-top: 0;
           margin-bottom: 15px;
-          color: #333;
+          color: #57321f;
           font-size: 18px;
         }
 
@@ -410,12 +410,12 @@ const AllPets = () => {
         }
 
         .detail-item strong {
-          color: #555;
+          color: #7a6658;
           font-size: 14px;
         }
 
         .detail-item span {
-          color: #333;
+          color: #302018;
           font-size: 15px;
           word-wrap: break-word;
         }

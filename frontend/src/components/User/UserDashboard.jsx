@@ -24,7 +24,7 @@ const UserDashboard = () => {
             View My Pets
           </Link>
           <Link to="/user/vaccinations" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
-            💉 Vaccination Schedule
+            Vaccination Schedule
           </Link>
         </div>
       </div>

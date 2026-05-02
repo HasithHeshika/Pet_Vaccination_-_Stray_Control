@@ -49,7 +49,6 @@ const PetProfile = () => {
     return (
       <div className="pet-profile-container">
         <div className="error-message">
-          <div className="error-icon">⚠️</div>
           <h2>Pet Not Found</h2>
           <p>{error}</p>
           <p className="error-help">Please check the QR code and try again.</p>
@@ -88,7 +87,7 @@ const PetProfile = () => {
       <div className="pet-profile-card">
         {/* Header */}
         <div className="profile-header">
-          <div className="header-icon">🐾</div>
+          <div className="header-icon" aria-hidden="true"></div>
           <h1>Pet Registration Certificate</h1>
           <p className="subtitle">Official Pet Vaccination & Stray Control System</p>
         </div>
@@ -177,19 +176,19 @@ const PetProfile = () => {
             <div className="medical-grid">
               {pet.medicalHistory.allergies && (
                 <div className="medical-item">
-                  <span className="medical-label">⚠️ Allergies</span>
+                  <span className="medical-label">Allergies</span>
                   <span className="medical-value">{pet.medicalHistory.allergies}</span>
                 </div>
               )}
               {pet.medicalHistory.existingConditions && (
                 <div className="medical-item">
-                  <span className="medical-label">🏥 Existing Conditions</span>
+                  <span className="medical-label">Existing Conditions</span>
                   <span className="medical-value">{pet.medicalHistory.existingConditions}</span>
                 </div>
               )}
               {pet.medicalHistory.specialNotes && (
                 <div className="medical-item">
-                  <span className="medical-label">📝 Special Notes</span>
+                  <span className="medical-label">Special Notes</span>
                   <span className="medical-value">{pet.medicalHistory.specialNotes}</span>
                 </div>
               )}
@@ -200,7 +199,7 @@ const PetProfile = () => {
         {/* Registration Date */}
         <div className="registration-footer">
           <div className="registration-stamp">
-            <span className="stamp-icon">✓</span>
+            <span className="stamp-icon">OK</span>
             <div className="stamp-text">
               <span className="stamp-label">Registered</span>
               <span className="stamp-date">{formatDate(pet.registrationDate)}</span>
@@ -211,7 +210,7 @@ const PetProfile = () => {
         {/* Download PDF Button */}
         <div className="pdf-download-section">
           <button onClick={handleDownloadPDF} className="btn-download-pdf">
-            📄 Download as PDF
+            Download as PDF
           </button>
           <p className="download-hint">Save or print this pet's information for offline access</p>
         </div>

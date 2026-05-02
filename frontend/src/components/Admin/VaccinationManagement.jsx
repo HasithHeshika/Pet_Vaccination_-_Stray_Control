@@ -128,10 +128,10 @@ const VaccinationManagement = () => {
 
   const getStatusBadge = (status) => {
     const styles = {
-      administered: { background: '#28a745', color: 'white' },
-      scheduled: { background: '#007bff', color: 'white' },
-      overdue: { background: '#dc3545', color: 'white' },
-      cancelled: { background: '#6c757d', color: 'white' }
+      administered: { background: '#a96332', color: 'white' },
+      scheduled: { background: '#d79a4b', color: '#302018' },
+      overdue: { background: '#b45d38', color: 'white' },
+      cancelled: { background: '#7a6658', color: 'white' }
     };
 
     return (
@@ -197,7 +197,7 @@ const VaccinationManagement = () => {
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+          <form onSubmit={handleSubmit} style={{ background: '#fff4e8', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
             <h4 style={{ marginTop: 0 }}>Add New Vaccination Record</h4>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
@@ -345,7 +345,7 @@ const VaccinationManagement = () => {
         )}
 
         {vaccinations.length === 0 ? (
-          <p style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+          <p style={{ textAlign: 'center', padding: '40px', color: '#7a6658' }}>
             No vaccination records found. Click "Add Vaccination" to create the first record.
           </p>
         ) : (
@@ -373,9 +373,9 @@ const VaccinationManagement = () => {
                     <td>{getStatusBadge(vacc.status)}</td>
                     <td>
                       {vacc.reminderSent ? (
-                        <span style={{ color: '#28a745' }}>✓ Sent</span>
+                        <span style={{ color: '#7a4a2e', fontWeight: 600 }}>Sent</span>
                       ) : (
-                        <span style={{ color: '#6c757d' }}>Pending</span>
+                        <span style={{ color: '#7a6658' }}>Pending</span>
                       )}
                     </td>
                   </tr>

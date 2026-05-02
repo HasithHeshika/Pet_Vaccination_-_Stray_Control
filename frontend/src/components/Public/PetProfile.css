@@ -1,115 +1,106 @@
-/* Pet Profile Container */
 .pet-profile-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  background:
+    linear-gradient(rgba(247, 234, 220, 0.82), rgba(247, 234, 220, 0.92)),
+    url('https://images.unsplash.com/photo-1544568100-847a948585b9?w=1600&h=1000&fit=crop') center/cover;
+  padding: 28px 20px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Pet Profile Card */
 .pet-profile-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 800px;
+  background: rgba(255, 248, 239, 0.97);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  max-width: 820px;
   width: 100%;
   overflow: hidden;
-  animation: slideUp 0.5s ease-out;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Header */
 .profile-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background:
+    linear-gradient(rgba(87, 50, 31, 0.82), rgba(87, 50, 31, 0.82)),
+    url('https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?w=1200&h=520&fit=crop') center/cover;
   color: white;
-  padding: 40px 30px;
+  padding: 46px 30px;
   text-align: center;
 }
 
 .header-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 36%, var(--cream-soft) 0 16%, transparent 17%),
+    radial-gradient(circle at 64% 36%, var(--cream-soft) 0 16%, transparent 17%),
+    radial-gradient(circle at 50% 60%, var(--cream-soft) 0 22%, transparent 23%),
+    linear-gradient(135deg, var(--terracotta), var(--caramel));
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
 }
 
 .profile-header h1 {
-  margin: 0 0 10px 0;
-  font-size: 28px;
-  font-weight: 700;
+  margin: 0 0 10px;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-weight: 900;
 }
 
 .subtitle {
   margin: 0;
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 0.96rem;
+  color: rgba(255, 248, 239, 0.9);
 }
 
-/* Pet Photo */
 .pet-photo-section {
   display: flex;
   justify-content: center;
   padding: 30px;
-  background: #f8f9fa;
+  background: #f3dec8;
 }
 
 .pet-photo {
-  width: 200px;
-  height: 200px;
+  width: 205px;
+  height: 205px;
   border-radius: 50%;
   object-fit: cover;
-  border: 5px solid white;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border: 6px solid white;
+  box-shadow: 0 12px 24px rgba(87, 50, 31, 0.16);
 }
 
-/* Pet ID Badge */
 .pet-id-badge {
-  background: #f8f9fa;
+  background: #fff4e8;
   padding: 20px;
   text-align: center;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 1px solid var(--line);
 }
 
 .id-label {
-  color: #6c757d;
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
   margin-right: 10px;
 }
 
 .id-value {
-  color: #667eea;
-  font-size: 20px;
-  font-weight: 700;
+  color: var(--terracotta);
+  font-size: 1.18rem;
+  font-weight: 900;
   font-family: monospace;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
-/* Info Sections */
 .info-section {
   padding: 30px;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.info-section:last-of-type {
-  border-bottom: none;
+  border-bottom: 1px solid var(--line);
 }
 
 .section-title {
-  margin: 0 0 20px 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #2d3748;
+  margin: 0 0 20px;
+  font-size: 1.22rem;
+  font-weight: 900;
+  color: var(--chocolate);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -118,76 +109,79 @@
 .section-title::before {
   content: '';
   display: inline-block;
-  width: 4px;
+  width: 5px;
   height: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
+  background: var(--terracotta);
+  border-radius: 999px;
 }
 
-/* Info Grid */
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  gap: 18px;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
 }
 
 .info-label {
-  color: #6c757d;
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
 .info-value {
-  color: #2d3748;
-  font-size: 16px;
-  font-weight: 500;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-/* Medical Section */
 .medical-section {
-  background: #fff8f0;
+  background: #fff5eb;
 }
 
 .medical-grid {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 14px;
 }
 
 .medical-item {
   background: white;
   padding: 15px;
-  border-radius: 8px;
-  border-left: 4px solid #ff6b6b;
+  border-radius: var(--radius);
+  border-left: 4px solid var(--terracotta);
 }
 
 .medical-label {
   display: block;
-  color: #495057;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  color: var(--chocolate);
+  font-size: 0.92rem;
+  font-weight: 900;
+  margin-bottom: 7px;
 }
 
 .medical-value {
   display: block;
-  color: #2d3748;
-  font-size: 14px;
+  color: var(--muted);
+  font-size: 0.92rem;
   line-height: 1.6;
 }
 
-/* Registration Footer */
-.registration-footer {
-  padding: 20px 30px;
-  background: #f8f9fa;
+.registration-footer,
+.pdf-download-section {
+  padding: 22px 30px;
+  background: #f6e6d4;
 }
 
 .registration-stamp {
@@ -196,21 +190,21 @@
   gap: 15px;
   padding: 15px;
   background: white;
-  border-radius: 12px;
-  border: 2px dashed #28a745;
+  border-radius: var(--radius);
+  border: 2px dashed var(--caramel);
 }
 
 .stamp-icon {
   width: 50px;
   height: 50px;
-  background: #28a745;
+  background: var(--cinnamon);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 0.82rem;
+  font-weight: 900;
 }
 
 .stamp-text {
@@ -220,80 +214,68 @@
 }
 
 .stamp-label {
-  color: #6c757d;
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 900;
   text-transform: uppercase;
 }
 
 .stamp-date {
-  color: #2d3748;
-  font-size: 16px;
-  font-weight: 700;
+  color: var(--chocolate);
+  font-size: 1rem;
+  font-weight: 900;
 }
 
-/* Emergency Notice */
+.pdf-download-section {
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+
+.btn-download-pdf {
+  background: linear-gradient(135deg, var(--terracotta), var(--cinnamon));
+  color: white;
+  border: none;
+  padding: 14px 36px;
+  font-size: 1rem;
+  font-weight: 900;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 10px 22px rgba(180, 93, 56, 0.24);
+}
+
+.btn-download-pdf:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(180, 93, 56, 0.28);
+}
+
+.download-hint {
+  margin: 11px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-style: italic;
+}
+
 .emergency-notice {
-  background: #fff3cd;
-  border: 2px solid #ffc107;
-  border-radius: 12px;
+  background: #fff2e4;
+  border: 1px solid rgba(180, 93, 56, 0.28);
+  border-radius: var(--radius);
   padding: 20px;
-  margin: 20px 30px 30px 30px;
+  margin: 22px 30px 30px;
 }
 
 .emergency-notice p {
   margin: 0;
-  color: #856404;
-  font-size: 14px;
-  line-height: 1.6;
+  color: var(--chocolate-soft);
+  font-size: 0.94rem;
+  line-height: 1.65;
   text-align: center;
 }
 
 .emergency-notice strong {
-  color: #533f03;
+  color: var(--chocolate);
 }
 
-/* PDF Download Section */
-.pdf-download-section {
-  padding: 20px 30px;
-  text-align: center;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.btn-download-pdf {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 15px 40px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.btn-download-pdf:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-}
-
-.btn-download-pdf:active {
-  transform: translateY(0);
-}
-
-.download-hint {
-  margin: 10px 0 0 0;
-  color: #6c757d;
-  font-size: 13px;
-  font-style: italic;
-}
-
-/* Loading Spinner */
 .loading-spinner {
   text-align: center;
   padding: 60px 20px;
@@ -303,8 +285,8 @@
   width: 50px;
   height: 50px;
   margin: 0 auto 20px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border: 4px solid rgba(87, 50, 31, 0.2);
+  border-top-color: var(--terracotta);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -316,57 +298,51 @@
 }
 
 .loading-spinner p {
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
+  color: var(--chocolate);
+  font-size: 1rem;
+  font-weight: 800;
 }
 
-/* Error Message */
-.error-message {
-  text-align: center;
-  padding: 60px 20px;
-  color: white;
-}
-
-.error-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
+.pet-profile-container .error-message {
+  max-width: 560px;
+  background: rgba(255, 248, 239, 0.95);
+  color: var(--chocolate);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--terracotta);
+  box-shadow: var(--shadow);
 }
 
 .error-message h2 {
-  margin: 0 0 10px 0;
-  font-size: 28px;
-  font-weight: 700;
+  margin: 0 0 10px;
+  font-size: 1.8rem;
+  font-weight: 900;
 }
 
 .error-message p {
   margin: 5px 0;
-  font-size: 16px;
-  opacity: 0.9;
+  color: var(--muted);
 }
 
 .error-help {
   margin-top: 15px !important;
-  font-size: 14px !important;
-  opacity: 0.7 !important;
+  font-size: 0.9rem !important;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
+  .pet-profile-container {
+    padding: 0;
+  }
+
   .pet-profile-card {
     border-radius: 0;
   }
 
-  .profile-header {
-    padding: 30px 20px;
-  }
-
-  .profile-header h1 {
-    font-size: 24px;
-  }
-
-  .info-section {
-    padding: 20px;
+  .profile-header,
+  .info-section,
+  .registration-footer,
+  .pdf-download-section {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .info-grid {
@@ -376,6 +352,11 @@
   .pet-photo {
     width: 150px;
     height: 150px;
+  }
+
+  .emergency-notice {
+    margin-left: 20px;
+    margin-right: 20px;
   }
 }
 

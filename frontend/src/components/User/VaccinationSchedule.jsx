@@ -85,10 +85,10 @@ const VaccinationSchedule = () => {
 
   const getStatusColor = (nextDueDate) => {
     const days = getDaysDifference(nextDueDate);
-    if (days < 0) return '#dc3545'; // Overdue- red
-    if (days <= 7) return '#ffc107'; // Due soon- yellow
-    if (days <= 30) return '#17a2b8'; // Upcoming- blue
-    return '#28a745'; // Future- green
+    if (days < 0) return '#b45d38';
+    if (days <= 7) return '#d79a4b';
+    if (days <= 30) return '#a96332';
+    return '#57321f';
   };
 
   const getStatusText = (nextDueDate) => {
@@ -122,7 +122,7 @@ const VaccinationSchedule = () => {
             <select 
               value={selectedPetId}
               onChange={(e) => setSelectedPetId(e.target.value)}
-              style={{ padding: '8px 15px', borderRadius: '5px', border: '1px solid #ddd' }}
+              style={{ padding: '8px 15px', borderRadius: '8px', border: '1px solid rgba(87, 50, 31, 0.22)' }}
             >
               <option value="all">All Pets</option>
               {pets.map(pet => (
@@ -133,9 +133,9 @@ const VaccinationSchedule = () => {
         )}
 
         {filteredVaccinations.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-            <p style={{ fontSize: '18px', marginBottom: '10px' }}>✓ No upcoming vaccinations</p>
-            <p style={{ fontSize: '14px', color: '#999' }}>All your pets are up to date!</p>
+          <div style={{ textAlign: 'center', padding: '40px', color: '#7a6658' }}>
+            <p style={{ fontSize: '18px', marginBottom: '10px' }}>No upcoming vaccinations</p>
+            <p style={{ fontSize: '14px', color: '#7a6658' }}>All your pets are up to date!</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: '15px' }}>
@@ -147,16 +147,16 @@ const VaccinationSchedule = () => {
                   border: `3px solid ${getStatusColor(vacc.nextDueDate)}`,
                   borderRadius: '10px',
                   padding: '20px',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                  boxShadow: '0 12px 28px rgba(87,50,31,0.12)'
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
                   <div>
-                    <h4 style={{ margin: 0, color: '#333', fontSize: '20px' }}>
+                    <h4 style={{ margin: 0, color: '#57321f', fontSize: '20px' }}>
                       {vacc.pet.petName}
                     </h4>
-                    <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '14px' }}>
-                      {vacc.pet.petType} • {vacc.pet.breed}
+                    <p style={{ margin: '5px 0 0 0', color: '#7a6658', fontSize: '14px' }}>
+                      {vacc.pet.petType} - {vacc.pet.breed}
                     </p>
                   </div>
                   <div 
@@ -194,7 +194,7 @@ const VaccinationSchedule = () => {
                 </div>
 
                 {vacc.notes && (
-                  <div style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '5px' }}>
+                  <div style={{ marginTop: '15px', padding: '10px', background: '#fff4e8', borderRadius: '8px' }}>
                     <strong>Notes:</strong> {vacc.notes}
                   </div>
                 )}
@@ -213,7 +213,7 @@ const VaccinationSchedule = () => {
             <h3>{pet.petName}'s Complete Vaccination History</h3>
 
             {vaccinations.length === 0 ? (
-              <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+              <p style={{ textAlign: 'center', padding: '20px', color: '#7a6658' }}>
                 No vaccination records found for {pet.petName}
               </p>
             ) : (
@@ -243,7 +243,7 @@ const VaccinationSchedule = () => {
                         <td>{vacc.veterinarianName}</td>
                         <td>
                           <span style={{
-                            background: vacc.status === 'administered' ? '#28a745' : '#007bff',
+                            background: vacc.status === 'administered' ? '#a96332' : '#d79a4b',
                             color: 'white',
                             padding: '4px 10px',
                             borderRadius: '12px',

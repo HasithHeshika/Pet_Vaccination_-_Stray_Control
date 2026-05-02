@@ -6,16 +6,16 @@ const Footer = () => {
   return (
     <footer className="app-footer">
       <div className="footer-content">
-        <div className="footer-section">
-          <h3 className="footer-title">🐾 Pet Management System</h3>
+        <div className="footer-section footer-brand">
+          <h3 className="footer-title">Pet Care Registry</h3>
           <p className="footer-description">
-            A comprehensive platform for managing pet ownership records, 
-            vaccination tracking, and stray animal reporting.
+            A comprehensive platform for pet ownership records, vaccination tracking,
+            and stray animal reporting.
           </p>
-          <div className="footer-social">
-            <span className="social-icon">📧</span>
-            <span className="social-icon">📱</span>
-            <span className="social-icon">🌐</span>
+          <div className="footer-social" aria-label="Contact channels">
+            <span className="social-icon">Email</span>
+            <span className="social-icon">Phone</span>
+            <span className="social-icon">Web</span>
           </div>
         </div>
 
@@ -41,16 +41,16 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Contact</h4>
           <ul className="footer-links">
-            <li>📧 info@petmanagement.com</li>
-            <li>📞 +1 (555) 123-4567</li>
-            <li>📍 123 Pet Street, City</li>
+            <li>info@petmanagement.com</li>
+            <li>+1 (555) 123-4567</li>
+            <li>123 Pet Street, City</li>
           </ul>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>© 2026 Pet Ownership, Vaccination & Stray Control System. All rights reserved.</p>
-        <p className="footer-tagline">Ensuring responsible pet ownership and community safety 🐕 🐈</p>
+        <p>Copyright 2026 Pet Ownership, Vaccination & Stray Control System. All rights reserved.</p>
+        <p className="footer-tagline">Ensuring responsible pet ownership and community safety.</p>
       </div>
     </footer>
   );
