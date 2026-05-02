@@ -76,7 +76,7 @@
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px rgba(217, 130, 74, 0.16);
 }
 
 .form-group textarea {
@@ -117,8 +117,8 @@
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--pet-soft-honey-cream);
+  border-color: var(--pet-golden-amber);
 }
 
 .btn-success {
@@ -274,8 +274,8 @@
 
 .status-badge {
   margin-left: auto;
-  background: #e0e7ff;
-  color: #4338ca;
+  background: rgba(231, 181, 103, 0.24);
+  color: var(--pet-terra-spice);
   padding: 6px 12px;
   border-radius: 999px;
   font-weight: 600;

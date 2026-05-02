@@ -1,16 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
+  --pet-soft-honey-cream: #f6e5c9;
+  --pet-golden-amber: #e7b567;
+  --pet-rustic-apricot: #d9824a;
+  --pet-terra-spice: #a65633;
+  --pet-ember-espresso: #5c3b27;
+  --primary: var(--pet-rustic-apricot);
+  --primary-hover: var(--pet-terra-spice);
   --secondary: #0ea5e9;
   --success: #10b981;
   --danger: #ef4444;
-  --background: #f8fafc;
+  --background: var(--pet-soft-honey-cream);
   --surface: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
+  --text-main: var(--pet-ember-espresso);
+  --text-muted: #7b604f;
+  --border: rgba(166, 86, 51, 0.18);
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -30,7 +35,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background);
-  background-image: linear-gradient(rgba(248, 250, 252, 0.4), rgba(248, 250, 252, 0.5)), url('https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=1920&q=80');
+  background-image: linear-gradient(rgba(246, 229, 201, 0.55), rgba(246, 229, 201, 0.65)), url('https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=1920&q=80');
   background-size: cover;
   background-position: center;
   background-attachment: fixed; /* Smart scrolling parallax effect */

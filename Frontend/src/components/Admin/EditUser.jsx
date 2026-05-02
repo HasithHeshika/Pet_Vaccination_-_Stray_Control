@@ -94,7 +94,7 @@ const EditUser = () => {
       <h1>✏️ Edit User</h1>
 
       <div className="card">
-        <h3>📝 User Details</h3>
+        <h3>User Details</h3>
         <p style={{ color: '#666', marginBottom: '25px' }}>
           Modify any field below and save. Changing email or NIC will be checked for uniqueness.
         </p>
@@ -140,7 +140,7 @@ const EditUser = () => {
 
           <div style={{ display: 'flex', gap: '15px', marginTop: '25px' }}>
             <button type="submit" className="btn btn-primary" style={{ width: 'auto', minWidth: '180px' }} disabled={saving}>
-              {saving ? 'Saving...' : '💾 Save Changes'}
+              {saving ? 'Saving...' : 'Save Changes'}
             </button>
             <button type="button" className="btn btn-secondary" style={{ width: 'auto', minWidth: '120px' }} onClick={() => navigate('/admin/users')}>
               ← Back to Users
@@ -153,3 +153,4 @@ const EditUser = () => {
 };
 
 export default EditUser;
+

@@ -1,7 +1,7 @@
 /* Pet Profile Container */
 .pet-profile-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--pet-soft-honey-cream) 0%, var(--pet-golden-amber) 100%);
   padding: 20px;
   display: flex;
   justify-content: center;
@@ -10,9 +10,9 @@
 
 /* Pet Profile Card */
 .pet-profile-card {
-  background: white;
+  background: #fff8ef;
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(92, 59, 39, 0.24);
   max-width: 800px;
   width: 100%;
   overflow: hidden;
@@ -32,8 +32,8 @@
 
 /* Header */
 .profile-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--pet-rustic-apricot) 0%, var(--pet-terra-spice) 100%);
+  color: #fff8ef;
   padding: 40px 30px;
   text-align: center;
 }
@@ -60,7 +60,7 @@
   display: flex;
   justify-content: center;
   padding: 30px;
-  background: #f8f9fa;
+  background: var(--pet-soft-honey-cream);
 }
 
 .pet-photo {
@@ -74,21 +74,21 @@
 
 /* Pet ID Badge */
 .pet-id-badge {
-  background: #f8f9fa;
+  background: var(--pet-soft-honey-cream);
   padding: 20px;
   text-align: center;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid rgba(166, 86, 51, 0.14);
 }
 
 .id-label {
-  color: #6c757d;
+  color: #7b604f;
   font-size: 14px;
   font-weight: 500;
   margin-right: 10px;
 }
 
 .id-value {
-  color: #667eea;
+  color: var(--pet-terra-spice);
   font-size: 20px;
   font-weight: 700;
   font-family: monospace;
@@ -98,7 +98,7 @@
 /* Info Sections */
 .info-section {
   padding: 30px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(166, 86, 51, 0.14);
 }
 
 .info-section:last-of-type {
@@ -109,7 +109,7 @@
   margin: 0 0 20px 0;
   font-size: 20px;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--pet-ember-espresso);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -120,7 +120,7 @@
   display: inline-block;
   width: 4px;
   height: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--pet-rustic-apricot) 0%, var(--pet-terra-spice) 100%);
   border-radius: 2px;
 }
 
@@ -138,7 +138,7 @@
 }
 
 .info-label {
-  color: #6c757d;
+  color: #7b604f;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -146,14 +146,14 @@
 }
 
 .info-value {
-  color: #2d3748;
+  color: var(--pet-ember-espresso);
   font-size: 16px;
   font-weight: 500;
 }
 
 /* Medical Section */
 .medical-section {
-  background: #fff8f0;
+  background: rgba(246, 229, 201, 0.55);
 }
 
 .medical-grid {
@@ -163,15 +163,15 @@
 }
 
 .medical-item {
-  background: white;
+  background: #fff8ef;
   padding: 15px;
   border-radius: 8px;
-  border-left: 4px solid #ff6b6b;
+  border-left: 4px solid var(--pet-rustic-apricot);
 }
 
 .medical-label {
   display: block;
-  color: #495057;
+  color: var(--pet-ember-espresso);
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 8px;
@@ -179,7 +179,7 @@
 
 .medical-value {
   display: block;
-  color: #2d3748;
+  color: #71523d;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -187,7 +187,7 @@
 /* Registration Footer */
 .registration-footer {
   padding: 20px 30px;
-  background: #f8f9fa;
+  background: var(--pet-soft-honey-cream);
 }
 
 .registration-stamp {
@@ -195,16 +195,16 @@
   align-items: center;
   gap: 15px;
   padding: 15px;
-  background: white;
+  background: #fff8ef;
   border-radius: 12px;
-  border: 2px dashed #28a745;
+  border: 2px dashed var(--pet-rustic-apricot);
 }
 
 .stamp-icon {
   width: 50px;
   height: 50px;
-  background: #28a745;
-  color: white;
+  background: var(--pet-terra-spice);
+  color: #fff8ef;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -220,22 +220,22 @@
 }
 
 .stamp-label {
-  color: #6c757d;
+  color: #7b604f;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .stamp-date {
-  color: #2d3748;
+  color: var(--pet-ember-espresso);
   font-size: 16px;
   font-weight: 700;
 }
 
 /* Emergency Notice */
 .emergency-notice {
-  background: #fff3cd;
-  border: 2px solid #ffc107;
+  background: rgba(231, 181, 103, 0.25);
+  border: 2px solid var(--pet-golden-amber);
   border-radius: 12px;
   padding: 20px;
   margin: 20px 30px 30px 30px;
@@ -243,27 +243,27 @@
 
 .emergency-notice p {
   margin: 0;
-  color: #856404;
+  color: var(--pet-ember-espresso);
   font-size: 14px;
   line-height: 1.6;
   text-align: center;
 }
 
 .emergency-notice strong {
-  color: #533f03;
+  color: var(--pet-terra-spice);
 }
 
 /* PDF Download Section */
 .pdf-download-section {
   padding: 20px 30px;
   text-align: center;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--pet-soft-honey-cream);
+  border-bottom: 1px solid rgba(166, 86, 51, 0.14);
 }
 
 .btn-download-pdf {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--pet-rustic-apricot) 0%, var(--pet-terra-spice) 100%);
+  color: #fff8ef;
   border: none;
   padding: 15px 40px;
   font-size: 16px;
@@ -271,7 +271,7 @@
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(166, 86, 51, 0.32);
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -279,7 +279,7 @@
 
 .btn-download-pdf:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px rgba(166, 86, 51, 0.42);
 }
 
 .btn-download-pdf:active {
@@ -288,7 +288,7 @@
 
 .download-hint {
   margin: 10px 0 0 0;
-  color: #6c757d;
+  color: #7b604f;
   font-size: 13px;
   font-style: italic;
 }

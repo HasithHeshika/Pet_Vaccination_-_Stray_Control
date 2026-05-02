@@ -101,7 +101,7 @@ const AdminDashboard = () => {
         </span>
 
         <Link to="/report-stray" className="btn btn-small" style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}>
-          🚨 Report a Stray
+          Report a Stray
         </Link>
 
         <Link to="/admin/users" className="btn btn-secondary btn-small">

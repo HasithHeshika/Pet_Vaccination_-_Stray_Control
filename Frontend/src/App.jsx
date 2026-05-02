@@ -20,6 +20,11 @@ import PetProfile from './components/Public/PetProfile';
 import LostFoundFeed from './components/LostAndFound/LostFoundFeed';
 import ReportLostForm from './components/LostAndFound/ReportLostForm';
 import ReportStrayForm from './components/Stray/ReportStrayForm';
+import BreederDashboard from './components/Breeder/BreederDashboard';
+import ApplyLicense from './components/Breeder/ApplyLicense';
+import RenewLicense from './components/Breeder/RenewLicense';
+import ApplicationStatus from './components/Breeder/ApplicationStatus';
+import ApplicationDetail from './components/Breeder/ApplicationDetail';
 import './App.css';
 
 // Protected Route Component
@@ -205,6 +210,48 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Breeder Licensing Routes */}
+          <Route
+            path="/breeder/dashboard"
+            element={
+              <ProtectedRoute>
+                <BreederDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/apply"
+            element={
+              <ProtectedRoute>
+                <ApplyLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/renew"
+            element={
+              <ProtectedRoute>
+                <RenewLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationStatus />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications/:id"
+            element={
+              <ProtectedRoute>
+                <ApplicationDetail />
               </ProtectedRoute>
             }
           />

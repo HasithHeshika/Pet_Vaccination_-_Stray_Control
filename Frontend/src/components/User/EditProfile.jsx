@@ -168,7 +168,7 @@ const EditProfile = () => {
 
   return (
     <div className="dashboard">
-      <h1>⚙️ Profile Settings</h1>
+      <h1>Profile Settings</h1>
 
       {/* Profile header */}
       <div className="card account-card" style={{ marginBottom: '25px' }}>
@@ -188,26 +188,26 @@ const EditProfile = () => {
           className={`profile-tab ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveTab('profile')}
         >
-          <span>👤</span> Personal Info
+          <span>Personal</span> Personal Info
         </button>
         <button
           className={`profile-tab ${activeTab === 'password' ? 'active' : ''}`}
           onClick={() => setActiveTab('password')}
         >
-          <span>🔒</span> Change Password
+          <span>Security</span> Change Password
         </button>
         <button
           className={`profile-tab ${activeTab === 'picture' ? 'active' : ''}`}
           onClick={() => setActiveTab('picture')}
         >
-          <span>🖼️</span> Profile Picture
+          <span>Photo</span> Profile Picture
         </button>
       </div>
 
       {/* Profile details tab */}
       {activeTab === 'profile' && (
         <div className="card" style={{ animation: 'fadeIn 0.4s ease-in-out' }}>
-          <h3>📝 Personal Information</h3>
+          <h3>Personal Information</h3>
           <p style={{ color: '#666', marginBottom: '25px' }}>
             Update your name, phone, and address. Email and NIC cannot be changed here.
           </p>
@@ -281,7 +281,7 @@ const EditProfile = () => {
 
             <div style={{ display: 'flex', gap: '15px', marginTop: '25px' }}>
               <button type="submit" className="btn btn-primary" style={{ width: 'auto', minWidth: '180px' }} disabled={loading}>
-                {loading ? 'Saving...' : '💾 Save Changes'}
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
               <button type="button" className="btn btn-secondary" style={{ width: 'auto', minWidth: '120px' }} onClick={() => navigate(-1)}>
                 Cancel
@@ -294,7 +294,7 @@ const EditProfile = () => {
       {/* Password tab */}
       {activeTab === 'password' && (
         <div className="card" style={{ animation: 'fadeIn 0.4s ease-in-out' }}>
-          <h3>🔒 Change Password</h3>
+          <h3>Change Password</h3>
           <p style={{ color: '#666', marginBottom: '25px' }}>
             Enter your current password and choose a new one (min 6 characters).
           </p>
@@ -337,7 +337,7 @@ const EditProfile = () => {
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ width: 'auto', minWidth: '200px', marginTop: '10px' }} disabled={pwLoading}>
-              {pwLoading ? 'Changing...' : '🔑 Update Password'}
+              {pwLoading ? 'Changing...' : 'Update Password'}
             </button>
           </form>
         </div>
@@ -346,7 +346,7 @@ const EditProfile = () => {
       {/* Profile Picture tab */}
       {activeTab === 'picture' && (
         <div className="card" style={{ animation: 'fadeIn 0.4s ease-in-out' }}>
-          <h3>🖼️ Profile Picture</h3>
+          <h3>Profile Picture</h3>
           <p style={{ color: '#666', marginBottom: '25px' }}>
             Upload a profile picture (max 5MB). Supported formats: JPG, PNG, GIF.
           </p>
@@ -378,14 +378,14 @@ const EditProfile = () => {
                     />
                   </div>
                   <button type="submit" className="btn btn-primary" style={{ width: 'auto', minWidth: '180px' }} disabled={picLoading || !profilePicture}>
-                    {picLoading ? 'Uploading...' : '📤 Upload Picture'}
+                    {picLoading ? 'Uploading...' : 'Upload Picture'}
                   </button>
                 </form>
               </div>
             </div>
             <div style={{ padding: '15px', background: 'linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%)', borderRadius: '10px', borderLeft: '4px solid #4FC3F7' }}>
               <p style={{ margin: 0, fontSize: '13px', color: '#555' }}>
-                💡 <strong>Note:</strong> Profile picture upload is currently in development. This feature will be available soon!
+                <strong>Note:</strong> Profile picture upload is currently in development. This feature will be available soon.
               </p>
             </div>
           </div>
@@ -396,3 +396,4 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
+
