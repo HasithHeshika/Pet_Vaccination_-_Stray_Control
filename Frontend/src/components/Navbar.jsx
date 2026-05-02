@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import BreederIcon from './Breeder/BreederIcons';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -16,19 +17,33 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          🐾 Pet Management System
+          <BreederIcon name="shield" size={20} /> Pet Management System
         </Link>
-        
+
         <div className="navbar-menu">
           <Link to="/lost-and-found" className="navbar-link">
             Lost & Found
           </Link>
-          
+
           {isAuthenticated ? (
             <>
-              <Link to={user?.isAdmin ? "/admin/dashboard" : "/user/dashboard"} className="navbar-link" style={{ fontWeight: 'bold' }}>
+              <Link to={user?.isAdmin ? '/admin/dashboard' : '/user/dashboard'} className="navbar-link" style={{ fontWeight: 'bold' }}>
                 My Dashboard
               </Link>
+              {user?.isAdmin ? (
+                <>
+                  <Link to="/admin/veterinarian" className="navbar-link">
+                    Veterinarian
+                  </Link>
+                  <Link to="/admin/authority" className="navbar-link">
+                    Authority
+                  </Link>
+                </>
+              ) : (
+                <Link to="/breeder/dashboard" className="navbar-link">
+                  Breeder Licensing
+                </Link>
+              )}
               <span className="navbar-user">
                 Welcome, {user?.fullName} {user?.isAdmin && '(Admin)'}
               </span>

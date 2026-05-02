@@ -189,7 +189,7 @@ const MyPets = () => {
               <img 
                 src={selectedPet.qrCode} 
                 alt="Pet QR Code" 
-                style={{ maxWidth: '250px', border: '2px solid #ddd', padding: '10px' }}
+                style={{ maxWidth: '250px', border: '2px solid var(--pet-golden-amber)', padding: '10px', background: 'var(--pet-soft-honey-cream)' }}
               />
             </div>
 
@@ -198,7 +198,7 @@ const MyPets = () => {
                 Download QR Code
               </button>
               <button onClick={() => handleDownloadPDF(selectedPet)} className="btn btn-primary">
-                📄 Download PDF
+                Download PDF
               </button>
               <button onClick={handleCloseDetails} className="btn btn-secondary">
                 Close

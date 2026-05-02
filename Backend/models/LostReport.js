@@ -8,7 +8,7 @@ const lostReportSchema = new mongoose.Schema({
   lastSeenDate: { type: Date, required: true },
   description: { type: String },
   contactInfo: { type: String, required: true },
-  status: { type: String, enum: ['Lost', 'Found'], default: 'Lost' },
+  status: { type: String, enum: ['Lost', 'Found', 'Resolved'], default: 'Lost' },
   imageUrl: { type: String }, // To align with LostFoundFeed.jsx expected props
   reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now }

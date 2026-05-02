@@ -86,9 +86,9 @@ const VaccinationSchedule = () => {
   const getStatusColor = (nextDueDate) => {
     const days = getDaysDifference(nextDueDate);
     if (days < 0) return '#dc3545'; // Overdue- red
-    if (days <= 7) return '#ffc107'; // Due soon- yellow
-    if (days <= 30) return '#17a2b8'; // Upcoming- blue
-    return '#28a745'; // Future- green
+    if (days <= 7) return 'var(--pet-golden-amber)'; // Due soon
+    if (days <= 30) return 'var(--pet-rustic-apricot)'; // Upcoming
+    return 'var(--pet-terra-spice)'; // Future
   };
 
   const getStatusText = (nextDueDate) => {
@@ -100,16 +100,16 @@ const VaccinationSchedule = () => {
     return `Due in ${days} days`;
   };
 
-  const getPetEmoji = (petType) => {
-    const emojis = {
-      'Dog': '🐕',
-      'Cat': '🐈',
-      'Bird': '🦜',
-      'Rabbit': '🐰',
-      'Hamster': '🐹',
-      'Other': '🐾'
+  const getPetLabel = (petType) => {
+    const labels = {
+      Dog: 'Dog',
+      Cat: 'Cat',
+      Bird: 'Bird',
+      Rabbit: 'Rabbit',
+      Hamster: 'Hamster',
+      Other: 'Other'
     };
-    return emojis[petType] || '🐾';
+    return labels[petType] || 'Pet';
   };
 
   const filteredVaccinations = selectedPetId === 'all' 
@@ -120,35 +120,35 @@ const VaccinationSchedule = () => {
 
   return (
     <div className="dashboard">
-      <h1>💉 My Pets' Vaccination Schedule</h1>
+      <h1>My Pets' Vaccination Schedule</h1>
 
       {error && <div className="error-message">{error}</div>}
 
       {/* Upcoming Vaccinations Section */}
       <div className="card">
-        <h3>📅 Upcoming Vaccinations (Next Year)</h3>
+        <h3>Upcoming Vaccinations (Next Year)</h3>
         
         {pets.length > 1 && (
           <div style={{ marginBottom: '20px', animation: 'fadeIn 0.6s ease-in-out' }}>
-            <label style={{ marginRight: '15px', fontWeight: '700', fontSize: '16px', color: '#333' }}>Filter by Pet:</label>
+            <label style={{ marginRight: '15px', fontWeight: '700', fontSize: '16px', color: 'var(--pet-ember-espresso)' }}>Filter by Pet:</label>
             <select 
               value={selectedPetId}
               onChange={(e) => setSelectedPetId(e.target.value)}
               style={{
                 padding: '12px 15px',
                 borderRadius: '10px',
-                border: '2px solid #4FC3F7',
+                border: '2px solid var(--pet-rustic-apricot)',
                 fontSize: '15px',
                 fontWeight: '600',
-                background: 'white',
+                background: '#fff8ef',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 4px 15px rgba(79, 195, 247, 0.2)'
+                boxShadow: '0 4px 15px rgba(166, 86, 51, 0.18)'
               }}
             >
-              <option value="all">🐾 All Pets</option>
+              <option value="all">All Pets</option>
               {pets.map(pet => (
-                <option key={pet._id} value={pet._id}>{getPetEmoji(pet.petType)} {pet.petName}</option>
+                <option key={pet._id} value={pet._id}>{getPetLabel(pet.petType)} - {pet.petName}</option>
               ))}
             </select>
           </div>
@@ -156,8 +156,8 @@ const VaccinationSchedule = () => {
 
         {filteredVaccinations.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 40px', animation: 'fadeIn 0.6s ease-in-out' }}>
-            <p style={{ fontSize: '28px', marginBottom: '15px' }}>✓ No upcoming vaccinations</p>
-            <p style={{ fontSize: '16px', color: '#999' }}>All your pets are up to date! 🎉</p>
+            <p style={{ fontSize: '28px', marginBottom: '15px' }}>No upcoming vaccinations</p>
+            <p style={{ fontSize: '16px', color: '#7b604f' }}>All your pets are up to date.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: '20px', animation: 'fadeIn 0.6s ease-in-out' }}>
@@ -165,11 +165,11 @@ const VaccinationSchedule = () => {
               <div 
                 key={vacc._id} 
                 style={{
-                  background: 'white',
+                  background: '#fff8ef',
                   border: `3px solid ${getStatusColor(vacc.nextDueDate)}`,
                   borderRadius: '15px',
                   padding: '25px',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.12)',
+                  boxShadow: '0 10px 30px rgba(92, 59, 39, 0.16)',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   animation: `fadeIn 0.6s ease-in-out ${index * 0.1}s both`,
                   cursor: 'pointer',
@@ -178,11 +178,11 @@ const VaccinationSchedule = () => {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.2)';
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(92, 59, 39, 0.22)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.12)';
+                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(92, 59, 39, 0.16)';
                 }}
               >
                 <div style={{
@@ -197,17 +197,17 @@ const VaccinationSchedule = () => {
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
                   <div>
-                    <h4 style={{ margin: 0, color: '#333', fontSize: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      {getPetEmoji(vacc.pet.petType)} {vacc.pet.petName}
+                    <h4 style={{ margin: 0, color: 'var(--pet-ember-espresso)', fontSize: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {vacc.pet.petName}
                     </h4>
-                    <p style={{ margin: '8px 0 0 0', color: '#888', fontSize: '14px' }}>
+                    <p style={{ margin: '8px 0 0 0', color: '#7b604f', fontSize: '14px' }}>
                       {vacc.pet.petType} • {vacc.pet.breed}
                     </p>
                   </div>
                   <div 
                     style={{
                       background: getStatusColor(vacc.nextDueDate),
-                      color: 'white',
+                      color: '#fff8ef',
                       padding: '12px 20px',
                       borderRadius: '25px',
                       fontWeight: '700',
@@ -224,33 +224,33 @@ const VaccinationSchedule = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '15px' }}>
                   <div>
-                    <strong style={{ color: '#4FC3F7', fontSize: '12px', textTransform: 'uppercase' }}>Vaccine:</strong>
-                    <p style={{ margin: '5px 0 0 0', color: '#333', fontSize: '15px' }}>{vacc.vaccineName}</p>
+                    <strong style={{ color: 'var(--pet-terra-spice)', fontSize: '12px', textTransform: 'uppercase' }}>Vaccine:</strong>
+                    <p style={{ margin: '5px 0 0 0', color: 'var(--pet-ember-espresso)', fontSize: '15px' }}>{vacc.vaccineName}</p>
                   </div>
                   <div>
-                    <strong style={{ color: '#4FC3F7', fontSize: '12px', textTransform: 'uppercase' }}>Type:</strong>
-                    <p style={{ margin: '5px 0 0 0', color: '#333', fontSize: '15px' }}>{vacc.vaccineType}</p>
+                    <strong style={{ color: 'var(--pet-terra-spice)', fontSize: '12px', textTransform: 'uppercase' }}>Type:</strong>
+                    <p style={{ margin: '5px 0 0 0', color: 'var(--pet-ember-espresso)', fontSize: '15px' }}>{vacc.vaccineType}</p>
                   </div>
                   <div>
-                    <strong style={{ color: '#4FC3F7', fontSize: '12px', textTransform: 'uppercase' }}>Due Date:</strong>
-                    <p style={{ margin: '5px 0 0 0', color: '#333', fontSize: '15px', fontWeight: '600' }}>{formatDate(vacc.nextDueDate)}</p>
+                    <strong style={{ color: 'var(--pet-terra-spice)', fontSize: '12px', textTransform: 'uppercase' }}>Due Date:</strong>
+                    <p style={{ margin: '5px 0 0 0', color: 'var(--pet-ember-espresso)', fontSize: '15px', fontWeight: '600' }}>{formatDate(vacc.nextDueDate)}</p>
                   </div>
                   <div>
-                    <strong style={{ color: '#4FC3F7', fontSize: '12px', textTransform: 'uppercase' }}>Veterinarian:</strong>
-                    <p style={{ margin: '5px 0 0 0', color: '#333', fontSize: '15px' }}>{vacc.veterinarianName}</p>
+                    <strong style={{ color: 'var(--pet-terra-spice)', fontSize: '12px', textTransform: 'uppercase' }}>Veterinarian:</strong>
+                    <p style={{ margin: '5px 0 0 0', color: 'var(--pet-ember-espresso)', fontSize: '15px' }}>{vacc.veterinarianName}</p>
                   </div>
                   {vacc.clinicName && (
                     <div>
-                      <strong style={{ color: '#4FC3F7', fontSize: '12px', textTransform: 'uppercase' }}>Clinic:</strong>
-                      <p style={{ margin: '5px 0 0 0', color: '#333', fontSize: '15px' }}>{vacc.clinicName}</p>
+                      <strong style={{ color: 'var(--pet-terra-spice)', fontSize: '12px', textTransform: 'uppercase' }}>Clinic:</strong>
+                      <p style={{ margin: '5px 0 0 0', color: 'var(--pet-ember-espresso)', fontSize: '15px' }}>{vacc.clinicName}</p>
                     </div>
                   )}
                 </div>
 
                 {vacc.notes && (
-                  <div style={{ marginTop: '15px', padding: '15px', background: 'linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%)', borderRadius: '10px', borderLeft: '4px solid #4FC3F7' }}>
-                    <strong style={{ color: '#4FC3F7' }}>📝 Notes:</strong>
-                    <p style={{ margin: '8px 0 0 0', color: '#555' }}>{vacc.notes}</p>
+                  <div style={{ marginTop: '15px', padding: '15px', background: 'linear-gradient(135deg, rgba(246, 229, 201, 0.9) 0%, rgba(231, 181, 103, 0.35) 100%)', borderRadius: '10px', borderLeft: '4px solid var(--pet-rustic-apricot)' }}>
+                    <strong style={{ color: 'var(--pet-terra-spice)' }}>Notes:</strong>
+                    <p style={{ margin: '8px 0 0 0', color: '#71523d' }}>{vacc.notes}</p>
                   </div>
                 )}
               </div>
@@ -265,10 +265,10 @@ const VaccinationSchedule = () => {
         
         return (
           <div key={pet._id} className="card" style={{ marginTop: '20px' }}>
-            <h3>{getPetEmoji(pet.petType)} {pet.petName}'s Complete Vaccination History</h3>
+            <h3>{pet.petName}'s Complete Vaccination History</h3>
 
             {vaccinations.length === 0 ? (
-              <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+              <p style={{ textAlign: 'center', padding: '20px', color: '#71523d' }}>
                 No vaccination records found for {pet.petName}
               </p>
             ) : (
@@ -298,8 +298,8 @@ const VaccinationSchedule = () => {
                         <td>{vacc.veterinarianName}</td>
                         <td>
                           <span style={{
-                            background: vacc.status === 'administered' ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' : 'linear-gradient(135deg, #007bff 0%, #0dcaf0 100%)',
-                            color: 'white',
+                            background: vacc.status === 'administered' ? 'linear-gradient(135deg, var(--pet-rustic-apricot) 0%, var(--pet-terra-spice) 100%)' : 'linear-gradient(135deg, var(--pet-golden-amber) 0%, var(--pet-rustic-apricot) 100%)',
+                            color: '#fff8ef',
                             padding: '6px 12px',
                             borderRadius: '20px',
                             fontSize: '12px',

@@ -7,6 +7,8 @@ import LandingPage from './components/Public/LandingPage';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import AuthorityDashboard from './components/Admin/AuthorityDashboard';
+import VeterinarianDashboard from './components/Admin/VeterinarianDashboard';
 import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
@@ -20,6 +22,11 @@ import PetProfile from './components/Public/PetProfile';
 import LostFoundFeed from './components/LostAndFound/LostFoundFeed';
 import ReportLostForm from './components/LostAndFound/ReportLostForm';
 import ReportStrayForm from './components/Stray/ReportStrayForm';
+import BreederDashboard from './components/Breeder/BreederDashboard';
+import ApplyLicense from './components/Breeder/ApplyLicense';
+import RenewLicense from './components/Breeder/RenewLicense';
+import ApplicationStatus from './components/Breeder/ApplicationStatus';
+import ApplicationDetail from './components/Breeder/ApplicationDetail';
 import './App.css';
 
 // Protected Route Component
@@ -135,6 +142,22 @@ function AppContent() {
             }
           />
           <Route
+            path="/admin/authority"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AuthorityDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/veterinarian"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <VeterinarianDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/users"
             element={
               <ProtectedRoute adminOnly={true}>
@@ -205,6 +228,48 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Breeder Licensing Routes */}
+          <Route
+            path="/breeder/dashboard"
+            element={
+              <ProtectedRoute>
+                <BreederDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/apply"
+            element={
+              <ProtectedRoute>
+                <ApplyLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/renew"
+            element={
+              <ProtectedRoute>
+                <RenewLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationStatus />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications/:id"
+            element={
+              <ProtectedRoute>
+                <ApplicationDetail />
               </ProtectedRoute>
             }
           />
