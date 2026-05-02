@@ -1,0 +1,197 @@
+.lost-found-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.lost-found-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.lost-found-header h2 {
+  color: var(--pet-ember-espresso);
+  margin-bottom: 0.5rem;
+}
+
+.lost-found-header p {
+  color: #7b604f;
+  margin-bottom: 1.5rem;
+}
+
+.lost-pets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.lost-pet-card {
+  background: #fff8ef;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(92, 59, 39, 0.12);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.lost-pet-card:hover {
+  transform: translateY(-5px);
+}
+
+.pet-image-container {
+  position: relative;
+  height: 200px;
+  width: 100%;
+}
+
+.pet-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pet-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--pet-soft-honey-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7b604f;
+  font-weight: bold;
+}
+
+.lost-found-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  color: #fff8ef;
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.lost-found-badge.lost {
+  background-color: var(--pet-terra-spice);
+}
+
+.lost-found-badge.found {
+  background-color: var(--pet-rustic-apricot);
+}
+
+.pet-info {
+  padding: 1.5rem;
+}
+
+.pet-info h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--pet-ember-espresso);
+}
+
+.pet-info p {
+  margin: 0.5rem 0;
+  color: #71523d;
+  font-size: 0.95rem;
+}
+
+.pet-description {
+  margin-top: 1rem !important;
+  color: #7b604f !important;
+  font-style: italic;
+  border-top: 1px solid rgba(166, 86, 51, 0.14);
+  padding-top: 1rem;
+}
+
+.contact-info {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: var(--pet-soft-honey-cream);
+  border-radius: 5px;
+  font-weight: bold;
+  color: var(--pet-terra-spice);
+  text-align: center;
+}
+
+.report-lost-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff8ef;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(92, 59, 39, 0.1);
+}
+
+.report-lost-container h2 {
+  text-align: center;
+  color: var(--pet-ember-espresso);
+  margin-bottom: 0.5rem;
+}
+
+.report-lost-container > p {
+  text-align: center;
+  color: #7b604f;
+  margin-bottom: 2rem;
+}
+
+.report-form .form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.report-form .form-group.half {
+  flex: 1;
+}
+
+.report-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.report-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: var(--pet-ember-espresso);
+}
+
+.report-form .form-control {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid rgba(166, 86, 51, 0.28);
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.report-form .form-control:focus {
+  outline: none;
+  border-color: var(--pet-rustic-apricot);
+  box-shadow: 0 0 0 2px rgba(217, 130, 74, 0.18);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.no-pets {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  background: var(--pet-soft-honey-cream);
+  border-radius: 10px;
+  color: #7b604f;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+  .report-form .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}

@@ -1,0 +1,32 @@
+# Docker Compose Override Example
+# Copy this file to docker-compose.override.yml to customize your local setup
+# This file is git-ignored and won't be committed
+
+version: '3.8'
+
+services:
+  # Example: Override backend ports
+  # backend:
+  #   ports:
+  #     - "5001:5000"
+
+  # Example: Override frontend ports
+  # frontend:
+  #   ports:
+  #     - "3001:80"
+
+  # Example: Override MongoDB ports
+  # mongodb:
+  #   ports:
+  #     - "27018:27017"
+
+  # Example: Add custom environment variables
+  # backend:
+  #   environment:
+  #     - DEBUG=true
+  #     - LOG_LEVEL=debug
+
+  # Example: Mount additional volumes
+  # backend:
+  #   volumes:
+  #     - ./logs:/app/logs
