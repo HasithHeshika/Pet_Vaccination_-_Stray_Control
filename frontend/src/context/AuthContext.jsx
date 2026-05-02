@@ -82,6 +82,15 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await axios.get('/api/auth/me');
+      setUser(response.data.user);
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
+  };
+
   const value = {
     user,
     token,
@@ -89,6 +98,7 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     logout,
+    refreshUser,
     isAuthenticated: !!user,
     isAdmin: user?.isAdmin || false
   };

@@ -13,8 +13,8 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Global error handlers
 process.on('unhandledRejection', (reason, promise) => {
@@ -61,6 +61,10 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/user'));
 app.use('/api/pets', require('./routes/pet'));
 app.use('/api/vaccinations', require('./routes/vaccination'));
+app.use('/api/stray-reports', require('./routes/strayReport'));
+app.use('/api/lost-and-found', require('./routes/lostReport'));
+app.use('/api/licenses', require('./routes/license'));
+app.use('/api/authority', require('./routes/authority'));
 
 // Health check route
 app.get('/', (req, res) => {
@@ -72,6 +76,39 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
+
+const listenOnAvailablePort = (preferredPort) => {
+  const ports = [Number(preferredPort) || 5000, 5001, 5002].filter((port, index, list) => list.indexOf(port) === index);
+
+  const tryListen = (index = 0) => new Promise((resolve, reject) => {
+    if (index >= ports.length) {
+      reject(new Error(`No available backend port found. Tried: ${ports.join(', ')}`));
+      return;
+    }
+
+    const port = ports[index];
+    const server = app.listen(port, '0.0.0.0');
+
+    server.once('listening', () => {
+      console.log(`Server is running on port ${port}`);
+      console.log(`Health check available at http://localhost:${port}`);
+      console.log('Server is now accepting connections');
+      resolve(server);
+    });
+
+    server.once('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.warn(`Port ${port} is already in use. Trying another port...`);
+        tryListen(index + 1).then(resolve).catch(reject);
+        return;
+      }
+
+      reject(error);
+    });
+  });
+
+  return tryListen();
+};
 
 // Start server function
 const startServer = async () => {
@@ -87,23 +124,7 @@ const startServer = async () => {
     console.log('Vaccination reminder scheduler initialized');
     
     // Start server
-    const PORT = process.env.PORT || 5000;
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server is running on port ${PORT}`);
-      console.log(`Health check available at http://localhost:${PORT}`);
-    });
-
-    server.on('error', (error) => {
-      console.error('Server error:', error);
-      if (error.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use`);
-      }
-      process.exit(1);
-    });
-
-    server.on('listening', () => {
-      console.log('Server is now accepting connections');
-    });
+    const server = await listenOnAvailablePort(process.env.PORT);
 
     // Graceful shutdown
     process.on('SIGTERM', () => {

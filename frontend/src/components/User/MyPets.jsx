@@ -73,6 +73,16 @@ const MyPets = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
           {pets.map((pet) => (
             <div key={pet._id} className="card">
+              {pet.photoUrl && (
+                <div style={{ marginBottom: '15px' }}>
+                  <img 
+                    src={pet.photoUrl} 
+                    alt={pet.petName} 
+                    style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px' }} 
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                </div>
+              )}
               <h3>{pet.petName}</h3>
               <p><strong>Pet ID:</strong> {pet.petId}</p>
               <p><strong>Type:</strong> {pet.petType === 'Other' ? pet.petTypeOther : pet.petType}</p>
@@ -131,6 +141,17 @@ const MyPets = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h2>{selectedPet.petName}</h2>
+            {selectedPet.photoUrl && (
+              <div style={{ marginTop: '15px', textAlign: 'center' }}>
+                <img 
+                  src={selectedPet.photoUrl} 
+                  alt={selectedPet.petName} 
+                  style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px' }} 
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+              </div>
+            )}
+            
             
             <div style={{ marginTop: '20px' }}>
               <h3>Basic Information</h3>
@@ -168,7 +189,7 @@ const MyPets = () => {
               <img 
                 src={selectedPet.qrCode} 
                 alt="Pet QR Code" 
-                style={{ maxWidth: '250px', border: '2px solid #ddd', padding: '10px' }}
+                style={{ maxWidth: '250px', border: '2px solid var(--pet-golden-amber)', padding: '10px', background: 'var(--pet-soft-honey-cream)' }}
               />
             </div>
 
@@ -177,7 +198,7 @@ const MyPets = () => {
                 Download QR Code
               </button>
               <button onClick={() => handleDownloadPDF(selectedPet)} className="btn btn-primary">
-                📄 Download PDF
+                Download PDF
               </button>
               <button onClick={handleCloseDetails} className="btn btn-secondary">
                 Close

@@ -27,13 +27,13 @@ services:
   # Backend API
   backend:
     build:
-      context: ./backend
+      context: ./Backend
       dockerfile: Dockerfile
     container_name: pet-management-backend
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      PORT: ${BACKEND_PORT:-5000}
+      PORT: 5000
       MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-admin123}@mongodb:27017/${MONGO_DATABASE:-pet_management}?authSource=admin
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@petmanagement.com}
@@ -44,7 +44,7 @@ services:
       mongodb:
         condition: service_healthy
     volumes:
-      - ./backend:/app
+      - ./Backend:/app
       - /app/node_modules
     networks:
       - pet-management-network
@@ -58,7 +58,7 @@ services:
   # Frontend
   frontend:
     build:
-      context: ./frontend
+      context: ./Frontend
       dockerfile: Dockerfile
       args:
         REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:5000}

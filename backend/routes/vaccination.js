@@ -132,16 +132,16 @@ router.get('/overdue', [auth, admin], async (req, res) => {
 router.get('/user/upcoming', auth, async (req, res) => {
   try {
     // Find all pets belonging to the user
-    const pets = await Pet.find({ owner: req.user.userId });
+    const pets = await Pet.find({ owner: req.user._id });
     const petIds = pets.map(pet => pet._id);
 
     const now = new Date();
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 30);
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
     const vaccinations = await Vaccination.find({
       pet: { $in: petIds },
-      nextDueDate: { $gte: now, $lte: futureDate },
+      nextDueDate: { $lte: oneYearFromNow },
       status: { $in: ['scheduled', 'administered'] }
     })
       .populate('pet')

@@ -2,6 +2,8 @@ const nodemailer = require('nodemailer');
 
 // Email transporter configuration
 const createTransporter = () => {
+  // For development, use ethereal email (fake SMTP)
+  // For production, use real SMTP credentials from environment variables
   if (process.env.NODE_ENV === 'production') {
     return nodemailer.createTransporter({
       host: process.env.SMTP_HOST,
@@ -13,6 +15,7 @@ const createTransporter = () => {
       }
     });
   } else {
+    // Development: Use console logging or ethereal
     return nodemailer.createTransporter({
       host: 'smtp.ethereal.email',
       port: 587,
@@ -251,8 +254,13 @@ const sendOverdueVaccinationEmail = async (vaccination, ownerEmail, ownerName, p
   }
 };
 
-// SMS notification placeholder.
+// SMS notification placeholder (requires Twilio or similar service)
 const sendVaccinationReminderSMS = async (vaccination, phoneNumber, petName) => {
+  // TODO: Implement SMS using Twilio
+  // Requires: npm install twilio
+  // const twilio = require('twilio');
+  // const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  
   console.log('SMS notification not yet implemented');
   console.log(`Would send SMS to ${phoneNumber} for ${petName}`);
   
@@ -264,4 +272,3 @@ module.exports = {
   sendOverdueVaccinationEmail,
   sendVaccinationReminderSMS
 };
-

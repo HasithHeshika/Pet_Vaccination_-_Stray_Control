@@ -1,18 +1,32 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import LandingPage from './components/Public/LandingPage';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import AuthorityDashboard from './components/Admin/AuthorityDashboard';
+import VeterinarianDashboard from './components/Admin/VeterinarianDashboard';
 import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
 import VaccinationManagement from './components/Admin/VaccinationManagement';
+import EditUser from './components/Admin/EditUser';
 import UserDashboard from './components/User/UserDashboard';
+import EditProfile from './components/User/EditProfile';
 import MyPets from './components/User/MyPets';
 import VaccinationSchedule from './components/User/VaccinationSchedule';
 import PetProfile from './components/Public/PetProfile';
+import LostFoundFeed from './components/LostAndFound/LostFoundFeed';
+import ReportLostForm from './components/LostAndFound/ReportLostForm';
+import ReportStrayForm from './components/Stray/ReportStrayForm';
+import BreederDashboard from './components/Breeder/BreederDashboard';
+import ApplyLicense from './components/Breeder/ApplyLicense';
+import RenewLicense from './components/Breeder/RenewLicense';
+import ApplicationStatus from './components/Breeder/ApplicationStatus';
+import ApplicationDetail from './components/Breeder/ApplicationDetail';
 import './App.css';
 
 // Protected Route Component
@@ -49,42 +63,31 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// Home Page Component
-const HomePage = () => {
-  const { isAuthenticated, isAdmin } = useAuth();
-
-  if (isAuthenticated) {
-    return <Navigate to={isAdmin ? '/admin/dashboard' : '/user/dashboard'} replace />;
-  }
-
-  return (
-    <div className="dashboard">
-      <div className="card" style={{ textAlign: 'center', maxWidth: '600px', margin: '50px auto' }}>
-        <h1>🐾 Welcome to Pet Management System</h1>
-        <p style={{ fontSize: '18px', marginTop: '20px', lineHeight: '1.6' }}>
-          A comprehensive system for managing pet ownership records, vaccination schedules, 
-          and QR-based pet identification.
-        </p>
-        <div style={{ marginTop: '30px', display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/login" className="btn btn-primary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
-            Login
-          </a>
-          <a href="/signup" className="btn btn-secondary" style={{ textDecoration: 'none', width: 'auto', minWidth: '120px' }}>
-            Sign Up
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 function AppContent() {
+  const { isAuthenticated, isAdmin } = useAuth();
+  const location = useLocation();
+
+  // Show Navbar on all pages except landing page when not authenticated
+  const showNavbar = isAuthenticated || location.pathname !== '/';
+
+  // Remove padding for landing, login, and signup pages to allow full-width backgrounds
+  const isFullWidthPage = ['/', '/login', '/signup'].includes(location.pathname);
+
   return (
     <div className="app-container">
-      <Navbar />
-      <div className="main-content">
+      {showNavbar && <Navbar />}
+      <div className="main-content" style={isFullWidthPage ? { padding: 0, maxWidth: 'none' } : {}}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route 
+            path="/" 
+            element={
+              isAuthenticated ? (
+                <Navigate to={isAdmin ? '/admin/dashboard' : '/user/dashboard'} replace />
+              ) : (
+                <LandingPage />
+              )
+            } 
+          />
           
           {/* Public Routes */}
           <Route 
@@ -107,12 +110,50 @@ function AppContent() {
           {/* Public Pet Profile - No authentication required */}
           <Route path="/pet-profile/:petId" element={<PetProfile />} />
 
+          {/* Public Stray Report */}
+          <Route path="/report-stray" element={<ReportStrayForm />} />
+
+          {/* Lost and Found Routes */}
+          <Route path="/lost-and-found" element={<LostFoundFeed />} />
+          <Route
+            path="/lost-and-found/report"
+            element={
+              <ProtectedRoute>
+                <ReportLostForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lost-and-found/edit/:id"
+            element={
+              <ProtectedRoute>
+                <ReportLostForm />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Admin Routes */}
           <Route
             path="/admin/dashboard"
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/authority"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AuthorityDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/veterinarian"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <VeterinarianDashboard />
               </ProtectedRoute>
             }
           />
@@ -148,6 +189,14 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/edit-user/:userId"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <EditUser />
+              </ProtectedRoute>
+            }
+          />
 
           {/* User Routes */}
           <Route
@@ -174,11 +223,62 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/user/edit-profile"
+            element={
+              <ProtectedRoute>
+                <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Breeder Licensing Routes */}
+          <Route
+            path="/breeder/dashboard"
+            element={
+              <ProtectedRoute>
+                <BreederDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/apply"
+            element={
+              <ProtectedRoute>
+                <ApplyLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/renew"
+            element={
+              <ProtectedRoute>
+                <RenewLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationStatus />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications/:id"
+            element={
+              <ProtectedRoute>
+                <ApplicationDetail />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Catch all - redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+      <Footer />
     </div>
   );
 }
