@@ -26,48 +26,6 @@ const AdminDashboard = () => {
           </div>
         </article>
 
-<<<<<<< HEAD
-      <div className="dashboard-toolbar">
-        <span className="dashboard-chip">
-          Stray Reports Status
-        </span>
-
-        <Link to="/report-stray" className="btn btn-small" style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}>
-          🚨 Report a Stray
-        </Link>
-
-        <Link to="/admin/users" className="btn btn-secondary btn-small">
-          View Users
-        </Link>
-
-        <Link to="/admin/pets" className="btn btn-primary btn-small">
-          View Pets
-        </Link>
-
-        <Link to="/vet/dashboard" className="btn btn-secondary btn-small" style={{ backgroundColor: '#0d9488', color: '#fff', borderColor: '#0d9488' }}>
-          🩺 Vet Portal
-        </Link>
-
-        <Link to="/admin/licenses" className="btn btn-secondary btn-small">
-          📜 Breeder Licenses
-        </Link>
-      </div>
-
-      <DashboardSummaryCards {...summary} />
-
-      {summary.total > 0 && <ReportsCharts statusCounts={summary} />}
-
-      {sortedReports.length > 0 && (
-        <RecentStrayReportsTable 
-          reports={sortedReports} 
-          onUpdateStatus={handleUpdateStrayStatus} 
-        />
-      )}
-
-      {lostReports.length > 0 && (
-        <RecentLostReportsTable reports={lostReports} />
-      )}
-=======
         <article className="admin-part-card authority">
           <div className="admin-part-icon"><BreederIcon name="shield" size={30} /></div>
           <div>
@@ -81,7 +39,6 @@ const AdminDashboard = () => {
           </div>
         </article>
       </section>
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
     </div>
   );
 };

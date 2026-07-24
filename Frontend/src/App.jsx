@@ -22,18 +22,13 @@ import PetProfile from './components/Public/PetProfile';
 import LostFoundFeed from './components/LostAndFound/LostFoundFeed';
 import ReportLostForm from './components/LostAndFound/ReportLostForm';
 import ReportStrayForm from './components/Stray/ReportStrayForm';
-<<<<<<< HEAD
 import VetDashboard from './components/Vet/VetDashboard';
-import ApplyBreederLicense from './components/Breeder/ApplyBreederLicense';
-import MyBreederLicenses from './components/Breeder/MyBreederLicenses';
 import AdminBreederLicenses from './components/Admin/AdminBreederLicenses';
-=======
 import BreederDashboard from './components/Breeder/BreederDashboard';
 import ApplyLicense from './components/Breeder/ApplyLicense';
 import RenewLicense from './components/Breeder/RenewLicense';
 import ApplicationStatus from './components/Breeder/ApplicationStatus';
 import ApplicationDetail from './components/Breeder/ApplicationDetail';
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
 import './App.css';
 
 // Protected Route Component
@@ -168,24 +163,6 @@ function AppContent() {
             }
           />
 
-          {/* Breeder Licensing Routes */}
-          <Route
-            path="/breeder/apply"
-            element={
-              <ProtectedRoute>
-                <ApplyBreederLicense />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/breeder/my-licenses"
-            element={
-              <ProtectedRoute>
-                <MyBreederLicenses />
-              </ProtectedRoute>
-            }
-          />
-
           {/* Admin Routes */}
           <Route
             path="/admin/dashboard"
@@ -196,12 +173,14 @@ function AppContent() {
             }
           />
           <Route
-<<<<<<< HEAD
             path="/admin/licenses"
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminBreederLicenses />
-=======
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/authority"
             element={
               <ProtectedRoute adminOnly={true}>
@@ -214,7 +193,6 @@ function AppContent() {
             element={
               <ProtectedRoute adminOnly={true}>
                 <VeterinarianDashboard />
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
               </ProtectedRoute>
             }
           />

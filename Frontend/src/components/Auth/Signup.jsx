@@ -10,7 +10,6 @@ const Signup = () => {
     confirmPassword: '',
     phone: '',
     nicNumber: '',
-<<<<<<< HEAD
     role: 'user',
     vetLicenseNumber: '',
     clinicName: '',
@@ -20,9 +19,6 @@ const Signup = () => {
       province: '',
       postalCode: ''
     }
-=======
-    address: { street: '', city: '', province: '', postalCode: '' }
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,7 +57,6 @@ const Signup = () => {
     setLoading(true);
     const { confirmPassword, ...signupData } = formData;
     const result = await signup(signupData);
-<<<<<<< HEAD
     
     if (result.success) {
       if (result.user.role === 'veterinarian') {
@@ -72,90 +67,66 @@ const Signup = () => {
     } else {
       setError(result.message);
     }
-    
-=======
-
-    if (result.success) navigate('/user/dashboard');
-    else setError(result.message);
-
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
     setLoading(false);
   };
 
   return (
     <div className="auth-page">
       <div className="form-container" style={{ maxWidth: '600px' }}>
-<<<<<<< HEAD
         <h2>🐾 Sign Up</h2>
       
-      {error && <div className="error-message">{error}</div>}
-      
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="role">Account Type *</label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-          >
-            <option value="user">Pet Owner / Citizen</option>
-            <option value="veterinarian">Registered Veterinarian</option>
-          </select>
-        </div>
-
-        {formData.role === 'veterinarian' && (
-          <>
-            <div className="form-group">
-              <label htmlFor="vetLicenseNumber">Veterinary License Number *</label>
-              <input
-                type="text"
-                id="vetLicenseNumber"
-                name="vetLicenseNumber"
-                value={formData.vetLicenseNumber}
-                onChange={handleChange}
-                required={formData.role === 'veterinarian'}
-                placeholder="e.g. VET-SL-2024-889"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="clinicName">Clinic / Hospital Name *</label>
-              <input
-                type="text"
-                id="clinicName"
-                name="clinicName"
-                value={formData.clinicName}
-                onChange={handleChange}
-                required={formData.role === 'veterinarian'}
-                placeholder="e.g. City Animal Hospital"
-              />
-            </div>
-          </>
-        )}
-
-        <div className="form-group">
-          <label htmlFor="fullName">Full Name *</label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-=======
-        <h2>Sign Up</h2>
         {error && <div className="error-message">{error}</div>}
+      
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="role">Account Type *</label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="user">Pet Owner / Citizen</option>
+              <option value="veterinarian">Registered Veterinarian</option>
+            </select>
+          </div>
+
+          {formData.role === 'veterinarian' && (
+            <>
+              <div className="form-group">
+                <label htmlFor="vetLicenseNumber">Veterinary License Number *</label>
+                <input
+                  type="text"
+                  id="vetLicenseNumber"
+                  name="vetLicenseNumber"
+                  value={formData.vetLicenseNumber}
+                  onChange={handleChange}
+                  required={formData.role === 'veterinarian'}
+                  placeholder="e.g. VET-SL-2024-889"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="clinicName">Clinic / Hospital Name *</label>
+                <input
+                  type="text"
+                  id="clinicName"
+                  name="clinicName"
+                  value={formData.clinicName}
+                  onChange={handleChange}
+                  required={formData.role === 'veterinarian'}
+                  placeholder="e.g. City Animal Hospital"
+                />
+              </div>
+            </>
+          )}
+
           <div className="form-group"><label htmlFor="fullName">Full Name *</label><input type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required /></div>
           <div className="form-group"><label htmlFor="email">Email *</label><input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required /></div>
           <div className="form-group"><label htmlFor="password">Password * (min 6 characters)</label><input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required minLength="6" /></div>
           <div className="form-group"><label htmlFor="confirmPassword">Confirm Password *</label><input type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required /></div>
           <div className="form-group"><label htmlFor="phone">Phone Number *</label><input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required /></div>
           <div className="form-group"><label htmlFor="nicNumber">NIC Number *</label><input type="text" id="nicNumber" name="nicNumber" value={formData.nicNumber} onChange={handleChange} required /></div>
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
 
           <h3 style={{ marginTop: '20px', marginBottom: '15px' }}>Address Information</h3>
           <div className="form-group"><label htmlFor="street">Street Address *</label><input type="text" id="street" name="address.street" value={formData.address.street} onChange={handleChange} required /></div>

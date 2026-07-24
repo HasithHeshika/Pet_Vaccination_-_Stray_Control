@@ -27,7 +27,6 @@ const Navbar = () => {
 
           {isAuthenticated ? (
             <>
-<<<<<<< HEAD
               {user?.role === 'veterinarian' ? (
                 <Link to="/vet/dashboard" className="navbar-link" style={{ fontWeight: 'bold', color: '#0d9488' }}>
                   🩺 Vet Portal
@@ -43,24 +42,6 @@ const Navbar = () => {
                   <Link to="/admin/licenses" className="navbar-link">
                     📜 Breeder Licenses
                   </Link>
-                </>
-              ) : (
-                <>
-                  <Link to="/user/dashboard" className="navbar-link" style={{ fontWeight: 'bold' }}>
-                    My Dashboard
-                  </Link>
-                  <Link to="/breeder/my-licenses" className="navbar-link">
-                    📜 Breeder License
-                  </Link>
-                </>
-              )}
-              
-=======
-              <Link to={user?.isAdmin ? '/admin/dashboard' : '/user/dashboard'} className="navbar-link" style={{ fontWeight: 'bold' }}>
-                My Dashboard
-              </Link>
-              {user?.isAdmin ? (
-                <>
                   <Link to="/admin/veterinarian" className="navbar-link">
                     Veterinarian
                   </Link>
@@ -69,11 +50,15 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                <Link to="/breeder/dashboard" className="navbar-link">
-                  Breeder Licensing
-                </Link>
+                <>
+                  <Link to="/user/dashboard" className="navbar-link" style={{ fontWeight: 'bold' }}>
+                    My Dashboard
+                  </Link>
+                  <Link to="/breeder/dashboard" className="navbar-link">
+                    Breeder Licensing
+                  </Link>
+                </>
               )}
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
               <span className="navbar-user">
                 Welcome, {user?.fullName} {user?.role === 'veterinarian' ? '(Vet)' : user?.isAdmin ? '(Admin)' : ''}
               </span>

@@ -113,35 +113,6 @@ const listenOnAvailablePort = (preferredPort) => {
 // Start server function
 const startServer = async () => {
   try {
-<<<<<<< HEAD
-    const PORT = process.env.PORT || 5000;
-    const server = app.listen(PORT, '0.0.0.0', async () => {
-      console.log(`Server is running on port ${PORT}`);
-      console.log(`Health check available at http://localhost:${PORT}`);
-
-      // Connect to database after server port is open
-      await connectDB();
-
-      // Initialize admin user
-      await createAdminUser();
-
-      // Start vaccination reminder scheduler
-      scheduleVaccinationReminders();
-      console.log('Vaccination reminder scheduler initialized');
-    });
-
-    server.on('error', (error) => {
-      console.error('Server error:', error);
-      if (error.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use`);
-      }
-      process.exit(1);
-    });
-
-    server.on('listening', () => {
-      console.log('Server is now accepting connections');
-    });
-=======
     // Connect to database first
     await connectDB();
     
@@ -154,7 +125,6 @@ const startServer = async () => {
     
     // Start server
     const server = await listenOnAvailablePort(process.env.PORT);
->>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
 
     // Graceful shutdown
     process.on('SIGTERM', () => {
