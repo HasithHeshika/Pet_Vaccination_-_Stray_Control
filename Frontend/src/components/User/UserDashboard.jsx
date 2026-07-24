@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import ProfileAvatar from '../ProfileAvatar';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ const UserDashboard = () => {
 
       <div className="card account-card">
         <div className="account-header">
-          <div className="avatar-chip">{(user?.fullName || 'U').slice(0, 1)}</div>
+          <ProfileAvatar user={user} />
           <div>
             <p className="eyebrow">My Account</p>
             <h3>{user?.fullName}</h3>

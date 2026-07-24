@@ -6,6 +6,23 @@ const Pet = require('../models/Pet');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
 
+const MAX_PROFILE_PICTURE_SIZE = 2 * 1024 * 1024;
+const PROFILE_PICTURE_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/;
+
+const validateProfilePicture = (image) => {
+  const match = typeof image === 'string' && image.match(PROFILE_PICTURE_DATA_URL);
+
+  if (!match) {
+    throw new Error('Profile picture must be a JPEG, PNG, or WebP image');
+  }
+
+  if (Buffer.byteLength(match[1], 'base64') > MAX_PROFILE_PICTURE_SIZE) {
+    throw new Error('Profile picture must be 2 MB or smaller');
+  }
+
+  return true;
+};
+
 // @route   GET /api/users
 // @desc    Get all users (Admin only)
 // @access  Private/Admin
@@ -103,7 +120,7 @@ router.put('/profile', authMiddleware, [
       req.user._id,
       { $set: updates },
       { new: true, runValidators: true }
-    ).select('-password');
+    ).select('-password +profilePicture');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -118,12 +135,69 @@ router.put('/profile', authMiddleware, [
         phone: user.phone,
         address: user.address,
         nicNumber: user.nicNumber,
-        isAdmin: user.isAdmin
+        role: user.role,
+        isAdmin: user.isAdmin,
+        profilePicture: user.profilePicture || ''
       }
     });
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   PUT /api/users/profile-picture
+// @desc    Replace the signed-in user's profile picture
+// @access  Private
+router.put('/profile-picture', authMiddleware, [
+  body('profilePicture')
+    .custom(validateProfilePicture)
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: { profilePicture: req.body.profilePicture } },
+      { new: true, runValidators: true }
+    ).select('-password +profilePicture');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Profile picture updated successfully',
+      profilePicture: user.profilePicture
+    });
+  } catch (error) {
+    console.error('Update profile picture error:', error);
+    res.status(500).json({ message: 'Server error while updating profile picture' });
+  }
+});
+
+// @route   DELETE /api/users/profile-picture
+// @desc    Remove the signed-in user's profile picture
+// @access  Private
+router.delete('/profile-picture', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: { profilePicture: '' } },
+      { new: true }
+    ).select('-password +profilePicture');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'Profile picture removed successfully' });
+  } catch (error) {
+    console.error('Remove profile picture error:', error);
+    res.status(500).json({ message: 'Server error while removing profile picture' });
   }
 });
 

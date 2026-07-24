@@ -93,9 +93,10 @@ function AppContent() {
 
   // Remove padding for landing, welcome, login, and signup pages to allow full-width backgrounds
   const isFullWidthPage = ['/', '/welcome', '/login', '/signup'].includes(location.pathname);
+  const isWelcomePage = ['/', '/welcome'].includes(location.pathname);
 
   return (
-    <div className="app-container">
+    <div className={`app-container${isWelcomePage ? ' welcome-page-surface' : ''}`}>
       {showNavbar && <Navbar />}
       <div className="main-content" style={isFullWidthPage ? { padding: 0, maxWidth: 'none' } : {}}>
         <Routes>
@@ -241,6 +242,14 @@ function AppContent() {
             element={
               <ProtectedRoute adminOnly={true}>
                 <EditUser />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <EditProfile />
               </ProtectedRoute>
             }
           />

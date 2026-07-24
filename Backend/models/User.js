@@ -55,6 +55,11 @@ const userSchema = new mongoose.Schema({
     google: { type: String, trim: true },
     apple: { type: String, trim: true }
   },
+  profilePicture: {
+    type: String,
+    default: '',
+    select: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
