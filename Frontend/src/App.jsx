@@ -91,8 +91,8 @@ function AppContent() {
   // Show Navbar on all pages except landing page when not authenticated
   const showNavbar = isAuthenticated || location.pathname !== '/';
 
-  // Remove padding for landing, login, and signup pages to allow full-width backgrounds
-  const isFullWidthPage = ['/', '/login', '/signup'].includes(location.pathname);
+  // Remove padding for landing, welcome, login, and signup pages to allow full-width backgrounds
+  const isFullWidthPage = ['/', '/welcome', '/login', '/signup'].includes(location.pathname);
 
   return (
     <div className="app-container">
@@ -108,6 +108,14 @@ function AppContent() {
                 <LandingPage />
               )
             } 
+          />
+          <Route
+            path="/welcome"
+            element={
+              <ProtectedRoute>
+                <LandingPage />
+              </ProtectedRoute>
+            }
           />
           
           {/* Public Routes */}

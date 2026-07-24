@@ -16,7 +16,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo">
+        <Link to={isAuthenticated ? '/welcome' : '/'} className="navbar-logo">
           <BreederIcon name="shield" size={20} /> Pet Management System
         </Link>
 
@@ -27,6 +27,9 @@ const Navbar = () => {
 
           {isAuthenticated ? (
             <>
+              <Link to="/welcome" className="navbar-link">
+                Welcome
+              </Link>
               {user?.role === 'veterinarian' ? (
                 <Link to="/vet/dashboard" className="navbar-link" style={{ fontWeight: 'bold', color: '#0d9488' }}>
                   🩺 Vet Portal
