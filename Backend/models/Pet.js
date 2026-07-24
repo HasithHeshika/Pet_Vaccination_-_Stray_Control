@@ -66,6 +66,14 @@ const petSchema = new mongoose.Schema({
   photoUrl: {
     type: String
   },
+  photoUrls: {
+    type: [String],
+    default: [],
+    validate: {
+      validator: (photos) => photos.length <= 2,
+      message: 'A pet can have a maximum of two images'
+    }
+  },
   qrCode: {
     type: String,
     required: true

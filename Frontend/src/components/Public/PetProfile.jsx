@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../../api/axios';
 import { generatePetPDF } from '../../utils/pdfGenerator';
+import { getPetImages } from '../../utils/petImages';
 import BreederIcon from '../Breeder/BreederIcons';
 import './PetProfile.css';
 
@@ -82,9 +83,17 @@ const PetProfile = () => {
           <p className="subtitle">Official Pet Vaccination & Stray Control System</p>
         </div>
 
-        {pet.photoUrl && (
+        {getPetImages(pet).length > 0 && (
           <div className="pet-photo-section">
-            <img src={pet.photoUrl} alt={pet.petName} className="pet-photo" onError={(e) => { e.target.style.display = 'none'; }} />
+            {getPetImages(pet).map((photo, index) => (
+              <img
+                key={index}
+                src={photo}
+                alt={`${pet.petName} ${index + 1}`}
+                className="pet-photo"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            ))}
           </div>
         )}
 
