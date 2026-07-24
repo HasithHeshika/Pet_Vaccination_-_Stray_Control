@@ -86,7 +86,7 @@
 }
 
 .navbar-admin .navbar-menu {
-  gap: 12px;
+  gap: 16px;
 }
 
 .navbar-admin .navbar-logo {
@@ -97,6 +97,10 @@
 .navbar-admin .navbar-link,
 .navbar-admin .navbar-user {
   font-size: 0.8rem;
+}
+
+.navbar-admin .navbar-user {
+  margin-left: 8px;
 }
 
 .navbar-admin .btn-small {
