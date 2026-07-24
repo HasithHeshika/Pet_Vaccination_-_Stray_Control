@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../api/axios';
+import { formatDate } from '../../utils/dateFormat';
 import './Breeder.css';
 
 const MyBreederLicenses = () => {
@@ -74,8 +75,8 @@ const MyBreederLicenses = () => {
 
               <div className="license-details">
                 <p><strong>Facility Address:</strong> {lic.facilityAddress}</p>
-                <p><strong>Issue Date:</strong> {lic.issueDate ? new Date(lic.issueDate).toLocaleDateString() : 'Pending Approval'}</p>
-                <p><strong>Expiry Date:</strong> {lic.expiryDate ? new Date(lic.expiryDate).toLocaleDateString() : 'N/A'}</p>
+                <p><strong>Issue Date:</strong> {formatDate(lic.issueDate, 'Pending Approval')}</p>
+                <p><strong>Expiry Date:</strong> {formatDate(lic.expiryDate)}</p>
                 {lic.notes && <p><strong>Authority Notes:</strong> {lic.notes}</p>}
                 {lic.documentsUrl && (
                   <p>

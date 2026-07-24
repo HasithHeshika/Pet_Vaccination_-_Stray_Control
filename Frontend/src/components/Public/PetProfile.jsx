@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from '../../api/axios';
 import { generatePetPDF } from '../../utils/pdfGenerator';
 import { getPetImages } from '../../utils/petImages';
+import { formatDate } from '../../utils/dateFormat';
 import BreederIcon from '../Breeder/BreederIcons';
 import './PetProfile.css';
 
@@ -41,12 +42,6 @@ const PetProfile = () => {
     if (months === 0) return `${years} ${years === 1 ? 'year' : 'years'}`;
     return `${years} ${years === 1 ? 'year' : 'years'} ${months} ${months === 1 ? 'month' : 'months'}`;
   };
-
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
 
   if (loading) {
     return (

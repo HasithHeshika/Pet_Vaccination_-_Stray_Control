@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { formatDate } = require('../utils/dateFormatter');
 
 // Email transporter configuration
 const createTransporter = () => {
@@ -25,15 +26,6 @@ const createTransporter = () => {
       }
     });
   }
-};
-
-// Format date for display
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
 };
 
 // Send vaccination reminder email

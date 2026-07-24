@@ -1,17 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../api/axios';
+import { formatDate } from '../../utils/dateFormat';
 import BreederIcon from '../Breeder/BreederIcons';
 import './AdminDashboard.css';
-
-const formatDate = (date) => {
-  if (!date) return 'Not available';
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-};
 
 const VeterinarianDashboard = () => {
   const [pets, setPets] = useState([]);

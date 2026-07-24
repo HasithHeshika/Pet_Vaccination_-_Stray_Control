@@ -1,3 +1,5 @@
+import { formatDate as formatStandardDate } from '../../utils/dateFormat';
+
 export const emptyApplication = {
   breederName: '',
   nicOrBusinessRegNo: '',
@@ -18,14 +20,7 @@ export const emptyApplication = {
 
 export const statusClass = (status = '') => `status-pill ${status.toLowerCase()}`;
 
-export const formatDate = (date) => {
-  if (!date) return 'Not available';
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-};
+export const formatDate = (date) => formatStandardDate(date, 'Not available');
 
 export const applicationFromUser = (user) => ({
   ...emptyApplication,

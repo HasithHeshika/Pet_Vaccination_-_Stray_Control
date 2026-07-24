@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from '../../api/axios';
+import { formatDate } from '../../utils/dateFormat';
 
 const VaccinationManagement = () => {
   const { petId } = useParams();
@@ -116,14 +117,6 @@ const VaccinationManagement = () => {
       console.error('Error adding vaccination:', err);
       setError(err.response?.data?.message || 'Failed to add vaccination record');
     }
-  };
-
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
   };
 
   const handleDelete = async (vaccinationId) => {

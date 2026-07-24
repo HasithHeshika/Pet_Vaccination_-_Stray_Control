@@ -1,15 +1,11 @@
 import React from 'react';
+import { formatDate } from '../../../utils/dateFormat';
 
 const statusLabelClass = {
   pending: 'status-badge status-badge--pending',
   'in-progress': 'status-badge status-badge--progress',
   resolved: 'status-badge status-badge--resolved'
 };
-
-const formatDate = (dateValue) => new Date(dateValue).toLocaleString('en-LK', {
-  dateStyle: 'medium',
-  timeStyle: 'short'
-});
 
 const RecentStrayReportsTable = ({ reports, onUpdateStatus }) => {
   return (

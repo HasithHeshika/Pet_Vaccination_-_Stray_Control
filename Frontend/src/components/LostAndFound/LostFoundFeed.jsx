@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
+import { formatDate } from '../../utils/dateFormat';
 import './LostFound.css';
 
 const LostFoundFeed = () => {
@@ -118,7 +119,7 @@ const LostFoundFeed = () => {
                 <p><strong>Breed:</strong> {pet.breed}</p>
                 <p><strong>Color:</strong> {pet.color}</p>
                 <p><strong>Last Seen:</strong> {pet.lastSeenLocation}</p>
-                <p><strong>Date:</strong> {new Date(pet.lastSeenDate).toLocaleDateString()}</p>
+                <p><strong>Date:</strong> {formatDate(pet.lastSeenDate)}</p>
                 <p className="pet-description">{pet.description}</p>
                 <div className="contact-info">
                   <strong>Contact:</strong> {pet.contactInfo}
