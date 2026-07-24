@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  oauthAccounts: {
+    google: { type: String, trim: true },
+    apple: { type: String, trim: true }
+  },
   createdAt: {
     type: Date,
     default: Date.now

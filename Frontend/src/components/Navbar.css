@@ -63,9 +63,55 @@
   color: var(--text-main);
 }
 
+.navbar-admin {
+  width: calc(100% - 24px);
+  max-width: 1600px;
+  padding: 10px 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.navbar-admin::-webkit-scrollbar {
+  display: none;
+}
+
+.navbar-admin .navbar-container,
+.navbar-admin .navbar-menu {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.navbar-admin .navbar-container {
+  min-width: max-content;
+}
+
+.navbar-admin .navbar-menu {
+  gap: 12px;
+}
+
+.navbar-admin .navbar-logo {
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.navbar-admin .navbar-link,
+.navbar-admin .navbar-user {
+  font-size: 0.8rem;
+}
+
+.navbar-admin .btn-small {
+  padding: 7px 12px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .navbar-container {
     flex-direction: column;
+    gap: 16px;
+  }
+
+  .navbar-admin .navbar-container {
+    flex-direction: row;
     gap: 16px;
   }
 }

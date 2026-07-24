@@ -75,6 +75,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const socialLogin = async (provider, idToken, fullName = '') => {
+    try {
+      const response = await axios.post(`/api/auth/oauth/${provider}`, { idToken, fullName });
+      const { token: sessionToken, user: authenticatedUser } = response.data;
+
+      localStorage.setItem('token', sessionToken);
+      setToken(sessionToken);
+      setUser(authenticatedUser);
+
+      return { success: true, user: authenticatedUser };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Social login failed'
+      };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -97,6 +115,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     signup,
+    socialLogin,
     logout,
     refreshUser,
     role: user?.role || (user?.isAdmin ? 'admin' : 'user'),

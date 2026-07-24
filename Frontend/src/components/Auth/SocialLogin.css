@@ -1,0 +1,110 @@
+.social-login {
+  margin-top: 24px;
+}
+
+.social-login-under-construction .social-login-buttons {
+  opacity: 0.48;
+  filter: grayscale(0.35);
+  pointer-events: none;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin: 24px 0 18px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: var(--border);
+}
+
+.auth-divider span {
+  white-space: nowrap;
+}
+
+.social-login-buttons {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.google-button-host,
+.social-button {
+  width: min(100%, 320px);
+  min-height: 42px;
+}
+
+.google-button-host {
+  display: flex;
+  justify-content: center;
+}
+
+.social-disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.social-button {
+  border-radius: 5px;
+  border: 1px solid #8c8c8c;
+  background: white;
+  color: #1f1f1f;
+  font: 500 14px/1 'Inter', sans-serif;
+  cursor: pointer;
+}
+
+.social-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.apple-button {
+  background: #111;
+  border-color: #111;
+  color: white;
+}
+
+.google-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.google-mark {
+  color: #a65633;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.social-login-note {
+  margin: 10px auto 0;
+  max-width: 330px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.social-construction-label {
+  width: fit-content;
+  margin: 14px auto 0;
+  padding: 5px 12px;
+  border: 1px solid rgba(166, 86, 51, 0.25);
+  border-radius: 999px;
+  background: rgba(246, 229, 201, 0.72);
+  color: var(--pet-terra-spice);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.social-error {
+  margin: 14px 0 0;
+}

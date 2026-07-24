@@ -14,7 +14,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${user?.isAdmin ? 'navbar-admin' : ''}`}>
       <div className="navbar-container">
         <Link to={isAuthenticated ? '/welcome' : '/'} className="navbar-logo">
           <BreederIcon name="shield" size={20} /> Pet Management System
@@ -37,10 +37,10 @@ const Navbar = () => {
                     Admin Dashboard
                   </Link>
                   <Link to="/vet/dashboard" className="navbar-link">
-                    🩺 Vet Portal
+                    Vet Portal
                   </Link>
                   <Link to="/admin/licenses" className="navbar-link">
-                    📜 Breeder Licenses
+                    Breeder Licenses
                   </Link>
                   <Link to="/admin/veterinarian" className="navbar-link">
                     Veterinarian
