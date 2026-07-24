@@ -7,6 +7,8 @@ import LandingPage from './components/Public/LandingPage';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import AuthorityDashboard from './components/Admin/AuthorityDashboard';
+import VeterinarianDashboard from './components/Admin/VeterinarianDashboard';
 import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
 import PetRegistration from './components/Admin/PetRegistration';
@@ -20,10 +22,18 @@ import PetProfile from './components/Public/PetProfile';
 import LostFoundFeed from './components/LostAndFound/LostFoundFeed';
 import ReportLostForm from './components/LostAndFound/ReportLostForm';
 import ReportStrayForm from './components/Stray/ReportStrayForm';
+<<<<<<< HEAD
 import VetDashboard from './components/Vet/VetDashboard';
 import ApplyBreederLicense from './components/Breeder/ApplyBreederLicense';
 import MyBreederLicenses from './components/Breeder/MyBreederLicenses';
 import AdminBreederLicenses from './components/Admin/AdminBreederLicenses';
+=======
+import BreederDashboard from './components/Breeder/BreederDashboard';
+import ApplyLicense from './components/Breeder/ApplyLicense';
+import RenewLicense from './components/Breeder/RenewLicense';
+import ApplicationStatus from './components/Breeder/ApplicationStatus';
+import ApplicationDetail from './components/Breeder/ApplicationDetail';
+>>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
 import './App.css';
 
 // Protected Route Component
@@ -186,10 +196,25 @@ function AppContent() {
             }
           />
           <Route
+<<<<<<< HEAD
             path="/admin/licenses"
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminBreederLicenses />
+=======
+            path="/admin/authority"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AuthorityDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/veterinarian"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <VeterinarianDashboard />
+>>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
               </ProtectedRoute>
             }
           />
@@ -264,6 +289,48 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Breeder Licensing Routes */}
+          <Route
+            path="/breeder/dashboard"
+            element={
+              <ProtectedRoute>
+                <BreederDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/apply"
+            element={
+              <ProtectedRoute>
+                <ApplyLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/renew"
+            element={
+              <ProtectedRoute>
+                <RenewLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationStatus />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/applications/:id"
+            element={
+              <ProtectedRoute>
+                <ApplicationDetail />
               </ProtectedRoute>
             }
           />

@@ -1,0 +1,514 @@
+.breeder-shell {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+  min-height: calc(100vh - 180px);
+}
+
+.breeder-sidebar,
+.breeder-card,
+.breeder-welcome,
+.breeder-topbar {
+  background: rgba(255, 248, 239, 0.92);
+  border: 1px solid rgba(166, 86, 51, 0.16);
+  box-shadow: 0 16px 36px rgba(92, 59, 39, 0.08);
+}
+
+.breeder-sidebar {
+  border-radius: 8px;
+  padding: 22px;
+  align-self: start;
+  position: sticky;
+  top: 118px;
+}
+
+.breeder-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--pet-ember-espresso);
+  margin-bottom: 28px;
+}
+
+.breeder-brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--pet-ember-espresso);
+  color: var(--pet-soft-honey-cream);
+}
+
+.breeder-brand small,
+.breeder-user-chip small,
+.activity-item span,
+.file-preview span {
+  display: block;
+  color: #7b604f;
+  font-size: 0.8rem;
+}
+
+.breeder-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.breeder-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #71523d;
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.breeder-nav-link:hover,
+.breeder-nav-link.active {
+  color: var(--pet-ember-espresso);
+  background: rgba(231, 181, 103, 0.22);
+}
+
+.breeder-workspace {
+  min-width: 0;
+}
+
+.breeder-topbar {
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.breeder-topbar h1,
+.breeder-welcome h2 {
+  margin: 0;
+  color: var(--pet-ember-espresso);
+}
+
+.breeder-topbar p,
+.breeder-welcome p {
+  margin: 6px 0 0;
+  color: #71523d;
+}
+
+.breeder-eyebrow {
+  margin: 0 0 6px;
+  color: var(--pet-terra-spice);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.breeder-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(246, 229, 201, 0.72);
+}
+
+.breeder-user-chip > span {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--pet-terra-spice);
+  color: #fff8ef;
+  font-weight: 700;
+}
+
+.breeder-welcome {
+  border-radius: 8px;
+  padding: 28px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.breeder-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.breeder-actions .btn,
+.card-title-row .btn {
+  width: auto;
+  gap: 8px;
+}
+
+.breeder-grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(160px, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.breeder-card {
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.card-title-row h3,
+.form-panel h3,
+.renewal-form h3,
+.section-subheading {
+  margin: 0;
+  color: var(--pet-ember-espresso);
+}
+
+.metric-card {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  color: var(--pet-terra-spice);
+}
+
+.metric-card span {
+  color: var(--pet-ember-espresso);
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.metric-card p {
+  margin: 0;
+  color: #71523d;
+}
+
+.breeder-details {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 0;
+}
+
+.breeder-details.two-column {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.breeder-details dt,
+.review-grid dt {
+  color: #7b604f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.breeder-details dd,
+.review-grid dd {
+  margin: 4px 0 0;
+  color: var(--pet-ember-espresso);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-pill.approved,
+.status-pill.active {
+  background: rgba(166, 86, 51, 0.14);
+  color: var(--pet-terra-spice);
+}
+
+.status-pill.pending,
+.status-pill.draft {
+  background: rgba(231, 181, 103, 0.28);
+  color: var(--pet-ember-espresso);
+}
+
+.status-pill.rejected,
+.status-pill.expired {
+  background: rgba(220, 53, 69, 0.12);
+  color: #b4232f;
+}
+
+.breeder-alert {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(231, 181, 103, 0.24);
+  color: var(--pet-ember-espresso);
+  font-weight: 700;
+}
+
+.breeder-alert.danger {
+  background: rgba(220, 53, 69, 0.12);
+  color: #b4232f;
+}
+
+.activity-list {
+  display: grid;
+  gap: 10px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(246, 229, 201, 0.48);
+}
+
+.text-link {
+  color: var(--pet-terra-spice);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.wizard-progress {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.wizard-progress button {
+  border: 1px solid rgba(166, 86, 51, 0.18);
+  background: rgba(246, 229, 201, 0.42);
+  color: #71523d;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.wizard-progress span {
+  width: 26px;
+  height: 26px;
+  display: inline-grid;
+  place-items: center;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #fff8ef;
+}
+
+.wizard-progress .active,
+.wizard-progress .complete {
+  background: var(--pet-ember-espresso);
+  color: #fff8ef;
+}
+
+.form-panel {
+  display: grid;
+  gap: 20px;
+}
+
+.breeder-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.breeder-form-grid label,
+.renewal-form label,
+.select-license {
+  display: grid;
+  gap: 8px;
+  color: var(--pet-ember-espresso);
+  font-weight: 700;
+}
+
+.breeder-form-grid input,
+.breeder-form-grid textarea,
+.renewal-form input,
+.renewal-form textarea,
+.select-license select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(166, 86, 51, 0.24);
+  border-radius: 8px;
+  background: #fff8ef;
+  color: var(--pet-ember-espresso);
+  font: inherit;
+}
+
+.breeder-form-grid textarea,
+.renewal-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.full-span {
+  grid-column: 1 / -1;
+}
+
+.field-error {
+  color: #b4232f;
+  font-size: 0.8rem;
+}
+
+.animal-options,
+.wizard-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.animal-options button {
+  border: 1px solid rgba(166, 86, 51, 0.24);
+  border-radius: 8px;
+  padding: 10px 18px;
+  background: #fff8ef;
+  color: var(--pet-ember-espresso);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.animal-options .selected {
+  background: var(--pet-terra-spice);
+  color: #fff8ef;
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.upload-box {
+  min-height: 140px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  text-align: center;
+  border: 1px dashed var(--pet-rustic-apricot);
+  border-radius: 8px;
+  color: var(--pet-terra-spice);
+  background: rgba(246, 229, 201, 0.38);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.upload-box input {
+  display: none;
+}
+
+.preview-grid,
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(246, 229, 201, 0.5);
+  color: var(--pet-ember-espresso);
+}
+
+.file-preview img {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.review-grid > div {
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(246, 229, 201, 0.46);
+}
+
+.detail-review {
+  margin: 20px 0;
+}
+
+.wizard-actions {
+  justify-content: flex-end;
+  margin-top: 26px;
+}
+
+.renewal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 22px;
+}
+
+.renewal-form {
+  display: grid;
+  gap: 16px;
+}
+
+.breeder-table-wrap {
+  background: transparent;
+}
+
+.breeder-table .btn {
+  width: auto;
+}
+
+.empty-state {
+  color: #71523d;
+  padding: 24px;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .breeder-shell,
+  .renewal-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .breeder-sidebar {
+    position: static;
+  }
+
+  .breeder-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .breeder-topbar,
+  .breeder-welcome,
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .breeder-grid,
+  .wizard-progress,
+  .breeder-form-grid,
+  .upload-grid,
+  .breeder-details.two-column {
+    grid-template-columns: 1fr;
+  }
+}

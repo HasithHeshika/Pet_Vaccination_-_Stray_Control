@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import BreederIcon from './Breeder/BreederIcons';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -16,16 +17,17 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          🐾 Pet Management System
+          <BreederIcon name="shield" size={20} /> Pet Management System
         </Link>
-        
+
         <div className="navbar-menu">
           <Link to="/lost-and-found" className="navbar-link">
             Lost & Found
           </Link>
-          
+
           {isAuthenticated ? (
             <>
+<<<<<<< HEAD
               {user?.role === 'veterinarian' ? (
                 <Link to="/vet/dashboard" className="navbar-link" style={{ fontWeight: 'bold', color: '#0d9488' }}>
                   🩺 Vet Portal
@@ -53,6 +55,25 @@ const Navbar = () => {
                 </>
               )}
               
+=======
+              <Link to={user?.isAdmin ? '/admin/dashboard' : '/user/dashboard'} className="navbar-link" style={{ fontWeight: 'bold' }}>
+                My Dashboard
+              </Link>
+              {user?.isAdmin ? (
+                <>
+                  <Link to="/admin/veterinarian" className="navbar-link">
+                    Veterinarian
+                  </Link>
+                  <Link to="/admin/authority" className="navbar-link">
+                    Authority
+                  </Link>
+                </>
+              ) : (
+                <Link to="/breeder/dashboard" className="navbar-link">
+                  Breeder Licensing
+                </Link>
+              )}
+>>>>>>> a22b2074d9644e88d05288e050a9679dc7edf9d7
               <span className="navbar-user">
                 Welcome, {user?.fullName} {user?.role === 'veterinarian' ? '(Vet)' : user?.isAdmin ? '(Admin)' : ''}
               </span>

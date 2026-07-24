@@ -150,8 +150,8 @@ const VaccinationManagement = () => {
 
   const getStatusBadge = (status) => {
     const styles = {
-      administered: { background: '#28a745', color: 'white' },
-      scheduled: { background: '#007bff', color: 'white' },
+      administered: { background: 'var(--pet-terra-spice)', color: '#fff8ef' },
+      scheduled: { background: 'var(--pet-rustic-apricot)', color: '#fff8ef' },
       overdue: { background: '#dc3545', color: 'white' },
       cancelled: { background: '#6c757d', color: 'white' }
     };
@@ -369,7 +369,7 @@ const VaccinationManagement = () => {
         )}
 
         {vaccinations.length === 0 ? (
-          <p style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+          <p style={{ textAlign: 'center', padding: '40px', color: '#71523d' }}>
             No vaccination records found. Click "Add Vaccination" to create the first record.
           </p>
         ) : (
@@ -398,7 +398,7 @@ const VaccinationManagement = () => {
                     <td>{getStatusBadge(vacc.status)}</td>
                     <td>
                       {vacc.reminderSent ? (
-                        <span style={{ color: '#28a745' }}>✓ Sent</span>
+                        <span style={{ color: 'var(--pet-terra-spice)' }}>Sent</span>
                       ) : (
                         <span style={{ color: '#6c757d' }}>Pending</span>
                       )}
@@ -417,7 +417,7 @@ const VaccinationManagement = () => {
                           cursor: 'pointer'
                         }}
                       >
-                        🗑️ Delete
+                        Delete
                       </button>
                     </td>
                   </tr>

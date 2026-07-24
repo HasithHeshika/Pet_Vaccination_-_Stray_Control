@@ -184,7 +184,7 @@ const PetRegistration = () => {
     return (
       <div className="dashboard">
         <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <h2 style={{ color: '#4CAF50', textAlign: 'center' }}>✓ Pet Registered Successfully!</h2>
+          <h2 style={{ color: 'var(--pet-terra-spice)', textAlign: 'center' }}>Pet Registered Successfully</h2>
           
           <div style={{ marginTop: '20px' }}>
             <h3>Pet Details</h3>
@@ -200,14 +200,14 @@ const PetRegistration = () => {
             <img 
               src={registeredPet.qrCode} 
               alt="Pet QR Code" 
-              style={{ maxWidth: '300px', border: '2px solid #ddd', padding: '10px' }}
+              style={{ maxWidth: '300px', border: '2px solid var(--pet-golden-amber)', padding: '10px', background: 'var(--pet-soft-honey-cream)' }}
             />
             <div style={{ marginTop: '15px', display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={handleDownloadQR} className="btn btn-primary">
                 Download QR Code
               </button>
               <button onClick={handleDownloadPDF} className="btn btn-primary">
-                📄 Download PDF
+                Download PDF
               </button>
               <button onClick={handleRegisterAnother} className="btn btn-secondary">
                 Register Another Pet
@@ -227,7 +227,7 @@ const PetRegistration = () => {
       <div className="form-container" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <h2>Register Pet for {owner.fullName}</h2>
         
-        <div style={{ background: '#f0f0f0', padding: '15px', borderRadius: '5px', marginBottom: '20px' }}>
+        <div style={{ background: 'var(--pet-soft-honey-cream)', border: '1px solid var(--border)', padding: '15px', borderRadius: '5px', marginBottom: '20px' }}>
           <h4>Owner Information</h4>
           <p><strong>Email:</strong> {owner.email}</p>
           <p><strong>Phone:</strong> {owner.phone}</p>

@@ -13,12 +13,12 @@
 }
 
 .lost-found-header h2 {
-  color: #2c3e50;
+  color: var(--pet-ember-espresso);
   margin-bottom: 0.5rem;
 }
 
 .lost-found-header p {
-  color: #7f8c8d;
+  color: #7b604f;
   margin-bottom: 1.5rem;
 }
 
@@ -29,9 +29,9 @@
 }
 
 .lost-pet-card {
-  background: white;
+  background: #fff8ef;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(92, 59, 39, 0.12);
   overflow: hidden;
   transition: transform 0.3s ease;
 }
@@ -55,11 +55,11 @@
 .pet-image-placeholder {
   width: 100%;
   height: 100%;
-  background: #ecf0f1;
+  background: var(--pet-soft-honey-cream);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #95a5a6;
+  color: #7b604f;
   font-weight: bold;
 }
 
@@ -69,18 +69,18 @@
   right: 10px;
   padding: 5px 10px;
   border-radius: 20px;
-  color: white;
+  color: #fff8ef;
   font-weight: bold;
   font-size: 0.8rem;
   text-transform: uppercase;
 }
 
 .lost-found-badge.lost {
-  background-color: #e74c3c;
+  background-color: var(--pet-terra-spice);
 }
 
 .lost-found-badge.found {
-  background-color: #2ecc71;
+  background-color: var(--pet-rustic-apricot);
 }
 
 .pet-info {
@@ -90,30 +90,30 @@
 .pet-info h3 {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #2c3e50;
+  color: var(--pet-ember-espresso);
 }
 
 .pet-info p {
   margin: 0.5rem 0;
-  color: #34495e;
+  color: #71523d;
   font-size: 0.95rem;
 }
 
 .pet-description {
   margin-top: 1rem !important;
-  color: #7f8c8d !important;
+  color: #7b604f !important;
   font-style: italic;
-  border-top: 1px solid #ecf0f1;
+  border-top: 1px solid rgba(166, 86, 51, 0.14);
   padding-top: 1rem;
 }
 
 .contact-info {
   margin-top: 1rem;
   padding: 0.8rem;
-  background-color: #f8f9fa;
+  background-color: var(--pet-soft-honey-cream);
   border-radius: 5px;
   font-weight: bold;
-  color: #e67e22;
+  color: var(--pet-terra-spice);
   text-align: center;
 }
 
@@ -121,20 +121,20 @@
   max-width: 600px;
   margin: 2rem auto;
   padding: 2rem;
-  background: white;
+  background: #fff8ef;
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(92, 59, 39, 0.1);
 }
 
 .report-lost-container h2 {
   text-align: center;
-  color: #2c3e50;
+  color: var(--pet-ember-espresso);
   margin-bottom: 0.5rem;
 }
 
 .report-lost-container > p {
   text-align: center;
-  color: #7f8c8d;
+  color: #7b604f;
   margin-bottom: 2rem;
 }
 
@@ -155,21 +155,21 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  color: #34495e;
+  color: var(--pet-ember-espresso);
 }
 
 .report-form .form-control {
   width: 100%;
   padding: 0.8rem;
-  border: 1px solid #bdc3c7;
+  border: 1px solid rgba(166, 86, 51, 0.28);
   border-radius: 5px;
   font-size: 1rem;
 }
 
 .report-form .form-control:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  border-color: var(--pet-rustic-apricot);
+  box-shadow: 0 0 0 2px rgba(217, 130, 74, 0.18);
 }
 
 .form-actions {
@@ -183,9 +183,9 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 3rem;
-  background: #f8f9fa;
+  background: var(--pet-soft-honey-cream);
   border-radius: 10px;
-  color: #7f8c8d;
+  color: #7b604f;
   font-size: 1.1rem;
 }
 
