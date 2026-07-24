@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from '../../api/axios';
+import ProfileAvatar from '../ProfileAvatar';
 
 const EditProfile = () => {
   const { user, token, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const pictureInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -119,10 +121,24 @@ const EditProfile = () => {
   const handlePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setPicError('File size must be less than 5MB');
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+      if (!allowedTypes.includes(file.type)) {
+        setProfilePicture(null);
+        setPicPreview('');
+        setPicError('Please choose a JPEG, PNG, or WebP image');
+        e.target.value = '';
         return;
       }
+
+      if (file.size > 2 * 1024 * 1024) {
+        setProfilePicture(null);
+        setPicPreview('');
+        setPicError('Profile picture must be 2 MB or smaller');
+        e.target.value = '';
+        return;
+      }
+
       setProfilePicture(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -145,22 +161,36 @@ const EditProfile = () => {
     setPicError('');
 
     try {
-      const formData = new FormData();
-      formData.append('profilePicture', profilePicture);
-
-      const response = await axios.put('/api/users/profile-picture', formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+      const response = await axios.put('/api/users/profile-picture', {
+        profilePicture: picPreview
       });
 
       setPicMessage(response.data.message);
       await refreshUser();
       setProfilePicture(null);
       setPicPreview('');
+      if (pictureInputRef.current) pictureInputRef.current.value = '';
     } catch (err) {
-      setPicError(err.response?.data?.message || 'Failed to upload profile picture. Feature coming soon!');
+      setPicError(err.response?.data?.message || 'Failed to update profile picture');
+    } finally {
+      setPicLoading(false);
+    }
+  };
+
+  const handlePictureRemove = async () => {
+    setPicLoading(true);
+    setPicMessage('');
+    setPicError('');
+
+    try {
+      const response = await axios.delete('/api/users/profile-picture');
+      setPicMessage(response.data.message);
+      setProfilePicture(null);
+      setPicPreview('');
+      if (pictureInputRef.current) pictureInputRef.current.value = '';
+      await refreshUser();
+    } catch (err) {
+      setPicError(err.response?.data?.message || 'Failed to remove profile picture');
     } finally {
       setPicLoading(false);
     }
@@ -173,7 +203,7 @@ const EditProfile = () => {
       {/* Profile header */}
       <div className="card account-card" style={{ marginBottom: '25px' }}>
         <div className="account-header">
-          <div className="avatar-chip">{(user?.fullName || 'U').slice(0, 1)}</div>
+          <ProfileAvatar user={user} />
           <div>
             <p className="eyebrow">Editing Profile</p>
             <h3 style={{ margin: '4px 0 0 0' }}>{user?.fullName}</h3>
@@ -188,19 +218,19 @@ const EditProfile = () => {
           className={`profile-tab ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveTab('profile')}
         >
-          <span>Personal</span> Personal Info
+          Personal Info
         </button>
         <button
           className={`profile-tab ${activeTab === 'password' ? 'active' : ''}`}
           onClick={() => setActiveTab('password')}
         >
-          <span>Security</span> Change Password
+          Change Password
         </button>
         <button
           className={`profile-tab ${activeTab === 'picture' ? 'active' : ''}`}
           onClick={() => setActiveTab('picture')}
         >
-          <span>Photo</span> Profile Picture
+          Profile Picture
         </button>
       </div>
 
@@ -348,45 +378,52 @@ const EditProfile = () => {
         <div className="card" style={{ animation: 'fadeIn 0.4s ease-in-out' }}>
           <h3>Profile Picture</h3>
           <p style={{ color: '#666', marginBottom: '25px' }}>
-            Upload a profile picture (max 5MB). Supported formats: JPG, PNG, GIF.
+            Upload a profile picture up to 2 MB. Supported formats are JPEG, PNG, and WebP.
           </p>
 
           {picMessage && <div className="success-message">{picMessage}</div>}
           {picError && <div className="error-message">{picError}</div>}
 
           <div style={{ maxWidth: '500px' }}>
-            <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start', marginBottom: '25px' }}>
-              <div className="avatar-chip" style={{ width: '120px', height: '120px', fontSize: '48px', flexShrink: 0 }}>
-                {picPreview ? (
-                  <img src={picPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '14px' }} />
-                ) : (
-                  (user?.fullName || 'U').slice(0, 1)
-                )}
-              </div>
+            <div className="profile-picture-editor">
+              <ProfileAvatar
+                user={user}
+                source={picPreview}
+                className="profile-picture-preview"
+                alt={picPreview ? 'Selected profile picture preview' : undefined}
+              />
               <div style={{ flex: 1 }}>
                 <p style={{ color: '#555', marginBottom: '15px', fontSize: '14px' }}>
-                  Current picture shows your initial. Upload a photo to personalize your profile.
+                  The saved picture appears in your navigation bar and account area. Selecting a new image shows a preview before it is saved.
                 </p>
                 <form onSubmit={handlePictureSubmit}>
                   <div className="form-group">
                     <label>Choose Picture</label>
                     <input
+                      ref={pictureInputRef}
                       type="file"
-                      accept="image/jpeg,image/png,image/gif"
+                      accept="image/jpeg,image/png,image/webp"
                       onChange={handlePictureChange}
                       style={{ padding: '10px' }}
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary" style={{ width: 'auto', minWidth: '180px' }} disabled={picLoading || !profilePicture}>
-                    {picLoading ? 'Uploading...' : 'Upload Picture'}
-                  </button>
+                  <div className="profile-picture-actions">
+                    <button type="submit" className="btn btn-primary" disabled={picLoading || !profilePicture || !picPreview}>
+                      {picLoading ? 'Saving...' : user?.profilePicture ? 'Replace Picture' : 'Save Picture'}
+                    </button>
+                    {user?.profilePicture && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handlePictureRemove}
+                        disabled={picLoading}
+                      >
+                        Remove Picture
+                      </button>
+                    )}
+                  </div>
                 </form>
               </div>
-            </div>
-            <div style={{ padding: '15px', background: 'linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%)', borderRadius: '10px', borderLeft: '4px solid #4FC3F7' }}>
-              <p style={{ margin: 0, fontSize: '13px', color: '#555' }}>
-                <strong>Note:</strong> Profile picture upload is currently in development. This feature will be available soon.
-              </p>
             </div>
           </div>
         </div>

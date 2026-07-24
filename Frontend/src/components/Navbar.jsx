@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import BreederIcon from './Breeder/BreederIcons';
+import ProfileAvatar from './ProfileAvatar';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -51,6 +52,9 @@ const Navbar = () => {
                   <NavLink to="/admin/authority" className={navLinkClass}>
                     Authority
                   </NavLink>
+                  <NavLink to="/admin/profile" className={navLinkClass}>
+                    Profile
+                  </NavLink>
                 </>
               ) : (
                 <>
@@ -60,10 +64,16 @@ const Navbar = () => {
                   <NavLink to="/breeder/dashboard" className={navLinkClass}>
                     Breeder Licensing
                   </NavLink>
+                  <NavLink to="/user/edit-profile" className={navLinkClass}>
+                    Profile
+                  </NavLink>
                 </>
               )}
               <span className="navbar-user">
-                Welcome, {user?.fullName} {user?.role === 'veterinarian' ? '(Vet)' : user?.isAdmin ? '(Admin)' : ''}
+                <ProfileAvatar user={user} className="navbar-avatar" />
+                <span>
+                  Welcome, {user?.fullName} {user?.role === 'veterinarian' ? '(Vet)' : user?.isAdmin ? '(Admin)' : ''}
+                </span>
               </span>
               <button onClick={handleLogout} className="btn btn-danger btn-small">
                 Logout

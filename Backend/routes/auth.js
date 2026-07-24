@@ -76,7 +76,8 @@ const authUserPayload = (user) => {
     role: effectiveRole,
     isAdmin: user.isAdmin || effectiveRole === 'admin',
     vetLicenseNumber: user.vetLicenseNumber,
-    clinicName: user.clinicName
+    clinicName: user.clinicName,
+    profilePicture: user.profilePicture || ''
   };
 };
 
@@ -172,10 +173,12 @@ router.post('/oauth/:provider', [
     const identity = await verifyProviderToken(provider, req.body.idToken);
     const normalizedEmail = identity.email.toLowerCase();
     const providerAccountPath = `oauthAccounts.${provider}`;
-    let user = await User.findOne({ [providerAccountPath]: identity.sub });
+    let user = await User.findOne({ [providerAccountPath]: identity.sub })
+      .select('+profilePicture');
 
     if (!user) {
-      user = await User.findOne({ email: normalizedEmail });
+      user = await User.findOne({ email: normalizedEmail })
+        .select('+profilePicture');
     }
 
     if (user && (user.isAdmin || (user.role && user.role !== 'user'))) {
@@ -254,7 +257,7 @@ router.post('/login', [
     const { email, password } = req.body;
 
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+profilePicture');
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -296,7 +299,8 @@ router.get('/me', authMiddleware, async (req, res) => {
         role: effectiveRole,
         isAdmin: req.user.isAdmin || effectiveRole === 'admin',
         vetLicenseNumber: req.user.vetLicenseNumber,
-        clinicName: req.user.clinicName
+        clinicName: req.user.clinicName,
+        profilePicture: req.user.profilePicture || ''
       }
     });
   } catch (error) {
