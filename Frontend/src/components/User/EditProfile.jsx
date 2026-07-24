@@ -37,6 +37,7 @@ const EditProfile = () => {
   const [pictureDimensions, setPictureDimensions] = useState({ width: 0, height: 0 });
   const [cropPosition, setCropPosition] = useState({ x: 50, y: 50 });
   const [isDraggingCrop, setIsDraggingCrop] = useState(false);
+  const [isEditingSavedPicture, setIsEditingSavedPicture] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
   const [picMessage, setPicMessage] = useState('');
   const [picError, setPicError] = useState('');
@@ -122,58 +123,76 @@ const EditProfile = () => {
     }
   };
 
+  const resetPictureEditor = () => {
+    setProfilePicture(null);
+    setPicPreview('');
+    setPictureDimensions({ width: 0, height: 0 });
+    setCropPosition({ x: 50, y: 50 });
+    setIsDraggingCrop(false);
+    setIsEditingSavedPicture(false);
+    cropDragRef.current = null;
+    if (pictureInputRef.current) pictureInputRef.current.value = '';
+  };
+
+  const openPictureInCropEditor = (imageSource, selectedFile = null, editingSavedPicture = false) => {
+    const image = new Image();
+
+    image.onload = () => {
+      setPictureDimensions({
+        width: image.naturalWidth,
+        height: image.naturalHeight
+      });
+      setCropPosition({ x: 50, y: 50 });
+      setProfilePicture(selectedFile);
+      setIsEditingSavedPicture(editingSavedPicture);
+      setPicPreview(imageSource);
+    };
+
+    image.onerror = () => {
+      resetPictureEditor();
+      setPicError('This image could not be opened. Please choose another file.');
+    };
+
+    image.src = imageSource;
+  };
+
   const handlePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
       if (!allowedTypes.includes(file.type)) {
-        setProfilePicture(null);
-        setPicPreview('');
+        resetPictureEditor();
         setPicError('Please choose a JPEG, PNG, or WebP image');
-        e.target.value = '';
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        setProfilePicture(null);
-        setPicPreview('');
+        resetPictureEditor();
         setPicError('Profile picture must be 2 MB or smaller');
-        e.target.value = '';
         return;
       }
 
-      setProfilePicture(file);
       const reader = new FileReader();
       reader.onload = () => {
-        const image = new Image();
-        image.onload = () => {
-          setPictureDimensions({
-            width: image.naturalWidth,
-            height: image.naturalHeight
-          });
-          setCropPosition({ x: 50, y: 50 });
-          setPicPreview(reader.result);
-        };
-        image.onerror = () => {
-          setProfilePicture(null);
-          setPicPreview('');
-          setPictureDimensions({ width: 0, height: 0 });
-          setPicError('This image could not be opened. Please choose another file.');
-          if (pictureInputRef.current) pictureInputRef.current.value = '';
-        };
-        image.src = reader.result;
+        openPictureInCropEditor(reader.result, file, false);
       };
       reader.onerror = () => {
-        setProfilePicture(null);
-        setPicPreview('');
-        setPictureDimensions({ width: 0, height: 0 });
+        resetPictureEditor();
         setPicError('This image could not be read. Please choose another file.');
-        if (pictureInputRef.current) pictureInputRef.current.value = '';
       };
       reader.readAsDataURL(file);
+      setPicMessage('');
       setPicError('');
     }
+  };
+
+  const handleEditSavedPicture = () => {
+    if (!user?.profilePicture) return;
+
+    setPicMessage('');
+    setPicError('');
+    openPictureInCropEditor(user.profilePicture, null, true);
   };
 
   const clampCropPosition = (value) => Math.min(100, Math.max(0, value));
@@ -272,7 +291,7 @@ const EditProfile = () => {
 
   const handlePictureSubmit = async (e) => {
     e.preventDefault();
-    if (!profilePicture || !picPreview || !pictureDimensions.width) {
+    if ((!profilePicture && !isEditingSavedPicture) || !picPreview || !pictureDimensions.width) {
       setPicError('Please select a picture first');
       return;
     }
@@ -289,11 +308,7 @@ const EditProfile = () => {
 
       setPicMessage(response.data.message);
       await refreshUser();
-      setProfilePicture(null);
-      setPicPreview('');
-      setPictureDimensions({ width: 0, height: 0 });
-      setCropPosition({ x: 50, y: 50 });
-      if (pictureInputRef.current) pictureInputRef.current.value = '';
+      resetPictureEditor();
     } catch (err) {
       setPicError(err.response?.data?.message || err.message || 'Failed to update profile picture');
     } finally {
@@ -309,11 +324,7 @@ const EditProfile = () => {
     try {
       const response = await axios.delete('/api/users/profile-picture');
       setPicMessage(response.data.message);
-      setProfilePicture(null);
-      setPicPreview('');
-      setPictureDimensions({ width: 0, height: 0 });
-      setCropPosition({ x: 50, y: 50 });
-      if (pictureInputRef.current) pictureInputRef.current.value = '';
+      resetPictureEditor();
       await refreshUser();
     } catch (err) {
       setPicError(err.response?.data?.message || 'Failed to remove profile picture');
@@ -600,12 +611,35 @@ const EditProfile = () => {
                       >
                         Reset crop position
                       </button>
+                      {isEditingSavedPicture && (
+                        <button
+                          type="button"
+                          className="profile-crop-reset"
+                          onClick={resetPictureEditor}
+                        >
+                          Cancel editing
+                        </button>
+                      )}
                     </div>
                   )}
                   <div className="profile-picture-actions">
-                    <button type="submit" className="btn btn-primary" disabled={picLoading || !profilePicture || !picPreview || !pictureDimensions.width}>
-                      {picLoading ? 'Saving...' : user?.profilePicture ? 'Replace Picture' : 'Save Picture'}
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={picLoading || (!profilePicture && !isEditingSavedPicture) || !picPreview || !pictureDimensions.width}
+                    >
+                      {picLoading ? 'Saving...' : isEditingSavedPicture ? 'Save Crop' : user?.profilePicture ? 'Replace Picture' : 'Save Picture'}
                     </button>
+                    {user?.profilePicture && !picPreview && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handleEditSavedPicture}
+                        disabled={picLoading}
+                      >
+                        Edit Current Picture
+                      </button>
+                    )}
                     {user?.profilePicture && (
                       <button
                         type="button"

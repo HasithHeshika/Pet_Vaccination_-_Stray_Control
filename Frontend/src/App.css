@@ -391,6 +391,10 @@
   background: rgba(92, 59, 39, 0.06);
 }
 
+.profile-crop-reset + .profile-crop-reset {
+  margin-left: 8px;
+}
+
 .profile-picture-actions {
   display: flex;
   gap: 12px;
