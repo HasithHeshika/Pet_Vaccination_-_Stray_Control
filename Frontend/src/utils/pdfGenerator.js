@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { formatDate } from './dateFormat';
 
 export const generatePetPDF = (pet) => {
   const doc = new jsPDF();
@@ -40,7 +41,7 @@ export const generatePetPDF = (pet) => {
     petData.push(['Microchip Number', pet.microchipNumber]);
   }
   
-  petData.push(['Registration Date', pet.registrationDate ? new Date(pet.registrationDate).toLocaleDateString() : 'N/A']);
+  petData.push(['Registration Date', formatDate(pet.registrationDate)]);
   
   doc.autoTable({
     startY: yPosition,

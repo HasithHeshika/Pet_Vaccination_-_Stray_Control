@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { generatePetPDF } from '../../utils/pdfGenerator';
 import { getPetImages, readPetImageFiles } from '../../utils/petImages';
+import { formatDate } from '../../utils/dateFormat';
 import axios from '../../api/axios';
 
 const AllPets = () => {
@@ -150,7 +151,7 @@ const AllPets = () => {
                     <td>{pet.breed === 'Other' ? pet.breedOther : pet.breed}</td>
                     <td>{pet.owner?.fullName || 'N/A'}</td>
                     <td>{pet.owner?.phone || 'N/A'}</td>
-                    <td>{new Date(pet.registrationDate).toLocaleDateString()}</td>
+                    <td>{formatDate(pet.registrationDate)}</td>
                     <td>
                       <button 
                         onClick={() => handleViewDetails(pet)}
@@ -268,7 +269,7 @@ const AllPets = () => {
                   )}
                   <div className="detail-item">
                     <strong>Registration Date:</strong>
-                    <span>{new Date(selectedPet.registrationDate).toLocaleDateString()}</span>
+                    <span>{formatDate(selectedPet.registrationDate)}</span>
                   </div>
                 </div>
               </div>

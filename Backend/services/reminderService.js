@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const Vaccination = require('../models/Vaccination');
 const Pet = require('../models/Pet');
 const User = require('../models/User');
+const { formatDate } = require('../utils/dateFormatter');
 
 // Create email transporter
 const createTransporter = () => {
@@ -47,12 +48,7 @@ const sendVaccinationReminderEmail = async (vaccinationId) => {
     const pet = vaccination.petId;
     const owner = pet.ownerId;
 
-    const formattedDate = new Date(vaccination.nextDueDate || vaccination.dueDate).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const formattedDate = formatDate(vaccination.nextDueDate || vaccination.dueDate);
 
     const mailOptions = {
       from: process.env.EMAIL_FROM || '"Pet Care & Vaccination System" <notifications@petcare.org>',

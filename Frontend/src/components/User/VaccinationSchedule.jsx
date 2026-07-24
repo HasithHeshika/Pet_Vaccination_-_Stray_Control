@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from '../../api/axios';
+import { formatDate } from '../../utils/dateFormat';
 
 const VaccinationSchedule = () => {
   const { token, user } = useAuth();
@@ -66,14 +67,6 @@ const VaccinationSchedule = () => {
       });
     }
   }, [pets, petVaccinations, fetchPetVaccinations]);
-
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   const getDaysDifference = (date) => {
     const today = new Date();

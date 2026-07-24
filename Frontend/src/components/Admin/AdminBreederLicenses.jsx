@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../api/axios';
+import { formatDate } from '../../utils/dateFormat';
 import '../Breeder/Breeder.css';
 
 const AdminBreederLicenses = () => {
@@ -100,8 +101,8 @@ const AdminBreederLicenses = () => {
                       {lic.status}
                     </span>
                   </td>
-                  <td>{new Date(lic.createdAt).toLocaleDateString()}</td>
-                  <td>{lic.expiryDate ? new Date(lic.expiryDate).toLocaleDateString() : 'N/A'}</td>
+                  <td>{formatDate(lic.createdAt)}</td>
+                  <td>{formatDate(lic.expiryDate)}</td>
                   <td>
                     <button
                       onClick={() => handleOpenStatusModal(lic)}

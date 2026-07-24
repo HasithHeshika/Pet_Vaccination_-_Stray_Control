@@ -1,14 +1,10 @@
 import React from 'react';
+import { formatDate } from '../../../utils/dateFormat';
 
 const statusLabelClass = {
   Lost: 'status-badge status-badge--pending',
   Found: 'status-badge status-badge--resolved'
 };
-
-const formatDate = (dateValue) => new Date(dateValue).toLocaleString('en-LK', {
-  dateStyle: 'medium',
-  timeStyle: 'short'
-});
 
 const RecentLostReportsTable = ({ reports }) => {
   return (

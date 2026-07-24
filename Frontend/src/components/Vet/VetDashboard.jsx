@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from '../../api/axios';
+import { formatDate } from '../../utils/dateFormat';
 import './VetDashboard.css';
 
 const VetDashboard = () => {
@@ -283,10 +284,10 @@ const VetDashboard = () => {
                     <tr key={v._id}>
                       <td><strong>{v.vaccineName}</strong></td>
                       <td><span className="badge-type">{v.vaccineType}</span></td>
-                      <td>{new Date(v.dateAdministered).toLocaleDateString()}</td>
+                      <td>{formatDate(v.dateAdministered)}</td>
                       <td>
                         <span className={`date-due ${new Date(v.nextDueDate) < new Date() ? 'overdue' : ''}`}>
-                          {new Date(v.nextDueDate).toLocaleDateString()}
+                          {formatDate(v.nextDueDate)}
                         </span>
                       </td>
                       <td>{v.batchNumber || 'N/A'}</td>
