@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import BreederIcon from './Breeder/BreederIcons';
 import './Navbar.css';
@@ -7,6 +7,9 @@ import './Navbar.css';
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const navLinkClass = ({ isActive }) => (
+    `navbar-link${isActive ? ' navbar-link-active' : ''}`
+  );
 
   const handleLogout = () => {
     logout();
@@ -21,42 +24,42 @@ const Navbar = () => {
         </Link>
 
         <div className="navbar-menu">
-          <Link to="/lost-and-found" className="navbar-link">
+          <NavLink to="/lost-and-found" className={navLinkClass}>
             Lost & Found
-          </Link>
+          </NavLink>
 
           {isAuthenticated ? (
             <>
               {user?.role === 'veterinarian' ? (
-                <Link to="/vet/dashboard" className="navbar-link" style={{ fontWeight: 'bold', color: '#0d9488' }}>
+                <NavLink to="/vet/dashboard" className={navLinkClass}>
                   🩺 Vet Portal
-                </Link>
+                </NavLink>
               ) : user?.isAdmin ? (
                 <>
-                  <Link to="/admin/dashboard" className="navbar-link" style={{ fontWeight: 'bold' }}>
+                  <NavLink to="/admin/dashboard" className={navLinkClass}>
                     Admin Dashboard
-                  </Link>
-                  <Link to="/vet/dashboard" className="navbar-link">
+                  </NavLink>
+                  <NavLink to="/vet/dashboard" className={navLinkClass}>
                     Vet Portal
-                  </Link>
-                  <Link to="/admin/licenses" className="navbar-link">
+                  </NavLink>
+                  <NavLink to="/admin/licenses" className={navLinkClass}>
                     Breeder Licenses
-                  </Link>
-                  <Link to="/admin/veterinarian" className="navbar-link">
+                  </NavLink>
+                  <NavLink to="/admin/veterinarian" className={navLinkClass}>
                     Veterinarian
-                  </Link>
-                  <Link to="/admin/authority" className="navbar-link">
+                  </NavLink>
+                  <NavLink to="/admin/authority" className={navLinkClass}>
                     Authority
-                  </Link>
+                  </NavLink>
                 </>
               ) : (
                 <>
-                  <Link to="/user/dashboard" className="navbar-link" style={{ fontWeight: 'bold' }}>
+                  <NavLink to="/user/dashboard" className={navLinkClass}>
                     My Dashboard
-                  </Link>
-                  <Link to="/breeder/dashboard" className="navbar-link">
+                  </NavLink>
+                  <NavLink to="/breeder/dashboard" className={navLinkClass}>
                     Breeder Licensing
-                  </Link>
+                  </NavLink>
                 </>
               )}
               <span className="navbar-user">
