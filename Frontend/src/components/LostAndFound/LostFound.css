@@ -18,7 +18,7 @@
 }
 
 .lost-found-header p {
-  color: #7b604f;
+  color: #52677f;
   margin-bottom: 1.5rem;
 }
 
@@ -29,9 +29,9 @@
 }
 
 .lost-pet-card {
-  background: #fff8ef;
+  background: #f8fbff;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(92, 59, 39, 0.12);
+  box-shadow: 0 4px 12px rgba(15, 59, 105, 0.12);
   overflow: hidden;
   transition: transform 0.3s ease;
 }
@@ -59,7 +59,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7b604f;
+  color: #52677f;
   font-weight: bold;
 }
 
@@ -69,7 +69,7 @@
   right: 10px;
   padding: 5px 10px;
   border-radius: 20px;
-  color: #fff8ef;
+  color: #f8fbff;
   font-weight: bold;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -95,15 +95,15 @@
 
 .pet-info p {
   margin: 0.5rem 0;
-  color: #71523d;
+  color: #405a75;
   font-size: 0.95rem;
 }
 
 .pet-description {
   margin-top: 1rem !important;
-  color: #7b604f !important;
+  color: #52677f !important;
   font-style: italic;
-  border-top: 1px solid rgba(166, 86, 51, 0.14);
+  border-top: 1px solid rgba(37, 99, 235, 0.14);
   padding-top: 1rem;
 }
 
@@ -121,9 +121,9 @@
   max-width: 600px;
   margin: 2rem auto;
   padding: 2rem;
-  background: #fff8ef;
+  background: #f8fbff;
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(92, 59, 39, 0.1);
+  box-shadow: 0 4px 15px rgba(15, 59, 105, 0.1);
 }
 
 .report-lost-container h2 {
@@ -134,7 +134,7 @@
 
 .report-lost-container > p {
   text-align: center;
-  color: #7b604f;
+  color: #52677f;
   margin-bottom: 2rem;
 }
 
@@ -161,7 +161,7 @@
 .report-form .form-control {
   width: 100%;
   padding: 0.8rem;
-  border: 1px solid rgba(166, 86, 51, 0.28);
+  border: 1px solid rgba(37, 99, 235, 0.28);
   border-radius: 5px;
   font-size: 1rem;
 }
@@ -169,7 +169,7 @@
 .report-form .form-control:focus {
   outline: none;
   border-color: var(--pet-rustic-apricot);
-  box-shadow: 0 0 0 2px rgba(217, 130, 74, 0.18);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.18);
 }
 
 .form-actions {
@@ -185,7 +185,7 @@
   padding: 3rem;
   background: var(--pet-soft-honey-cream);
   border-radius: 10px;
-  color: #7b604f;
+  color: #52677f;
   font-size: 1.1rem;
 }
 

@@ -143,8 +143,8 @@ const VaccinationManagement = () => {
 
   const getStatusBadge = (status) => {
     const styles = {
-      administered: { background: 'var(--pet-terra-spice)', color: '#fff8ef' },
-      scheduled: { background: 'var(--pet-rustic-apricot)', color: '#fff8ef' },
+      administered: { background: 'var(--pet-terra-spice)', color: '#f8fbff' },
+      scheduled: { background: 'var(--pet-rustic-apricot)', color: '#f8fbff' },
       overdue: { background: '#dc3545', color: 'white' },
       cancelled: { background: '#6c757d', color: 'white' }
     };
@@ -362,7 +362,7 @@ const VaccinationManagement = () => {
         )}
 
         {vaccinations.length === 0 ? (
-          <p style={{ textAlign: 'center', padding: '40px', color: '#71523d' }}>
+          <p style={{ textAlign: 'center', padding: '40px', color: '#405a75' }}>
             No vaccination records found. Click "Add Vaccination" to create the first record.
           </p>
         ) : (

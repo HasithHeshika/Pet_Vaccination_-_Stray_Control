@@ -379,7 +379,7 @@ const AllPets = () => {
         .data-table td {
           padding: 12px 15px;
           text-align: left;
-          border-bottom: 1px solid rgba(166, 86, 51, 0.18);
+          border-bottom: 1px solid rgba(37, 99, 235, 0.18);
         }
 
         .data-table th {
@@ -391,7 +391,7 @@ const AllPets = () => {
         }
 
         .data-table tbody tr:hover {
-          background-color: rgba(231, 181, 103, 0.18);
+          background-color: rgba(147, 197, 253, 0.18);
         }
 
         .data-table tbody tr:last-child td {
@@ -414,13 +414,13 @@ const AllPets = () => {
         }
 
         .modal-content {
-          background: #fff8ef;
+          background: #f8fbff;
           border-radius: 10px;
           max-width: 800px;
           width: 100%;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 10px 40px rgba(92, 59, 39, 0.28);
+          box-shadow: 0 10px 40px rgba(15, 59, 105, 0.28);
         }
 
         .modal-header {
@@ -428,7 +428,7 @@ const AllPets = () => {
           justify-content: space-between;
           align-items: center;
           padding: 20px 25px;
-          border-bottom: 2px solid rgba(166, 86, 51, 0.16);
+          border-bottom: 2px solid rgba(37, 99, 235, 0.16);
           background-color: var(--pet-soft-honey-cream);
           color: var(--pet-ember-espresso);
           border-radius: 10px 10px 0 0;
@@ -465,7 +465,7 @@ const AllPets = () => {
 
         .modal-footer {
           padding: 15px 25px;
-          border-top: 2px solid rgba(166, 86, 51, 0.16);
+          border-top: 2px solid rgba(37, 99, 235, 0.16);
           display: flex;
           justify-content: flex-end;
         }
@@ -473,7 +473,7 @@ const AllPets = () => {
         .detail-section {
           margin-bottom: 25px;
           padding: 20px;
-          background: rgba(246, 229, 201, 0.48);
+          background: rgba(219, 234, 254, 0.48);
           border-radius: 8px;
           border-left: 4px solid var(--pet-rustic-apricot);
         }
@@ -502,7 +502,7 @@ const AllPets = () => {
         }
 
         .detail-item strong {
-          color: #71523d;
+          color: #405a75;
           font-size: 14px;
         }
 

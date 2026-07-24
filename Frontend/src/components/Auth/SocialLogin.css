@@ -79,7 +79,7 @@
 }
 
 .google-mark {
-  color: #a65633;
+  color: #2563eb;
   font-weight: 700;
   font-size: 18px;
 }
@@ -96,9 +96,9 @@
   width: fit-content;
   margin: 14px auto 0;
   padding: 5px 12px;
-  border: 1px solid rgba(166, 86, 51, 0.25);
+  border: 1px solid rgba(37, 99, 235, 0.25);
   border-radius: 999px;
-  background: rgba(246, 229, 201, 0.72);
+  background: rgba(219, 234, 254, 0.72);
   color: var(--pet-terra-spice);
   font-size: 0.75rem;
   font-weight: 700;

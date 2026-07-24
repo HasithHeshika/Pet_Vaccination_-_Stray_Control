@@ -10,9 +10,9 @@
 
 /* Pet Profile Card */
 .pet-profile-card {
-  background: #fff8ef;
+  background: #f8fbff;
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(92, 59, 39, 0.24);
+  box-shadow: 0 20px 60px rgba(15, 59, 105, 0.24);
   max-width: 800px;
   width: 100%;
   overflow: hidden;
@@ -33,7 +33,7 @@
 /* Header */
 .profile-header {
   background: linear-gradient(135deg, var(--pet-rustic-apricot) 0%, var(--pet-terra-spice) 100%);
-  color: #fff8ef;
+  color: #f8fbff;
   padding: 40px 30px;
   text-align: center;
 }
@@ -79,11 +79,11 @@
   background: var(--pet-soft-honey-cream);
   padding: 20px;
   text-align: center;
-  border-bottom: 2px solid rgba(166, 86, 51, 0.14);
+  border-bottom: 2px solid rgba(37, 99, 235, 0.14);
 }
 
 .id-label {
-  color: #7b604f;
+  color: #52677f;
   font-size: 14px;
   font-weight: 500;
   margin-right: 10px;
@@ -100,7 +100,7 @@
 /* Info Sections */
 .info-section {
   padding: 30px;
-  border-bottom: 1px solid rgba(166, 86, 51, 0.14);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.14);
 }
 
 .info-section:last-of-type {
@@ -140,7 +140,7 @@
 }
 
 .info-label {
-  color: #7b604f;
+  color: #52677f;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -155,7 +155,7 @@
 
 /* Medical Section */
 .medical-section {
-  background: rgba(246, 229, 201, 0.55);
+  background: rgba(219, 234, 254, 0.55);
 }
 
 .medical-grid {
@@ -165,7 +165,7 @@
 }
 
 .medical-item {
-  background: #fff8ef;
+  background: #f8fbff;
   padding: 15px;
   border-radius: 8px;
   border-left: 4px solid var(--pet-rustic-apricot);
@@ -181,7 +181,7 @@
 
 .medical-value {
   display: block;
-  color: #71523d;
+  color: #405a75;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -197,7 +197,7 @@
   align-items: center;
   gap: 15px;
   padding: 15px;
-  background: #fff8ef;
+  background: #f8fbff;
   border-radius: 12px;
   border: 2px dashed var(--pet-rustic-apricot);
 }
@@ -206,7 +206,7 @@
   width: 50px;
   height: 50px;
   background: var(--pet-terra-spice);
-  color: #fff8ef;
+  color: #f8fbff;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -222,7 +222,7 @@
 }
 
 .stamp-label {
-  color: #7b604f;
+  color: #52677f;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -236,7 +236,7 @@
 
 /* Emergency Notice */
 .emergency-notice {
-  background: rgba(231, 181, 103, 0.25);
+  background: rgba(147, 197, 253, 0.25);
   border: 2px solid var(--pet-golden-amber);
   border-radius: 12px;
   padding: 20px;
@@ -260,12 +260,12 @@
   padding: 20px 30px;
   text-align: center;
   background: var(--pet-soft-honey-cream);
-  border-bottom: 1px solid rgba(166, 86, 51, 0.14);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.14);
 }
 
 .btn-download-pdf {
   background: linear-gradient(135deg, var(--pet-rustic-apricot) 0%, var(--pet-terra-spice) 100%);
-  color: #fff8ef;
+  color: #f8fbff;
   border: none;
   padding: 15px 40px;
   font-size: 16px;
@@ -273,7 +273,7 @@
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(166, 86, 51, 0.32);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.32);
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -281,7 +281,7 @@
 
 .btn-download-pdf:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(166, 86, 51, 0.42);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.42);
 }
 
 .btn-download-pdf:active {
@@ -290,7 +290,7 @@
 
 .download-hint {
   margin: 10px 0 0 0;
-  color: #7b604f;
+  color: #52677f;
   font-size: 13px;
   font-style: italic;
 }
