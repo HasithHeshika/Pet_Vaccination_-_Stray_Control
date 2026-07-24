@@ -7,6 +7,27 @@ const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
 const { generateQRCode } = require('../utils/qrGenerator');
 
+const MAX_PET_IMAGES = 2;
+const MAX_PET_IMAGE_SIZE = 2 * 1024 * 1024;
+const PET_IMAGE_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/;
+
+const validatePetImage = (image) => {
+  if (typeof image === 'string' && /^https?:\/\/\S+$/i.test(image)) {
+    return true;
+  }
+
+  const match = typeof image === 'string' && image.match(PET_IMAGE_DATA_URL);
+  if (!match) {
+    throw new Error('Images must be JPEG, PNG, or WebP files');
+  }
+
+  if (Buffer.byteLength(match[1], 'base64') > MAX_PET_IMAGE_SIZE) {
+    throw new Error('Each pet image must be 2 MB or smaller');
+  }
+
+  return true;
+};
+
 // Generate unique Pet ID
 const generatePetId = () => {
   const timestamp = Date.now().toString(36);
@@ -26,13 +47,21 @@ router.post('/register', authMiddleware, adminMiddleware, [
   body('age.months').isInt({ min: 0, max: 11 }).withMessage('Valid age in months is required'),
   body('gender').isIn(['Male', 'Female']).withMessage('Gender must be Male or Female'),
   body('color').trim().notEmpty().withMessage('Color is required'),
-  body('weight').isFloat({ min: 0 }).withMessage('Valid weight is required')
+  body('weight').isFloat({ min: 0 }).withMessage('Valid weight is required'),
+  body('photoUrls')
+    .optional()
+    .isArray({ max: MAX_PET_IMAGES })
+    .withMessage('A pet can have a maximum of two images'),
+  body('photoUrls.*').optional().custom(validatePetImage)
 ], async (req, res) => {
   try {
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({
+        message: errors.array()[0].msg,
+        errors: errors.array()
+      });
     }
 
     const {
@@ -48,7 +77,8 @@ router.post('/register', authMiddleware, adminMiddleware, [
       weight,
       microchipNumber,
       medicalHistory,
-      photoUrl
+      photoUrl,
+      photoUrls = []
     } = req.body;
 
     // Verify owner exists
@@ -95,6 +125,7 @@ router.post('/register', authMiddleware, adminMiddleware, [
       microchipNumber,
       medicalHistory,
       photoUrl,
+      photoUrls,
       qrCode
     });
 
@@ -110,6 +141,42 @@ router.post('/register', authMiddleware, adminMiddleware, [
   } catch (error) {
     console.error('Pet registration error:', error);
     res.status(500).json({ message: 'Server error during pet registration' });
+  }
+});
+
+// @route   PUT /api/pets/:id/photos
+// @desc    Replace a pet's images (Owner or Admin)
+// @access  Private
+router.put('/:id/photos', authMiddleware, [
+  body('photoUrls')
+    .isArray({ max: MAX_PET_IMAGES })
+    .withMessage('A pet can have a maximum of two images'),
+  body('photoUrls.*').custom(validatePetImage)
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const pet = await Pet.findById(req.params.id);
+    if (!pet) {
+      return res.status(404).json({ message: 'Pet not found' });
+    }
+
+    if (pet.owner.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    pet.photoUrls = req.body.photoUrls;
+    pet.photoUrl = undefined;
+    await pet.save();
+
+    await pet.populate('owner', 'fullName email phone address');
+    res.json({ message: 'Pet images updated successfully', pet });
+  } catch (error) {
+    console.error('Update pet images error:', error);
+    res.status(500).json({ message: 'Server error while updating pet images' });
   }
 });
 

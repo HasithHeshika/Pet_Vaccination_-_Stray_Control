@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { generatePetPDF } from '../../utils/pdfGenerator';
+import { getPetImages, readPetImageFiles } from '../../utils/petImages';
 import axios from '../../api/axios';
 
 const AllPets = () => {
@@ -12,6 +13,8 @@ const AllPets = () => {
   const [error, setError] = useState('');
   const [selectedPet, setSelectedPet] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [photoError, setPhotoError] = useState('');
+  const [savingPhotos, setSavingPhotos] = useState(false);
 
   const fetchAllPets = useCallback(async () => {
     try {
@@ -43,6 +46,48 @@ const AllPets = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedPet(null);
+    setPhotoError('');
+  };
+
+  const updatePetPhotos = async (photoUrls) => {
+    setSavingPhotos(true);
+    setPhotoError('');
+
+    try {
+      const response = await axios.put(
+        `/api/pets/${selectedPet._id}/photos`,
+        { photoUrls },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const updatedPet = response.data.pet;
+      setSelectedPet(updatedPet);
+      setPets((currentPets) => currentPets.map((pet) => (
+        pet._id === updatedPet._id ? updatedPet : pet
+      )));
+    } catch (updateError) {
+      setPhotoError(updateError.response?.data?.message || 'Failed to update pet images');
+    } finally {
+      setSavingPhotos(false);
+    }
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const currentPhotos = getPetImages(selectedPet);
+
+    try {
+      const newPhotos = await readPetImageFiles(e.target.files, currentPhotos.length);
+      await updatePetPhotos([...currentPhotos, ...newPhotos]);
+    } catch (uploadError) {
+      setPhotoError(uploadError.message);
+    } finally {
+      e.target.value = '';
+    }
+  };
+
+  const handleRemovePhoto = async (index) => {
+    await updatePetPhotos(
+      getPetImages(selectedPet).filter((_, photoIndex) => photoIndex !== index)
+    );
   };
 
   const handleDownloadQR = (pet) => {
@@ -134,16 +179,50 @@ const AllPets = () => {
             
             <div className="modal-body">
               {/* Pet Photo Section */}
-              {selectedPet.photoUrl && (
-                <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-                  <img 
-                    src={selectedPet.photoUrl} 
-                    alt={selectedPet.petName} 
-                    style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
-                    onError={(e) => e.target.style.display = 'none'}
-                  />
-                </div>
-              )}
+              <div className="detail-section">
+                <h3>Pet Images</h3>
+                {photoError && <div className="error-message">{photoError}</div>}
+                {getPetImages(selectedPet).length > 0 && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px', marginBottom: '15px' }}>
+                    {getPetImages(selectedPet).map((photo, index) => (
+                      <div key={index} style={{ position: 'relative' }}>
+                        <img
+                          src={photo}
+                          alt={`${selectedPet.petName} ${index + 1}`}
+                          style={{ width: '100%', height: '260px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                          onError={(e) => e.target.style.display = 'none'}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-small"
+                          onClick={() => handleRemovePhoto(index)}
+                          disabled={savingPhotos}
+                          style={{ position: 'absolute', top: '8px', right: '8px' }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {getPetImages(selectedPet).length < 2 && (
+                  <label className="btn btn-secondary" style={{ display: 'inline-block', cursor: savingPhotos ? 'not-allowed' : 'pointer' }}>
+                    {savingPhotos ? 'Saving Images...' : 'Upload Pet Images'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      onChange={handlePhotoUpload}
+                      disabled={savingPhotos}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                )}
+                <p style={{ marginTop: '8px', fontSize: '13px' }}>
+                  Maximum 2 images. JPEG, PNG, or WebP; up to 2 MB each.
+                </p>
+                {getPetImages(selectedPet).length === 0 && <p>No pet images uploaded yet.</p>}
+              </div>
 
               {/* Pet Information Section */}
               <div className="detail-section">

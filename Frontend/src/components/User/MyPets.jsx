@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import { generatePetPDF } from '../../utils/pdfGenerator';
+import { getPetImages, readPetImageFiles } from '../../utils/petImages';
 
 const MyPets = () => {
   const { user, token } = useAuth();
@@ -9,6 +10,8 @@ const MyPets = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedPet, setSelectedPet] = useState(null);
+  const [photoError, setPhotoError] = useState('');
+  const [savingPhotos, setSavingPhotos] = useState(false);
 
   const fetchMyPets = useCallback(async () => {
     try {
@@ -51,6 +54,49 @@ const MyPets = () => {
 
   const handleCloseDetails = () => {
     setSelectedPet(null);
+    setPhotoError('');
+  };
+
+  const updatePetPhotos = async (photoUrls) => {
+    setSavingPhotos(true);
+    setPhotoError('');
+
+    try {
+      const response = await axios.put(
+        `/api/pets/${selectedPet._id}/photos`,
+        { photoUrls },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const updatedPet = response.data.pet;
+      setSelectedPet(updatedPet);
+      setPets((currentPets) => currentPets.map((pet) => (
+        pet._id === updatedPet._id ? updatedPet : pet
+      )));
+    } catch (updateError) {
+      setPhotoError(updateError.response?.data?.message || 'Failed to update pet images');
+    } finally {
+      setSavingPhotos(false);
+    }
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const currentPhotos = getPetImages(selectedPet);
+
+    try {
+      const newPhotos = await readPetImageFiles(e.target.files, currentPhotos.length);
+      await updatePetPhotos([...currentPhotos, ...newPhotos]);
+    } catch (uploadError) {
+      setPhotoError(uploadError.message);
+    } finally {
+      e.target.value = '';
+    }
+  };
+
+  const handleRemovePhoto = async (index) => {
+    const remainingPhotos = getPetImages(selectedPet).filter(
+      (_, photoIndex) => photoIndex !== index
+    );
+    await updatePetPhotos(remainingPhotos);
   };
 
   if (loading) {
@@ -73,10 +119,10 @@ const MyPets = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
           {pets.map((pet) => (
             <div key={pet._id} className="card">
-              {pet.photoUrl && (
+              {getPetImages(pet)[0] && (
                 <div style={{ marginBottom: '15px' }}>
                   <img 
-                    src={pet.photoUrl} 
+                    src={getPetImages(pet)[0]}
                     alt={pet.petName} 
                     style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px' }} 
                     onError={(e) => e.target.style.display = 'none'}
@@ -141,16 +187,51 @@ const MyPets = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h2>{selectedPet.petName}</h2>
-            {selectedPet.photoUrl && (
-              <div style={{ marginTop: '15px', textAlign: 'center' }}>
-                <img 
-                  src={selectedPet.photoUrl} 
-                  alt={selectedPet.petName} 
-                  style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px' }} 
-                  onError={(e) => e.target.style.display = 'none'}
-                />
-              </div>
-            )}
+            <div style={{ marginTop: '15px' }}>
+              <h3>Pet Images</h3>
+              {photoError && <div className="error-message">{photoError}</div>}
+              {getPetImages(selectedPet).length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                  {getPetImages(selectedPet).map((photo, index) => (
+                    <div key={index} style={{ position: 'relative' }}>
+                      <img
+                        src={photo}
+                        alt={`${selectedPet.petName} ${index + 1}`}
+                        style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '8px' }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-small"
+                        onClick={() => handleRemovePhoto(index)}
+                        disabled={savingPhotos}
+                        style={{ position: 'absolute', top: '8px', right: '8px' }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {getPetImages(selectedPet).length < 2 && (
+                <label className="btn btn-secondary" style={{ display: 'inline-block', cursor: savingPhotos ? 'not-allowed' : 'pointer' }}>
+                  {savingPhotos ? 'Saving Images...' : 'Upload Pet Images'}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    onChange={handlePhotoUpload}
+                    disabled={savingPhotos}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+              )}
+              <p style={{ marginTop: '8px', fontSize: '13px' }}>
+                Maximum 2 images. JPEG, PNG, or WebP; up to 2 MB each.
+              </p>
+              {getPetImages(selectedPet).length === 0 && (
+                <p>No pet images uploaded yet.</p>
+              )}
+            </div>
             
             
             <div style={{ marginTop: '20px' }}>

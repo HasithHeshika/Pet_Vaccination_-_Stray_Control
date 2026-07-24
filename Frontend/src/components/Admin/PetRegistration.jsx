@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { generatePetPDF } from '../../utils/pdfGenerator';
+import { getPetImages, readPetImageFiles } from '../../utils/petImages';
 import axios from '../../api/axios';
 
 const PetRegistration = () => {
@@ -35,7 +36,7 @@ const PetRegistration = () => {
       existingConditions: '',
       specialNotes: ''
     },
-    photoUrl: ''
+    photoUrls: []
   });
 
   // Breed options for each pet type
@@ -107,6 +108,28 @@ const PetRegistration = () => {
     }
   };
 
+  const handlePhotoUpload = async (e) => {
+    try {
+      const newPhotos = await readPetImageFiles(e.target.files, formData.photoUrls.length);
+      setFormData((previous) => ({
+        ...previous,
+        photoUrls: [...previous.photoUrls, ...newPhotos]
+      }));
+      setError('');
+    } catch (uploadError) {
+      setError(uploadError.message);
+    } finally {
+      e.target.value = '';
+    }
+  };
+
+  const handleRemovePhoto = (index) => {
+    setFormData((previous) => ({
+      ...previous,
+      photoUrls: previous.photoUrls.filter((_, photoIndex) => photoIndex !== index)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -168,7 +191,7 @@ const PetRegistration = () => {
         existingConditions: '',
         specialNotes: ''
       },
-      photoUrl: ''
+      photoUrls: []
     });
   };
 
@@ -194,6 +217,22 @@ const PetRegistration = () => {
             <p><strong>Breed:</strong> {registeredPet.breed === 'Other' ? registeredPet.breedOther : registeredPet.breed}</p>
             <p><strong>Owner:</strong> {owner.fullName}</p>
           </div>
+
+          {getPetImages(registeredPet).length > 0 && (
+            <div style={{ marginTop: '20px' }}>
+              <h3>Pet Images</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px' }}>
+                {getPetImages(registeredPet).map((photo, index) => (
+                  <img
+                    key={index}
+                    src={photo}
+                    alt={`${registeredPet.petName} ${index + 1}`}
+                    style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '8px' }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <h3>QR Code</h3>
@@ -449,15 +488,37 @@ const PetRegistration = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="photoUrl">Pet Photo URL (Optional)</label>
+            <label htmlFor="petPhotos">Pet Images (Optional, maximum 2)</label>
             <input
-              type="url"
-              id="photoUrl"
-              name="photoUrl"
-              value={formData.photoUrl}
-              onChange={handleChange}
-              placeholder="https://example.com/pet-photo.jpg"
+              type="file"
+              id="petPhotos"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={handlePhotoUpload}
+              disabled={formData.photoUrls.length >= 2}
             />
+            <small>JPEG, PNG, or WebP. Maximum 2 MB per image.</small>
+            {formData.photoUrls.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px', marginTop: '12px' }}>
+                {formData.photoUrls.map((photo, index) => (
+                  <div key={index} style={{ position: 'relative' }}>
+                    <img
+                      src={photo}
+                      alt={`Pet preview ${index + 1}`}
+                      style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '8px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-small"
+                      onClick={() => handleRemovePhoto(index)}
+                      style={{ position: 'absolute', top: '8px', right: '8px' }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={submitting}>

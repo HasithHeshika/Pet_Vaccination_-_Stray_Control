@@ -59,6 +59,8 @@
 .pet-photo-section {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
   padding: 30px;
   background: var(--pet-soft-honey-cream);
 }
