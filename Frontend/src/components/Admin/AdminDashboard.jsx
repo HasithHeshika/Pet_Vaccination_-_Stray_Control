@@ -111,6 +111,14 @@ const AdminDashboard = () => {
         <Link to="/admin/pets" className="btn btn-primary btn-small">
           View Pets
         </Link>
+
+        <Link to="/vet/dashboard" className="btn btn-secondary btn-small" style={{ backgroundColor: '#0d9488', color: '#fff', borderColor: '#0d9488' }}>
+          🩺 Vet Portal
+        </Link>
+
+        <Link to="/admin/licenses" className="btn btn-secondary btn-small">
+          📜 Breeder Licenses
+        </Link>
       </div>
 
       <DashboardSummaryCards {...summary} />

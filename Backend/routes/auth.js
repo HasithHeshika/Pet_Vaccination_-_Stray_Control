@@ -33,13 +33,17 @@ router.post('/signup', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullName, email, password, phone, nicNumber, address } = req.body;
+    const { fullName, email, password, phone, nicNumber, address, role, vetLicenseNumber, clinicName } = req.body;
 
     // Check if user already exists
     let user = await User.findOne({ $or: [{ email }, { nicNumber }] });
     if (user) {
       return res.status(400).json({ message: 'User with this email or NIC already exists' });
     }
+
+    // Determine user role and isAdmin flag
+    const userRole = role === 'veterinarian' ? 'veterinarian' : (role === 'admin' ? 'admin' : 'user');
+    const isAdmin = userRole === 'admin';
 
     // Create new user
     user = new User({
@@ -49,7 +53,10 @@ router.post('/signup', [
       phone,
       nicNumber,
       address,
-      isAdmin: false
+      role: userRole,
+      isAdmin,
+      vetLicenseNumber: userRole === 'veterinarian' ? vetLicenseNumber : undefined,
+      clinicName: userRole === 'veterinarian' ? clinicName : undefined
     });
 
     await user.save();
@@ -64,7 +71,10 @@ router.post('/signup', [
         id: user._id,
         fullName: user.fullName,
         email: user.email,
-        isAdmin: user.isAdmin
+        role: user.role,
+        isAdmin: user.isAdmin,
+        vetLicenseNumber: user.vetLicenseNumber,
+        clinicName: user.clinicName
       }
     });
   } catch (error) {
@@ -104,6 +114,9 @@ router.post('/login', [
     // Generate token
     const token = generateToken(user._id);
 
+    // Fallback role for existing users created before role field
+    const effectiveRole = user.role || (user.isAdmin ? 'admin' : 'user');
+
     res.json({
       message: 'Login successful',
       token,
@@ -111,7 +124,10 @@ router.post('/login', [
         id: user._id,
         fullName: user.fullName,
         email: user.email,
-        isAdmin: user.isAdmin
+        role: effectiveRole,
+        isAdmin: user.isAdmin || effectiveRole === 'admin',
+        vetLicenseNumber: user.vetLicenseNumber,
+        clinicName: user.clinicName
       }
     });
   } catch (error) {
@@ -125,6 +141,7 @@ router.post('/login', [
 // @access  Private
 router.get('/me', authMiddleware, async (req, res) => {
   try {
+    const effectiveRole = req.user.role || (req.user.isAdmin ? 'admin' : 'user');
     res.json({
       user: {
         id: req.user._id,
@@ -133,7 +150,10 @@ router.get('/me', authMiddleware, async (req, res) => {
         phone: req.user.phone,
         address: req.user.address,
         nicNumber: req.user.nicNumber,
-        isAdmin: req.user.isAdmin
+        role: effectiveRole,
+        isAdmin: req.user.isAdmin || effectiveRole === 'admin',
+        vetLicenseNumber: req.user.vetLicenseNumber,
+        clinicName: req.user.clinicName
       }
     });
   } catch (error) {

@@ -38,6 +38,19 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  role: {
+    type: String,
+    enum: ['user', 'veterinarian', 'admin'],
+    default: 'user'
+  },
+  vetLicenseNumber: {
+    type: String,
+    trim: true
+  },
+  clinicName: {
+    type: String,
+    trim: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

@@ -20,6 +20,10 @@ import PetProfile from './components/Public/PetProfile';
 import LostFoundFeed from './components/LostAndFound/LostFoundFeed';
 import ReportLostForm from './components/LostAndFound/ReportLostForm';
 import ReportStrayForm from './components/Stray/ReportStrayForm';
+import VetDashboard from './components/Vet/VetDashboard';
+import ApplyBreederLicense from './components/Breeder/ApplyBreederLicense';
+import MyBreederLicenses from './components/Breeder/MyBreederLicenses';
+import AdminBreederLicenses from './components/Admin/AdminBreederLicenses';
 import './App.css';
 
 // Protected Route Component
@@ -35,6 +39,25 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
 
   if (adminOnly && !isAdmin) {
+    return <Navigate to="/user/dashboard" replace />;
+  }
+
+  return children;
+};
+
+// Vet Protected Route Component
+const VetRoute = ({ children }) => {
+  const { isAuthenticated, isVet, loading } = useAuth();
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isVet) {
     return <Navigate to="/user/dashboard" replace />;
   }
 
@@ -125,12 +148,48 @@ function AppContent() {
             }
           />
 
+          {/* Vet Portal Routes */}
+          <Route
+            path="/vet/dashboard"
+            element={
+              <VetRoute>
+                <VetDashboard />
+              </VetRoute>
+            }
+          />
+
+          {/* Breeder Licensing Routes */}
+          <Route
+            path="/breeder/apply"
+            element={
+              <ProtectedRoute>
+                <ApplyBreederLicense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/breeder/my-licenses"
+            element={
+              <ProtectedRoute>
+                <MyBreederLicenses />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Admin Routes */}
           <Route
             path="/admin/dashboard"
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/licenses"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminBreederLicenses />
               </ProtectedRoute>
             }
           />

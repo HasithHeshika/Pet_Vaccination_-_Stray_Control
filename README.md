@@ -1,32 +1,53 @@
 # Pet Vaccination & Stray Control System
 
-A comprehensive MERN stack application for managing pet ownership records, vaccination schedules, and QR-based pet identification. This system provides a robust solution for tracking pets, managing stray reports, and facilitating administrative control over pet registrations.
+A comprehensive MERN stack application for managing pet ownership records, vaccination schedules, QR-based pet identification, veterinarian patient records, breeder licensing, and municipal stray animal control.
 
 ---
 
 ## 📑 Table of Contents
 - [Features](#features)
+- [Sprint Progress & Implementation Status](#sprint-progress--implementation-status)
+- [User Roles & Access Control](#user-roles--access-control)
 - [Technologies Used](#technologies-used)
 - [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
 - [Getting Started (Docker)](#getting-started-docker-recommended)
 - [Manual Setup](#manual-setup)
-- [Usage Guide](#usage-guide)
 - [API Documentation](#api-documentation)
-- [Troubleshooting](#troubleshooting)
 
 ---
 
 ## ✨ Features
 
-- **User Authentication**: Secure Login/Signup with JWT.
-- **Role-Based Access**: Separation of Admin and User roles.
-- **Admin Dashboard**: Comprehensive user and pet management.
-- **Pet Registration**: Admin-only pet registration system.
-- **QR Code Integration**: Unique QR code generation and downloading for each pet.
-- **User Dashboard**: Personalized view of registered pets and their details.
-- **Vaccination Tracking**: Schedule and monitor vaccination records.
-- **Stray Reporting**: Built-in mechanisms to report and manage stray animals.
+- **Role-Based Access Control**: Granular permissions for **Admins**, **Veterinarians**, and **Pet Owners / Breeders**.
+- **Pet Registration & Unique QR Codes**: Admin pet registration with instant QR code generation and scan tracking.
+- **Veterinarian Portal**: Dedicated doctor interface to lookup patient records by Pet ID, view medical history, log vaccinations/treatments, and send reminders.
+- **Automated Vaccination Reminders**: Background `node-cron` service and `nodemailer` integration to deliver email reminders for upcoming/overdue vaccinations.
+- **Breeder Licensing System**: Full breeder application workflow, status tracking, renewal requests, and municipal authority approval dashboards.
+- **Stray & Lost Pet Reporting**: Citizen stray animal reporting, lost pet feed, and municipal progress dashboards.
+
+---
+
+## 🏆 Sprint Progress & Implementation Status
+
+| Sprint | Goal / Description | Status | Key Components |
+| :--- | :--- | :---: | :--- |
+| **Sprint 1** | Setup of Pet Registration & QR ID system | ✅ Completed | `Pet.js`, `PetRegistration.jsx`, QR generation, JWT Auth |
+| **Sprint 2** | Vaccination Scheduler & Automated Reminder service | ✅ Completed | `Vaccination.js`, `reminderService.js`, `node-cron`, `nodemailer` email notifications |
+| **Sprint 3** | Implementation of Veterinarian Portal | ✅ Completed | `VetDashboard.jsx`, Vet role middleware (`vet.js`), patient lookup & treatment logger |
+| **Sprint 4** | Lost-and-Found & Stray Reporting modules | ✅ Completed | `LostReport.js`, `StrayReport.js`, `ReportStrayForm.jsx`, `LostFoundFeed.jsx` |
+| **Sprint 5** | Breeder Licensing & Admin Dashboards | ✅ Completed | `BreederLicense.js`, `ApplyBreederLicense.jsx`, `MyBreederLicenses.jsx`, `AdminBreederLicenses.jsx` |
+| **Sprint 6** | Testing, UI polish & deployment readiness | ✅ Completed | API validation suite (`validate-api.js`), responsive UI styling, Docker compose setup |
+
+---
+
+## 👥 User Roles & Access Control
+
+1. **System Administrator (`admin`)**
+   - Access to full Admin Dashboard, pet registration, user management, stray report tracking, and breeder license approvals.
+2. **Registered Veterinarian (`veterinarian`)**
+   - Access to dedicated **Vet Portal** (`/vet/dashboard`) for quick patient lookup, viewing full medical history, logging new vaccinations/treatments, and triggering email reminders to pet owners.
+3. **Pet Owner / Breeder (`user`)**
+   - Personal dashboard to view registered pets, QR codes, upcoming vaccination schedules, report stray animals, post lost pets, and apply for/renew breeder licenses.
 
 ---
 
@@ -34,16 +55,16 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 
 ### Backend
 - **Node.js** & **Express.js** - RESTful API framework
-- **MongoDB** & **Mongoose** - NoSQL database and object modeling
-- **JWT** (JSON Web Tokens) - Authentication
-- **Bcrypt.js** - Password hashing
-- **QRCode** - QR generation library
+- **MongoDB** & **Mongoose** - Database & object modeling
+- **JWT & Bcrypt.js** - Authentication & password security
+- **node-cron** & **nodemailer** - Automated background reminders & emails
+- **QRCode** - QR identification library
 
 ### Frontend
-- **React.js** - UI framework
-- **React Router** - Navigation
-- **Axios** - HTTP client
-- **Context API** - State management
+- **React.js** - Dynamic single-page application framework
+- **React Router v6** - Route management & role protection
+- **Axios** - HTTP API client
+- **Context API** - Global auth & state management
 
 ---
 
@@ -53,20 +74,23 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 pet-management-system/
 ├── Backend/          # Node.js + Express API
 │   ├── config/       # Database configuration
-│   ├── controllers/  # Route controllers
-│   ├── middleware/   # Authentication & validation
-│   ├── models/       # Mongoose schemas
+│   ├── middleware/   # Auth, Admin, and Vet role validation
+│   ├── models/       # Schemas (User, Pet, Vaccination, BreederLicense, StrayReport, LostReport)
 │   ├── routes/       # API endpoints
-│   ├── services/     # Business logic
-│   ├── utils/        # Helper functions
+│   ├── services/     # Automated reminder service & cron scheduler
+│   ├── tests/        # API verification test suite
 │   └── server.js     # Entry point
 ├── Frontend/         # React Application
-│   ├── public/       # Static assets
-│   └── src/          # React source code
-│       ├── api/      # API configurations
-│       ├── components/ # React components
-│       ├── context/  # State management
-│       └── utils/    # Helper functions
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Admin/     # Admin dashboard & license management
+│   │   │   ├── Auth/      # Login & role-enabled Signup
+│   │   │   ├── Breeder/   # Breeder licensing application & list
+│   │   │   ├── Vet/       # Veterinarian Portal & patient lookup
+│   │   │   ├── Stray/     # Stray reporting form
+│   │   │   └── User/      # User dashboard & pet views
+│   │   ├── context/       # AuthContext
+│   │   └── App.jsx        # Routes
 ├── docker-compose.yml     # Production Docker configuration
 ├── docker-compose.dev.yml # Development Docker configuration
 └── Makefile               # Task automation
@@ -74,145 +98,40 @@ pet-management-system/
 
 ---
 
-## 📦 Prerequisites
-
-Choose one of the following methods to run the project. Docker is highly recommended for a seamless setup.
-
-### Option 1: Docker (Recommended)
-- [Docker](https://www.docker.com/get-started)
-- Docker Compose (included with Docker Desktop)
-
-### Option 2: Manual Setup
-- [Node.js](https://nodejs.org/) (v14 or higher)
-- [MongoDB](https://www.mongodb.com/try/download/community) (Running locally on port 27017)
-
----
-
 ## 🐳 Getting Started (Docker - Recommended)
 
-The easiest way to run the project is using the provided Docker configuration.
-
-### 1. Environment Setup
-Copy the example environment file and update the variables if necessary:
 ```bash
+# 1. Environment Setup
 cp .env.example .env
-```
 
-### 2. Start the Application
-
-**Using Make (Easiest):**
-```bash
-# Development mode with hot-reload (Frontend on 3000, Backend on 5001)
+# 2. Start Application with hot-reload (Frontend on 3000, Backend on 5001)
 make dev-up
-
-# Production mode (Frontend on 80 mapped to 3000, Backend on 5000)
-make prod-up
 ```
-
-**Using Docker Compose Directly:**
-```bash
-# Development mode
-docker-compose -f docker-compose.dev.yml up -d
-
-# Production mode
-docker-compose up -d
-```
-
-### 3. Access the System
-- **Frontend (UI):** http://localhost:3000
-- **Backend (API):** http://localhost:5000 (or 5001 in dev mode)
-
-### 4. Stopping the Application
-```bash
-make dev-down    # Or make prod-down
-# OR
-docker-compose down
-```
-
----
-
-## 💻 Manual Setup
-
-If you prefer to run the project without Docker, follow these steps:
-
-### 1. Backend Setup
-1. Open a terminal and navigate to the `Backend` directory:
-   ```bash
-   cd Backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Ensure MongoDB is running locally (`mongodb://localhost:27017`).
-4. Start the backend server:
-   ```bash
-   npm run dev
-   ```
-
-### 2. Frontend Setup
-1. Open a new terminal and navigate to the `Frontend` directory:
-   ```bash
-   cd Frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-
----
-
-## 📘 Usage Guide
-
-### Default Admin Credentials
-- **Email:** `admin@petmanagement.com`
-- **Password:** `Admin@123`
-*(Make sure to change these in the `.env` file before deploying to production!)*
-
-### Workflows
-1. **User Registration:** Users can sign up via the frontend portal providing necessary details.
-2. **Admin Verification:** Log in as an Admin to view registered users.
-3. **Pet Registration:** Admins register pets under specific users, filling in medical and biological details.
-4. **QR Generation:** A unique QR code is automatically generated for the pet, which can be downloaded by both the user and the admin.
 
 ---
 
 ## 🔌 API Documentation
 
 ### Authentication (`/api/auth`)
-- `POST /signup` - Register new user
-- `POST /login` - Authenticate user & get token
-- `GET /me` - Get current authenticated user
+- `POST /signup` - Register user (supports `user` or `veterinarian` role)
+- `POST /login` - Authenticate & receive JWT token
+- `GET /me` - Fetch active authenticated user profile
 
-### Users (`/api/users`) - *Admin Only*
-- `GET /` - Retrieve all users
-- `GET /:id` - Retrieve user by ID
-- `GET /:id/pets` - Retrieve specific user's pets
+### Veterinarian & Vaccinations (`/api/vaccinations`)
+- `POST /` - Add vaccination record (*Admin or Vet*)
+- `GET /pet/:petId` - Retrieve vaccination history for pet
+- `POST /:id/send-reminder` - Trigger manual/automated email reminder to pet owner (*Admin or Vet*)
 
-### Pets (`/api/pets`)
-- `POST /register` - Register a new pet *(Admin Only)*
-- `GET /` - Retrieve all pets *(Admin Only)*
-- `GET /:id` - Retrieve pet by DB ID
-- `GET /petid/:petId` - Retrieve pet by System Pet ID (used for QR scanning)
+### Breeder Licensing (`/api/licenses`)
+- `POST /apply` - Submit breeder license application (*Private*)
+- `GET /my-licenses` - List user's license applications (*Private*)
+- `GET /` - Retrieve all applications (*Admin Only*)
+- `PUT /:id/status` - Approve, reject, or set expiry dates for license (*Admin Only*)
+- `POST /:id/renew` - Request license renewal (*Private*)
+
+### Stray & Lost Reports (`/api/stray-reports`, `/api/lost-and-found`)
+- `POST /` - Submit stray sighting or lost pet report
+- `GET /` - List reports with status filters
+- `PATCH /:id/status` - Update report progress (*Admin Only*)
 
 ---
-
-## 🔧 Troubleshooting
-
-### Port Conflicts
-- If `localhost:3000` or `localhost:5000` is already in use, you can update the ports in your `.env` file or stop the conflicting services.
-
-### MongoDB Connection Issues
-- Ensure your MongoDB container is running (`docker ps`) or your local instance is active.
-- Verify the connection string in `docker-compose.yml` or `Backend/.env`.
-
-### General Docker Issues
-Use the provided Makefile to clean up your environment:
-```bash
-make clean      # Removes all containers and volumes
-make clean-all  # Removes containers, volumes, and images
-```

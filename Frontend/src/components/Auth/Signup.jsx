@@ -10,6 +10,9 @@ const Signup = () => {
     confirmPassword: '',
     phone: '',
     nicNumber: '',
+    role: 'user',
+    vetLicenseNumber: '',
+    clinicName: '',
     address: {
       street: '',
       city: '',
@@ -70,7 +73,11 @@ const Signup = () => {
     const result = await signup(signupData);
     
     if (result.success) {
-      navigate('/user/dashboard');
+      if (result.user.role === 'veterinarian') {
+        navigate('/vet/dashboard');
+      } else {
+        navigate('/user/dashboard');
+      }
     } else {
       setError(result.message);
     }
@@ -86,6 +93,49 @@ const Signup = () => {
       {error && <div className="error-message">{error}</div>}
       
       <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="role">Account Type *</label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+          >
+            <option value="user">Pet Owner / Citizen</option>
+            <option value="veterinarian">Registered Veterinarian</option>
+          </select>
+        </div>
+
+        {formData.role === 'veterinarian' && (
+          <>
+            <div className="form-group">
+              <label htmlFor="vetLicenseNumber">Veterinary License Number *</label>
+              <input
+                type="text"
+                id="vetLicenseNumber"
+                name="vetLicenseNumber"
+                value={formData.vetLicenseNumber}
+                onChange={handleChange}
+                required={formData.role === 'veterinarian'}
+                placeholder="e.g. VET-SL-2024-889"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="clinicName">Clinic / Hospital Name *</label>
+              <input
+                type="text"
+                id="clinicName"
+                name="clinicName"
+                value={formData.clinicName}
+                onChange={handleChange}
+                required={formData.role === 'veterinarian'}
+                placeholder="e.g. City Animal Hospital"
+              />
+            </div>
+          </>
+        )}
+
         <div className="form-group">
           <label htmlFor="fullName">Full Name *</label>
           <input

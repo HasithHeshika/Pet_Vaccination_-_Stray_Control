@@ -26,11 +26,35 @@ const Navbar = () => {
           
           {isAuthenticated ? (
             <>
-              <Link to={user?.isAdmin ? "/admin/dashboard" : "/user/dashboard"} className="navbar-link" style={{ fontWeight: 'bold' }}>
-                My Dashboard
-              </Link>
+              {user?.role === 'veterinarian' ? (
+                <Link to="/vet/dashboard" className="navbar-link" style={{ fontWeight: 'bold', color: '#0d9488' }}>
+                  🩺 Vet Portal
+                </Link>
+              ) : user?.isAdmin ? (
+                <>
+                  <Link to="/admin/dashboard" className="navbar-link" style={{ fontWeight: 'bold' }}>
+                    Admin Dashboard
+                  </Link>
+                  <Link to="/vet/dashboard" className="navbar-link">
+                    🩺 Vet Portal
+                  </Link>
+                  <Link to="/admin/licenses" className="navbar-link">
+                    📜 Breeder Licenses
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/user/dashboard" className="navbar-link" style={{ fontWeight: 'bold' }}>
+                    My Dashboard
+                  </Link>
+                  <Link to="/breeder/my-licenses" className="navbar-link">
+                    📜 Breeder License
+                  </Link>
+                </>
+              )}
+              
               <span className="navbar-user">
-                Welcome, {user?.fullName} {user?.isAdmin && '(Admin)'}
+                Welcome, {user?.fullName} {user?.role === 'veterinarian' ? '(Vet)' : user?.isAdmin ? '(Admin)' : ''}
               </span>
               <button onClick={handleLogout} className="btn btn-danger btn-small">
                 Logout

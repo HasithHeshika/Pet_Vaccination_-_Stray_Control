@@ -99,8 +99,10 @@ export const AuthProvider = ({ children }) => {
     signup,
     logout,
     refreshUser,
+    role: user?.role || (user?.isAdmin ? 'admin' : 'user'),
     isAuthenticated: !!user,
-    isAdmin: user?.isAdmin || false
+    isAdmin: user?.isAdmin || user?.role === 'admin',
+    isVet: user?.role === 'veterinarian' || user?.role === 'admin' || user?.isAdmin || false
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,0 +1,96 @@
+.breeder-page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.breeder-header {
+  margin-bottom: 25px;
+}
+
+.breeder-header h2 {
+  margin: 0 0 5px 0;
+  color: #111827;
+}
+
+.breeder-header .subtitle {
+  color: #6b7280;
+  margin: 0;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.breeder-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+.licenses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.license-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 12px;
+  margin-bottom: 15px;
+}
+
+.license-card-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #1f2937;
+}
+
+.status-pill {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-expired {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.license-details p {
+  margin: 8px 0;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.license-card-footer {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px dashed #f3f4f6;
+  text-align: right;
+}

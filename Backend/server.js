@@ -79,21 +79,20 @@ app.use((err, req, res, next) => {
 // Start server function
 const startServer = async () => {
   try {
-    // Connect to database first
-    await connectDB();
-    
-    // Initialize admin user
-    await createAdminUser();
-    
-    // Start vaccination reminder scheduler
-    scheduleVaccinationReminders();
-    console.log('Vaccination reminder scheduler initialized');
-    
-    // Start server
     const PORT = process.env.PORT || 5000;
-    const server = app.listen(PORT, '0.0.0.0', () => {
+    const server = app.listen(PORT, '0.0.0.0', async () => {
       console.log(`Server is running on port ${PORT}`);
       console.log(`Health check available at http://localhost:${PORT}`);
+
+      // Connect to database after server port is open
+      await connectDB();
+
+      // Initialize admin user
+      await createAdminUser();
+
+      // Start vaccination reminder scheduler
+      scheduleVaccinationReminders();
+      console.log('Vaccination reminder scheduler initialized');
     });
 
     server.on('error', (error) => {

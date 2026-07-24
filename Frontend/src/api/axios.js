@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Create axios instance with base URL from environment variable
+// Create axios instance with base URL from environment variable or live Azure API
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  baseURL: process.env.REACT_APP_API_URL || 'https://pet-control-api-fxhkd7fwa5e2gtem.malaysiawest-01.azurewebsites.net',
   headers: {
     'Content-Type': 'application/json',
   },

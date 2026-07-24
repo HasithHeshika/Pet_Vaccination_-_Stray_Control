@@ -2,15 +2,15 @@
 // Preference order: http://localhost:5000 -> http://localhost:5001 -> REACT_APP_API_URL (if set)
 // Exports: apiRequest(path, options), apiGet, apiPost, apiPut, apiDelete
 
-const DEFAULT_BASES = ['http://localhost:5000', 'http://localhost:5001'];
+const DEFAULT_BASES = [
+  process.env.REACT_APP_API_URL,
+  'https://pet-control-api-fxhkd7fwa5e2gtem.malaysiawest-01.azurewebsites.net',
+  'http://localhost:5000',
+  'http://localhost:5001'
+].filter(Boolean);
 
 function getBases() {
-  const env = typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL
-    ? String(process.env.REACT_APP_API_URL).replace(/\/$/, '')
-    : null;
-  const bases = env ? [...DEFAULT_BASES, env] : [...DEFAULT_BASES];
-  // remove duplicates while preserving order
-  return [...new Set(bases)];
+  return [...new Set(DEFAULT_BASES)];
 }
 
 async function tryFetch(url, opts = {}) {

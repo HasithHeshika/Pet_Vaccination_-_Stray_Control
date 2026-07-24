@@ -4,11 +4,13 @@ const Vaccination = require('../models/Vaccination');
 const Pet = require('../models/Pet');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+const vet = require('../middleware/vet');
+const { sendVaccinationReminderEmail } = require('../services/reminderService');
 
 // @route   POST /api/vaccinations
 // @desc    Add a new vaccination record
-// @access  Admin only
-router.post('/', [auth, admin], async (req, res) => {
+// @access  Admin or Veterinarian
+router.post('/', [auth, vet], async (req, res) => {
   try {
     const {
       petId,
@@ -32,17 +34,19 @@ router.post('/', [auth, admin], async (req, res) => {
 
     const vaccination = new Vaccination({
       pet: petId,
+      petId: petId,
       vaccineType,
       vaccineName,
-      dateAdministered,
+      dateAdministered: dateAdministered || new Date(),
       nextDueDate,
-      veterinarianName,
-      clinicName,
+      veterinarianName: veterinarianName || req.user.fullName,
+      clinicName: clinicName || req.user.clinicName || 'City Veterinary Clinic',
       batchNumber,
       notes,
       status: status || 'administered',
-      notificationPreference,
-      createdBy: req.user.userId
+      notificationPreference: notificationPreference || 'email',
+      createdBy: req.user._id || req.user.userId,
+      administeredBy: req.user._id
     });
 
     await vaccination.save();
@@ -236,6 +240,23 @@ router.get('/:id', auth, async (req, res) => {
   } catch (error) {
     console.error('Error fetching vaccination record:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// @route   POST /api/vaccinations/:id/send-reminder
+// @desc    Send automated or manual vaccination reminder email to pet owner
+// @access  Private (Admin or Vet)
+router.post('/:id/send-reminder', [auth, vet], async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await sendVaccinationReminderEmail(id);
+    res.json({
+      message: 'Vaccination reminder sent successfully',
+      result
+    });
+  } catch (error) {
+    console.error('Error sending reminder email:', error);
+    res.status(500).json({ message: error.message || 'Failed to send reminder email' });
   }
 });
 
