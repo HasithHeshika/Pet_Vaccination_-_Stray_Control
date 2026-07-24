@@ -27,9 +27,6 @@ const Navbar = () => {
 
           {isAuthenticated ? (
             <>
-              <Link to="/welcome" className="navbar-link">
-                Welcome
-              </Link>
               {user?.role === 'veterinarian' ? (
                 <Link to="/vet/dashboard" className="navbar-link" style={{ fontWeight: 'bold', color: '#0d9488' }}>
                   🩺 Vet Portal
