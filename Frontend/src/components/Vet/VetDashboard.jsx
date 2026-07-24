@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from '../../api/axios';
 import './VetDashboard.css';
 
 const VetDashboard = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [vaccinations, setVaccinations] = useState([]);
