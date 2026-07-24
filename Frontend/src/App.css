@@ -181,7 +181,6 @@
 }
 
 .link:hover {
-  text-decoration: underline;
   color: var(--primary-hover);
 }
 
@@ -437,14 +436,13 @@
 .profile-tab {
   padding: 12px 24px;
   border: none;
+  border-radius: var(--radius-md);
   background: transparent;
   color: var(--text-muted);
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
   transition: var(--transition);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
 }
 
 .profile-tab:hover {
@@ -452,8 +450,9 @@
 }
 
 .profile-tab.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
+  color: var(--text-main);
+  background: rgba(92, 59, 39, 0.08);
+  font-weight: 700;
 }
 
 /* Profile form grid */
