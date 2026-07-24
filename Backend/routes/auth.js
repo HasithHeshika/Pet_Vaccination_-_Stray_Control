@@ -75,6 +75,8 @@ const authUserPayload = (user) => {
     nicNumber: user.nicNumber,
     role: effectiveRole,
     isAdmin: user.isAdmin || effectiveRole === 'admin',
+    isVerified: user.isAdmin || user.isVerified !== false,
+    verifiedAt: user.verifiedAt,
     vetLicenseNumber: user.vetLicenseNumber,
     clinicName: user.clinicName,
     profilePicture: user.profilePicture || ''
@@ -124,24 +126,23 @@ router.post('/signup', [
       address,
       role: userRole,
       isAdmin,
+      isVerified: false,
       vetLicenseNumber: userRole === 'veterinarian' ? vetLicenseNumber : undefined,
       clinicName: userRole === 'veterinarian' ? clinicName : undefined
     });
 
     await user.save();
 
-    // Generate token
-    const token = generateToken(user._id);
-
     res.status(201).json({
-      message: 'User registered successfully',
-      token,
+      message: 'Registration successful. Your account is awaiting administrator verification.',
+      requiresVerification: true,
       user: {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
         role: user.role,
         isAdmin: user.isAdmin,
+        isVerified: false,
         vetLicenseNumber: user.vetLicenseNumber,
         clinicName: user.clinicName
       }
@@ -219,9 +220,17 @@ router.post('/oauth/:provider', [
         },
         role: 'user',
         isAdmin: false,
+        isVerified: false,
         oauthAccounts: { [provider]: identity.sub }
       });
       await user.save();
+    }
+
+    if (!user.isAdmin && user.isVerified === false) {
+      return res.status(403).json({
+        code: 'ACCOUNT_PENDING_VERIFICATION',
+        message: 'Your account is awaiting administrator verification'
+      });
     }
 
     const token = generateToken(user._id);
@@ -268,6 +277,13 @@ router.post('/login', [
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    if (!user.isAdmin && user.isVerified === false) {
+      return res.status(403).json({
+        code: 'ACCOUNT_PENDING_VERIFICATION',
+        message: 'Your account is awaiting administrator verification'
+      });
+    }
+
     // Generate token
     const token = generateToken(user._id);
 
@@ -298,6 +314,8 @@ router.get('/me', authMiddleware, async (req, res) => {
         nicNumber: req.user.nicNumber,
         role: effectiveRole,
         isAdmin: req.user.isAdmin || effectiveRole === 'admin',
+        isVerified: req.user.isAdmin || req.user.isVerified !== false,
+        verifiedAt: req.user.verifiedAt,
         vetLicenseNumber: req.user.vetLicenseNumber,
         clinicName: req.user.clinicName,
         profilePicture: req.user.profilePicture || ''

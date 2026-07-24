@@ -438,6 +438,42 @@
   white-space: nowrap;
 }
 
+.verification-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.verification-badge.verified {
+  background: rgba(92, 59, 39, 0.1);
+  color: var(--pet-ember-espresso);
+}
+
+.verification-badge.pending {
+  background: rgba(231, 181, 103, 0.28);
+  color: var(--pet-ember-espresso);
+}
+
+.verify-user-button {
+  padding: 7px 13px;
+  background: var(--pet-ember-espresso);
+  color: white;
+}
+
+.verify-user-button:hover:not(:disabled) {
+  background: var(--pet-terra-spice);
+}
+
+.actions-cell .btn {
+  padding: 7px 12px;
+  font-size: 0.78rem;
+}
+
 /* Loading Spinner */
 .loading {
   display: flex;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import SocialLogin from './SocialLogin';
 
@@ -9,6 +9,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const registrationMessage = location.state?.registrationMessage;
 
   useEffect(() => {
     document.body.classList.add('auth-bg-override');
@@ -35,6 +37,7 @@ const Login = () => {
     <div className="auth-page">
       <div className="form-container">
         <h2>Login</h2>
+        {registrationMessage && <div className="success-message">{registrationMessage}</div>}
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">

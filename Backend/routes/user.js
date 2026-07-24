@@ -42,7 +42,7 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
 // @route   GET /api/users/:id
 // @desc    Get user by ID (Admin only)
 // @access  Private/Admin
-router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     
@@ -60,7 +60,7 @@ router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
 // @route   GET /api/users/:id/pets
 // @desc    Get all pets of a user
 // @access  Private
-router.get('/:id/pets', authMiddleware, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})/pets', authMiddleware, async (req, res) => {
   try {
     // Check if user is requesting their own pets or if admin
     if (req.params.id !== req.user._id.toString() && !req.user.isAdmin) {
@@ -201,6 +201,37 @@ router.delete('/profile-picture', authMiddleware, async (req, res) => {
   }
 });
 
+// @route   PATCH /api/users/:id/verify
+// @desc    Verify a pending user account (Admin only)
+// @access  Private/Admin
+router.patch('/:id([0-9a-fA-F]{24})/verify', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          isVerified: true,
+          verifiedAt: new Date(),
+          verifiedBy: req.user._id
+        }
+      },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: `${user.fullName} has been verified`,
+      user
+    });
+  } catch (error) {
+    console.error('Verify user error:', error);
+    res.status(500).json({ message: 'Server error while verifying user' });
+  }
+});
+
 // @route   PUT /api/users/change-password
 // @desc    Change own password
 // @access  Private
@@ -239,7 +270,7 @@ router.put('/change-password', authMiddleware, [
 // @route   PUT /api/users/:id
 // @desc    Update any user (Admin only)
 // @access  Private/Admin
-router.put('/:id', authMiddleware, adminMiddleware, [
+router.put('/:id([0-9a-fA-F]{24})', authMiddleware, adminMiddleware, [
   body('fullName').optional().trim().notEmpty().withMessage('Full name cannot be empty'),
   body('phone').optional().notEmpty().withMessage('Phone cannot be empty'),
   body('email').optional().isEmail().withMessage('Valid email is required'),

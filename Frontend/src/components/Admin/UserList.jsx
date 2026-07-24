@@ -7,6 +7,8 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [verifyingId, setVerifyingId] = useState('');
   const navigate = useNavigate();
   const { token } = useAuth();
 
@@ -36,17 +38,43 @@ const UserList = () => {
     navigate(`/admin/register-pet/${userId}`);
   };
 
+  const handleVerify = async (userId) => {
+    setVerifyingId(userId);
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await axios.patch(`/api/users/${userId}/verify`);
+      setUsers((currentUsers) => currentUsers.map((user) => (
+        user._id === userId ? response.data.user : user
+      )));
+      setMessage(response.data.message);
+    } catch (verifyError) {
+      setError(verifyError.response?.data?.message || 'Failed to verify user');
+    } finally {
+      setVerifyingId('');
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading users...</div>;
   }
 
   if (error) {
-    return <div className="error-message">{error}</div>;
+    if (users.length === 0) {
+      return <div className="error-message">{error}</div>;
+    }
   }
+
+  const orderedUsers = [...users].sort((first, second) => (
+    Number(first.isVerified !== false) - Number(second.isVerified !== false)
+  ));
 
   return (
     <div className="dashboard">
       <h1>Registered Users</h1>
+      {message && <div className="success-message">{message}</div>}
+      {error && <div className="error-message">{error}</div>}
       
       {users.length === 0 ? (
         <div className="card">
@@ -58,40 +86,59 @@ const UserList = () => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th style={{ width: '15%' }}>Full Name</th>
-                  <th style={{ width: '20%' }}>Email</th>
-                  <th style={{ width: '12%' }}>Phone</th>
-                  <th style={{ width: '13%' }}>NIC Number</th>
-                  <th style={{ width: '12%' }}>City</th>
-                  <th style={{ width: '28%' }}>Actions</th>
+                  <th style={{ width: '12%' }}>Full Name</th>
+                  <th style={{ width: '18%' }}>Email</th>
+                  <th style={{ width: '11%' }}>Phone</th>
+                  <th style={{ width: '12%' }}>NIC Number</th>
+                  <th style={{ width: '10%' }}>City</th>
+                  <th style={{ width: '11%' }}>Status</th>
+                  <th style={{ width: '26%' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user._id}>
-                    <td>{user.fullName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phone}</td>
-                    <td>{user.nicNumber}</td>
-                    <td>{user.address.city}</td>
-                    <td className="actions-cell">
+                {orderedUsers.map((user) => {
+                  const isVerified = user.isVerified !== false;
+
+                  return (
+                    <tr key={user._id}>
+                      <td>{user.fullName}</td>
+                      <td>{user.email}</td>
+                      <td>{user.phone}</td>
+                      <td>{user.nicNumber}</td>
+                      <td>{user.address?.city || '—'}</td>
+                      <td>
+                        <span className={`verification-badge ${isVerified ? 'verified' : 'pending'}`}>
+                          {isVerified ? 'Verified' : 'Pending'}
+                        </span>
+                      </td>
+                      <td className="actions-cell">
+                      {!isVerified && (
+                        <button
+                          onClick={() => handleVerify(user._id)}
+                          className="btn verify-user-button"
+                          disabled={verifyingId === user._id}
+                        >
+                          {verifyingId === user._id ? 'Verifying...' : 'Verify'}
+                        </button>
+                      )}
                       <button
                         onClick={() => handleRegisterPet(user._id)}
                         className="btn btn-primary"
-                        style={{ padding: '6px 12px', fontSize: '13px', marginRight: '8px', whiteSpace: 'nowrap' }}
+                        disabled={!isVerified}
+                        title={!isVerified ? 'Verify this user before registering a pet' : undefined}
                       >
-                        REGISTER PET
+                        Register Pet
                       </button>
                       <button
                         onClick={() => navigate(`/admin/edit-user/${user._id}`)}
                         className="btn btn-secondary"
-                        style={{ padding: '6px 12px', fontSize: '13px' }}
                       >
-                        ✏️ Edit
+                        Edit
                       </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
