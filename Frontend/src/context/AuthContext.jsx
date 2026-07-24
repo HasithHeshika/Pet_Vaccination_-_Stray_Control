@@ -60,13 +60,20 @@ export const AuthProvider = ({ children }) => {
   const signup = async (userData) => {
     try {
       const response = await axios.post('/api/auth/signup', userData);
-      const { token, user } = response.data;
-      
-      localStorage.setItem('token', token);
-      setToken(token);
-      setUser(user);
-      
-      return { success: true, user };
+      const { token: signupToken, user: registeredUser, message, requiresVerification } = response.data;
+
+      if (signupToken) {
+        localStorage.setItem('token', signupToken);
+        setToken(signupToken);
+        setUser(registeredUser);
+      }
+
+      return {
+        success: true,
+        user: registeredUser,
+        message,
+        requiresVerification: Boolean(requiresVerification)
+      };
     } catch (error) {
       return {
         success: false,

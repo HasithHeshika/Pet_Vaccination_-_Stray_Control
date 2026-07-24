@@ -59,7 +59,12 @@ const Signup = () => {
     const result = await signup(signupData);
     
     if (result.success) {
-      if (result.user.role === 'veterinarian') {
+      if (result.requiresVerification) {
+        navigate('/login', {
+          replace: true,
+          state: { registrationMessage: result.message }
+        });
+      } else if (result.user.role === 'veterinarian') {
         navigate('/vet/dashboard');
       } else {
         navigate('/user/dashboard');

@@ -20,6 +20,13 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: 'User not found' });
     }
 
+    if (!user.isAdmin && user.isVerified === false) {
+      return res.status(403).json({
+        code: 'ACCOUNT_PENDING_VERIFICATION',
+        message: 'Your account is awaiting administrator verification'
+      });
+    }
+
     // Attach user to request
     req.user = user;
     next();
