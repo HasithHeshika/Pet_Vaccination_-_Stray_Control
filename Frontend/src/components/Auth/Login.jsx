@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import SocialLogin from './SocialLogin';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -48,6 +49,7 @@ const Login = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+        <SocialLogin />
         <Link to="/signup" className="link">Don't have an account? Sign up</Link>
       </div>
     </div>

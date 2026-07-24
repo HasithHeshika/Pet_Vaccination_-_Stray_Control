@@ -42,20 +42,20 @@ const UserDashboard = () => {
 
       <div className="card">
         <h3>Quick Actions</h3>
-        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-          <Link to="/user/my-pets" className="btn btn-primary" style={{ width: 'auto', minWidth: '150px' }}>
+        <div className="quick-actions">
+          <Link to="/user/my-pets" className="btn quick-action">
             View My Pets
           </Link>
-          <Link to="/user/vaccinations" className="btn btn-secondary" style={{ width: 'auto', minWidth: '150px' }}>
+          <Link to="/user/vaccinations" className="btn quick-action">
             Vaccination Schedule
           </Link>
-          <Link to="/breeder/dashboard" className="btn btn-primary" style={{ width: 'auto', minWidth: '150px' }}>
+          <Link to="/breeder/dashboard" className="btn quick-action">
             Breeder Licensing
           </Link>
-          <Link to="/report-stray" className="btn" style={{ width: 'auto', minWidth: '150px', backgroundColor: '#000', color: '#fff', border: 'none' }}>
+          <Link to="/report-stray" className="btn quick-action">
             Report a Stray
           </Link>
-          <Link to="/user/edit-profile" className="btn btn-success" style={{ width: 'auto', minWidth: '150px' }}>
+          <Link to="/user/edit-profile" className="btn quick-action">
             Edit Profile
           </Link>
         </div>
