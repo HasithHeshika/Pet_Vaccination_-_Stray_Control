@@ -9,9 +9,9 @@
 .breeder-card,
 .breeder-welcome,
 .breeder-topbar {
-  background: rgba(255, 248, 239, 0.92);
-  border: 1px solid rgba(166, 86, 51, 0.16);
-  box-shadow: 0 16px 36px rgba(92, 59, 39, 0.08);
+  background: rgba(248, 251, 255, 0.92);
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  box-shadow: 0 16px 36px rgba(15, 59, 105, 0.08);
 }
 
 .breeder-sidebar {
@@ -45,7 +45,7 @@
 .activity-item span,
 .file-preview span {
   display: block;
-  color: #7b604f;
+  color: #52677f;
   font-size: 0.8rem;
 }
 
@@ -60,7 +60,7 @@
   gap: 10px;
   padding: 12px 14px;
   border-radius: 8px;
-  color: #71523d;
+  color: #405a75;
   text-decoration: none;
   font-weight: 600;
   transition: var(--transition);
@@ -69,7 +69,7 @@
 .breeder-nav-link:hover,
 .breeder-nav-link.active {
   color: var(--pet-ember-espresso);
-  background: rgba(231, 181, 103, 0.22);
+  background: rgba(147, 197, 253, 0.22);
 }
 
 .breeder-workspace {
@@ -95,7 +95,7 @@
 .breeder-topbar p,
 .breeder-welcome p {
   margin: 6px 0 0;
-  color: #71523d;
+  color: #405a75;
 }
 
 .breeder-eyebrow {
@@ -114,7 +114,7 @@
   min-width: 220px;
   padding: 10px;
   border-radius: 8px;
-  background: rgba(246, 229, 201, 0.72);
+  background: rgba(219, 234, 254, 0.72);
 }
 
 .breeder-user-chip > span {
@@ -124,7 +124,7 @@
   place-items: center;
   border-radius: 50%;
   background: var(--pet-terra-spice);
-  color: #fff8ef;
+  color: #f8fbff;
   font-weight: 700;
 }
 
@@ -193,7 +193,7 @@
 
 .metric-card p {
   margin: 0;
-  color: #71523d;
+  color: #405a75;
 }
 
 .breeder-details {
@@ -208,7 +208,7 @@
 
 .breeder-details dt,
 .review-grid dt {
-  color: #7b604f;
+  color: #52677f;
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -237,13 +237,13 @@
 
 .status-pill.approved,
 .status-pill.active {
-  background: rgba(166, 86, 51, 0.14);
+  background: rgba(37, 99, 235, 0.14);
   color: var(--pet-terra-spice);
 }
 
 .status-pill.pending,
 .status-pill.draft {
-  background: rgba(231, 181, 103, 0.28);
+  background: rgba(147, 197, 253, 0.28);
   color: var(--pet-ember-espresso);
 }
 
@@ -257,7 +257,7 @@
   margin: 18px 0 0;
   padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(231, 181, 103, 0.24);
+  background: rgba(147, 197, 253, 0.24);
   color: var(--pet-ember-espresso);
   font-weight: 700;
 }
@@ -279,7 +279,7 @@
   gap: 16px;
   padding: 14px;
   border-radius: 8px;
-  background: rgba(246, 229, 201, 0.48);
+  background: rgba(219, 234, 254, 0.48);
 }
 
 .text-link {
@@ -296,9 +296,9 @@
 }
 
 .wizard-progress button {
-  border: 1px solid rgba(166, 86, 51, 0.18);
-  background: rgba(246, 229, 201, 0.42);
-  color: #71523d;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  background: rgba(219, 234, 254, 0.42);
+  color: #405a75;
   border-radius: 8px;
   padding: 12px;
   font-weight: 700;
@@ -313,13 +313,13 @@
   place-items: center;
   margin-right: 8px;
   border-radius: 50%;
-  background: #fff8ef;
+  background: #f8fbff;
 }
 
 .wizard-progress .active,
 .wizard-progress .complete {
   background: var(--pet-ember-espresso);
-  color: #fff8ef;
+  color: #f8fbff;
 }
 
 .form-panel {
@@ -349,9 +349,9 @@
 .select-license select {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(166, 86, 51, 0.24);
+  border: 1px solid rgba(37, 99, 235, 0.24);
   border-radius: 8px;
-  background: #fff8ef;
+  background: #f8fbff;
   color: var(--pet-ember-espresso);
   font: inherit;
 }
@@ -379,10 +379,10 @@
 }
 
 .animal-options button {
-  border: 1px solid rgba(166, 86, 51, 0.24);
+  border: 1px solid rgba(37, 99, 235, 0.24);
   border-radius: 8px;
   padding: 10px 18px;
-  background: #fff8ef;
+  background: #f8fbff;
   color: var(--pet-ember-espresso);
   cursor: pointer;
   font-weight: 700;
@@ -390,7 +390,7 @@
 
 .animal-options .selected {
   background: var(--pet-terra-spice);
-  color: #fff8ef;
+  color: #f8fbff;
 }
 
 .upload-grid {
@@ -408,7 +408,7 @@
   border: 1px dashed var(--pet-rustic-apricot);
   border-radius: 8px;
   color: var(--pet-terra-spice);
-  background: rgba(246, 229, 201, 0.38);
+  background: rgba(219, 234, 254, 0.38);
   font-weight: 800;
   cursor: pointer;
 }
@@ -430,7 +430,7 @@
   gap: 12px;
   padding: 12px;
   border-radius: 8px;
-  background: rgba(246, 229, 201, 0.5);
+  background: rgba(219, 234, 254, 0.5);
   color: var(--pet-ember-espresso);
 }
 
@@ -444,7 +444,7 @@
 .review-grid > div {
   padding: 14px;
   border-radius: 8px;
-  background: rgba(246, 229, 201, 0.46);
+  background: rgba(219, 234, 254, 0.46);
 }
 
 .detail-review {
@@ -476,7 +476,7 @@
 }
 
 .empty-state {
-  color: #71523d;
+  color: #405a75;
   padding: 24px;
   text-align: center;
 }

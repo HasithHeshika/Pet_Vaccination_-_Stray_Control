@@ -5,10 +5,10 @@
 .admin-hub-hero,
 .admin-part-card,
 .admin-part-hero {
-  background: rgba(255, 248, 239, 0.94);
-  border: 1px solid rgba(166, 86, 51, 0.16);
+  background: rgba(248, 251, 255, 0.94);
+  border: 1px solid rgba(37, 99, 235, 0.16);
   border-radius: 8px;
-  box-shadow: 0 16px 36px rgba(92, 59, 39, 0.08);
+  box-shadow: 0 16px 36px rgba(15, 59, 105, 0.08);
 }
 
 .admin-hub-hero {
@@ -26,7 +26,7 @@
 .admin-hub-hero p,
 .admin-part-card p,
 .admin-part-hero p {
-  color: #71523d;
+  color: #405a75;
   line-height: 1.65;
 }
 
@@ -97,7 +97,7 @@
 .animal-type-card {
   padding: 18px;
   border-radius: 8px;
-  background: rgba(246, 229, 201, 0.48);
+  background: rgba(219, 234, 254, 0.48);
 }
 
 .animal-type-card strong {
@@ -107,7 +107,7 @@
 }
 
 .animal-type-card span {
-  color: #71523d;
+  color: #405a75;
   font-weight: 700;
 }
 
@@ -118,10 +118,10 @@
 .authority-hero,
 .authority-card,
 .authority-metric {
-  background: rgba(255, 248, 239, 0.94);
-  border: 1px solid rgba(166, 86, 51, 0.16);
+  background: rgba(248, 251, 255, 0.94);
+  border: 1px solid rgba(37, 99, 235, 0.16);
   border-radius: 8px;
-  box-shadow: 0 16px 36px rgba(92, 59, 39, 0.08);
+  box-shadow: 0 16px 36px rgba(15, 59, 105, 0.08);
 }
 
 .authority-hero {
@@ -140,7 +140,7 @@
 .authority-hero p {
   margin: 8px 0 0;
   max-width: 860px;
-  color: #71523d;
+  color: #405a75;
 }
 
 .authority-eyebrow {
@@ -193,7 +193,7 @@
 }
 
 .authority-metric span {
-  color: #7b604f;
+  color: #52677f;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -210,7 +210,7 @@
 
 .authority-metric p {
   margin: 8px 0 0;
-  color: #71523d;
+  color: #405a75;
   font-size: 0.88rem;
 }
 
@@ -250,7 +250,7 @@
   height: 40px;
   padding: 0 10px;
   border-radius: 999px;
-  background: rgba(231, 181, 103, 0.26);
+  background: rgba(147, 197, 253, 0.26);
   color: var(--pet-terra-spice);
   font-weight: 800;
 }
@@ -273,7 +273,7 @@
   gap: 14px;
   padding: 14px;
   border-radius: 8px;
-  background: rgba(246, 229, 201, 0.46);
+  background: rgba(219, 234, 254, 0.46);
 }
 
 .license-review-card strong,
@@ -284,13 +284,13 @@
 
 .license-review-card span,
 .stray-row span {
-  color: #7b604f;
+  color: #52677f;
   font-size: 0.86rem;
 }
 
 .license-review-card p {
   margin: 5px 0 0;
-  color: #71523d;
+  color: #405a75;
 }
 
 .authority-status {
@@ -309,14 +309,14 @@
 .authority-status.approved,
 .authority-status.found,
 .authority-status.resolved {
-  background: rgba(166, 86, 51, 0.14);
+  background: rgba(37, 99, 235, 0.14);
   color: var(--pet-terra-spice);
 }
 
 .authority-status.pending,
 .authority-status.lost,
 .authority-status.in-progress {
-  background: rgba(231, 181, 103, 0.28);
+  background: rgba(147, 197, 253, 0.28);
   color: var(--pet-ember-espresso);
 }
 
@@ -338,13 +338,13 @@
 .authority-table th,
 .authority-table td {
   padding: 12px 10px;
-  border-bottom: 1px solid rgba(166, 86, 51, 0.14);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.14);
   text-align: left;
   vertical-align: top;
 }
 
 .authority-table th {
-  color: #7b604f;
+  color: #52677f;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -356,18 +356,18 @@
 }
 
 .authority-filter button {
-  border: 1px solid rgba(166, 86, 51, 0.22);
+  border: 1px solid rgba(37, 99, 235, 0.22);
   border-radius: 999px;
   padding: 8px 12px;
-  background: #fff8ef;
-  color: #71523d;
+  background: #f8fbff;
+  color: #405a75;
   cursor: pointer;
   font-weight: 700;
 }
 
 .authority-filter button.active {
   background: var(--pet-ember-espresso);
-  color: #fff8ef;
+  color: #f8fbff;
 }
 
 .report-card-grid {
@@ -382,7 +382,7 @@
   gap: 14px;
   padding: 14px;
   border-radius: 8px;
-  background: rgba(246, 229, 201, 0.42);
+  background: rgba(219, 234, 254, 0.42);
 }
 
 .animal-report-image {
@@ -392,7 +392,7 @@
   place-items: center;
   overflow: hidden;
   border-radius: 8px;
-  background: #fff8ef;
+  background: #f8fbff;
   color: var(--pet-terra-spice);
 }
 
@@ -416,7 +416,7 @@
 
 .animal-report-body p {
   margin: 6px 0;
-  color: #71523d;
+  color: #405a75;
   font-size: 0.9rem;
 }
 
@@ -426,13 +426,13 @@
   margin-top: 10px;
   padding: 10px;
   border-radius: 8px;
-  background: rgba(231, 181, 103, 0.22);
+  background: rgba(147, 197, 253, 0.22);
   color: var(--pet-ember-espresso);
   font-size: 0.86rem;
 }
 
 .authority-empty {
-  color: #71523d;
+  color: #405a75;
   margin: 0;
   padding: 16px 0;
 }

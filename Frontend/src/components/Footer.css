@@ -18,7 +18,7 @@
 .footer-section h3,
 .footer-section h4 {
   margin-bottom: 15px;
-  color: #fff8ef;
+  color: #f8fbff;
   font-weight: 600;
 }
 
@@ -49,7 +49,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(246, 229, 201, 0.12);
+  background: rgba(219, 234, 254, 0.12);
   border-radius: 50%;
   font-size: 1.2rem;
   cursor: pointer;
@@ -89,10 +89,10 @@
 }
 
 .footer-bottom {
-  background: rgba(92, 59, 39, 0.5);
+  background: rgba(15, 59, 105, 0.5);
   padding: 20px;
   text-align: center;
-  border-top: 1px solid rgba(246, 229, 201, 0.16);
+  border-top: 1px solid rgba(219, 234, 254, 0.16);
 }
 
 .footer-bottom p {
