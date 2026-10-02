@@ -1,0 +1,114 @@
+﻿Resolving dependencies...
+Downloading packages...
+  clock 1.1.2 (1.1.3 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  google_fonts 8.2.1 (9.0.0 available)
+  hooks 2.0.2 (2.2.0 available)
+  matcher 0.12.19 (0.12.20 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.0 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  record_use 0.6.0 (1.1.1 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.11 (0.7.14 available)
+  vector_math 2.2.0 (2.4.3 available)
+Got dependencies!
+13 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing Mobileapp...                                          
+
+  error - Classes can only extend other classes. Try specifying a different superclass, or removing the extends clause - lib\screens\home_screen.dart:6:26 - extends_non_class
+  error - No associated named super constructor parameter. Try changing the name to the name of an existing named super constructor parameter, or creating such named parameter - lib\screens\home_screen.dart:7:27 - super_formal_parameter_without_associated_named
+  error - Undefined class 'Widget'. Try changing the name to the name of an existing class, or creating a class with the name 'Widget' - lib\screens\home_screen.dart:10:3 - undefined_class
+warning - The method doesn't override an inherited method. Try updating this class to match the superclass, or removing the override annotation - lib\screens\home_screen.dart:10:10 - override_on_non_overriding_member
+  error - Undefined class 'BuildContext'. Try changing the name to the name of an existing class, or creating a class with the name 'BuildContext' - lib\screens\home_screen.dart:10:16 - undefined_class
+  error - The method 'Scaffold' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Scaffold' - lib\screens\home_screen.dart:11:12 - undefined_method
+  error - The method 'SafeArea' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'SafeArea' - lib\screens\home_screen.dart:13:13 - undefined_method
+  error - The method 'Column' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Column' - lib\screens\home_screen.dart:14:16 - undefined_method
+  error - The method 'Padding' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Padding' - lib\screens\home_screen.dart:17:13 - undefined_method
+  error - Undefined name 'EdgeInsets'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:18:30 - undefined_identifier
+  error - The method 'Row' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Row' - lib\screens\home_screen.dart:19:22 - undefined_method
+  error - The name 'CircleAvatar' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:21:25 - creation_with_non_type
+  error - The method 'AssetImage' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'AssetImage' - lib\screens\home_screen.dart:23:38 - undefined_method
+  error - The name 'SizedBox' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:25:25 - creation_with_non_type
+  error - The method 'Expanded' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Expanded' - lib\screens\home_screen.dart:26:19 - undefined_method
+  error - The method 'Column' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Column' - lib\screens\home_screen.dart:27:28 - undefined_method
+  error - Undefined name 'CrossAxisAlignment'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:28:43 - undefined_identifier
+  error - The method 'Text' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Text' - lib\screens\home_screen.dart:30:25 - undefined_method
+  error - The values in a const list literal must be constants. Try removing the keyword 'const' from the list literal - lib\screens\home_screen.dart:30:25 - non_constant_list_element
+  error - The method 'TextStyle' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'TextStyle' - lib\screens\home_screen.dart:32:34 - undefined_method
+  error - The method 'Text' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Text' - lib\screens\home_screen.dart:34:25 - undefined_method
+  error - The values in a const list literal must be constants. Try removing the keyword 'const' from the list literal - lib\screens\home_screen.dart:34:25 - non_constant_list_element
+  error - The method 'TextStyle' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'TextStyle' - lib\screens\home_screen.dart:36:34 - undefined_method
+  error - Undefined name 'FontWeight'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:36:70 - undefined_identifier
+  error - The method 'IconButton' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'IconButton' - lib\screens\home_screen.dart:41:19 - undefined_method
+  error - The name 'Icon' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:42:33 - creation_with_non_type
+  error - Undefined name 'Icons'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:42:38 - undefined_identifier
+  error - The method 'Container' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Container' - lib\screens\home_screen.dart:50:13 - undefined_method
+  error - Undefined name 'EdgeInsets'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:51:29 - undefined_identifier
+  error - The method 'BoxDecoration' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'BoxDecoration' - lib\screens\home_screen.dart:53:27 - undefined_method
+  error - Undefined name 'BorderRadius'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:54:31 - undefined_identifier
+  error - The name 'DecorationImage' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:55:30 - creation_with_non_type
+  error - The method 'AssetImage' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'AssetImage' - lib\screens\home_screen.dart:56:26 - undefined_method
+  error - Undefined name 'BoxFit'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:57:24 - undefined_identifier
+  error - Undefined name 'ColorFilter'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:58:32 - undefined_identifier
+  error - Undefined name 'Colors'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:58:49 - undefined_identifier
+  error - Undefined name 'BlendMode'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:58:65 - undefined_identifier
+  error - The method 'Center' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Center' - lib\screens\home_screen.dart:61:22 - undefined_method
+  error - The method 'Column' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Column' - lib\screens\home_screen.dart:62:24 - undefined_method
+  error - Undefined name 'MainAxisAlignment'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:63:38 - undefined_identifier
+  error - The name 'Text' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:65:27 - creation_with_non_type
+  error - The method 'TextStyle' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'TextStyle' - lib\screens\home_screen.dart:67:30 - undefined_method
+  error - Undefined name 'Colors'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:67:47 - undefined_identifier
+  error - Undefined name 'FontWeight'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:67:87 - undefined_identifier
+  error - The name 'SizedBox' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:69:27 - creation_with_non_type
+  error - The method 'ElevatedButton' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'ElevatedButton' - lib\screens\home_screen.dart:70:21 - undefined_method
+  error - Undefined name 'ElevatedButton'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:71:30 - undefined_identifier
+  error - The name 'Text' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:73:36 - creation_with_non_type
+  error - The name 'SizedBox' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:79:19 - creation_with_non_type
+  error - The method 'Expanded' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Expanded' - lib\screens\home_screen.dart:82:13 - undefined_method
+  error - The method 'Container' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Container' - lib\screens\home_screen.dart:83:22 - undefined_method
+  error - Undefined name 'EdgeInsets'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:84:32 - undefined_identifier
+  error - The name 'BoxDecoration' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:85:35 - creation_with_non_type
+  error - Undefined name 'Colors'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:86:26 - undefined_identifier
+  error - Undefined name 'BorderRadius'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:87:33 - undefined_identifier
+  error - Undefined name 'Radius'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:87:60 - undefined_identifier
+  error - Undefined name 'Radius'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:87:91 - undefined_identifier
+  error - Undefined name 'GridView'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:89:24 - undefined_identifier
+  error - Undefined name 'Icons'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:95:56 - undefined_identifier
+  error - Undefined name 'Colors'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:95:91 - undefined_identifier
+  error - Undefined name 'Navigator'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:96:23 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'MaterialPageRoute' - lib\screens\home_screen.dart:96:47 - undefined_method
+  error - Undefined name 'Icons'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:98:61 - undefined_identifier
+  error - Undefined name 'Navigator'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:99:23 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'MaterialPageRoute' - lib\screens\home_screen.dart:99:47 - undefined_method
+  error - Undefined name 'Icons'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:101:61 - undefined_identifier
+  error - Undefined name 'Colors'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:101:97 - undefined_identifier
+  error - Undefined name 'Navigator'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:102:23 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'MaterialPageRoute' - lib\screens\home_screen.dart:102:47 - undefined_method
+  error - Undefined name 'Icons'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:104:57 - undefined_identifier
+  error - Undefined name 'Colors'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:104:94 - undefined_identifier
+  error - Undefined class 'Widget'. Try changing the name to the name of an existing class, or creating a class with the name 'Widget' - lib\screens\home_screen.dart:115:3 - undefined_class
+  error - Undefined class 'BuildContext'. Try changing the name to the name of an existing class, or creating a class with the name 'BuildContext' - lib\screens\home_screen.dart:115:25 - undefined_class
+  error - Undefined class 'IconData'. Try changing the name to the name of an existing class, or creating a class with the name 'IconData' - lib\screens\home_screen.dart:115:61 - undefined_class
+  error - Undefined class 'Color'. Try changing the name to the name of an existing class, or creating a class with the name 'Color' - lib\screens\home_screen.dart:115:76 - undefined_class
+  error - Undefined class 'Color'. Try changing the name to the name of an existing class, or creating a class with the name 'Color' - lib\screens\home_screen.dart:115:91 - undefined_class
+  error - Undefined class 'VoidCallback'. Try changing the name to the name of an existing class, or creating a class with the name 'VoidCallback' - lib\screens\home_screen.dart:115:108 - undefined_class
+  error - The method 'GestureDetector' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'GestureDetector' - lib\screens\home_screen.dart:116:12 - undefined_method
+  error - The method 'Container' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Container' - lib\screens\home_screen.dart:118:14 - undefined_method
+  error - The method 'BoxDecoration' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'BoxDecoration' - lib\screens\home_screen.dart:119:21 - undefined_method
+  error - Undefined name 'BorderRadius'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:121:25 - undefined_identifier
+  error - The method 'Column' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Column' - lib\screens\home_screen.dart:123:16 - undefined_method
+  error - Undefined name 'MainAxisAlignment'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:124:30 - undefined_identifier
+  error - The method 'Icon' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Icon' - lib\screens\home_screen.dart:126:13 - undefined_method
+  error - The name 'SizedBox' isn't a class. Try correcting the name to match an existing class - lib\screens\home_screen.dart:127:19 - creation_with_non_type
+  error - The method 'Text' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'Text' - lib\screens\home_screen.dart:128:13 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type 'HomeScreen'. Try correcting the name to the name of an existing method, or defining a method named 'TextStyle' - lib\screens\home_screen.dart:130:22 - undefined_method
+  error - Undefined name 'FontWeight'. Try correcting the name to one that is defined, or defining the name - lib\screens\home_screen.dart:130:58 - undefined_identifier
+  error - The returned type 'HomeScreen' isn't returnable from a 'Widget' function, as required by the closure's context - lib\screens\login_screen.dart:19:41 - return_of_invalid_type_from_closure
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\screens\vaccination_screen.dart:35:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\theme\app_theme.dart:62:49 - deprecated_member_use
+  error - The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.  - lib\theme\app_theme.dart:64:18 - argument_type_not_assignable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement - lib\theme\app_theme.dart:67:36 - deprecated_member_use
+
