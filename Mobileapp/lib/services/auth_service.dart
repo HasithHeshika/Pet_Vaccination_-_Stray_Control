@@ -16,10 +16,27 @@ class AuthService {
       if (data['token'] != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', data['token']);
+        
+        // Save user ID securely for future queries
+        if (data['user'] != null && data['user']['id'] != null) {
+          await prefs.setString('userId', data['user']['id'].toString());
+        } else if (data['user'] != null && data['user']['_id'] != null) {
+          await prefs.setString('userId', data['user']['_id'].toString());
+        }
       }
       return data;
     }
-    throw Exception('Failed to login: ${response.body}');
+    
+    // Better error message parsing
+    String errorMessage = 'Failed to login';
+    try {
+      final errorData = jsonDecode(response.body);
+      if (errorData['message'] != null) {
+        errorMessage = errorData['message'];
+      }
+    } catch (_) {}
+    
+    throw Exception(errorMessage);
   }
 
   Future<Map<String, dynamic>?> signup(Map<String, dynamic> userData) async {
@@ -37,9 +54,15 @@ class AuthService {
     }
     return null;
   }
+  
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId');
+  }
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('userId');
   }
 }

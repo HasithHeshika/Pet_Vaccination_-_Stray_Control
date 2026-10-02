@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/lost_and_found_service.dart';
 
-class LostFoundScreen extends StatelessWidget {
+class LostFoundScreen extends StatefulWidget {
   const LostFoundScreen({super.key});
+
+  @override
+  State<LostFoundScreen> createState() => _LostFoundScreenState();
+}
+
+class _LostFoundScreenState extends State<LostFoundScreen> {
+  late Future<List<dynamic>> _reportsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _reportsFuture = LostAndFoundService().getLostAndFoundList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,13 +24,32 @@ class LostFoundScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Lost & Found"),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          _buildLostCard("Buddy", "Lost yesterday near Central Park. Very friendly but shy.", "assets/images/login_dog.png", true),
-          const SizedBox(height: 16),
-          _buildLostCard("Whiskers", "Found wandering near 1st avenue. Safe at clinic.", "assets/images/dashboard_cat.png", false),
-        ],
+      body: FutureBuilder<List<dynamic>>(
+        future: _reportsFuture,
+        builder: (context, snapshot) {
+           if (snapshot.connectionState == ConnectionState.waiting) {
+             return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBrown));
+           } else if (snapshot.hasError) {
+             return Center(child: Text("Error fetching posts: ${snapshot.error}"));
+           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+             return const Center(child: Text("No missing pets currently. Yay!", style: TextStyle(color: AppTheme.primaryBrown)));
+           }
+
+           final reports = snapshot.data!;
+           return ListView.builder(
+             padding: const EdgeInsets.all(20),
+             itemCount: reports.length,
+             itemBuilder: (context, index) {
+               final report = reports[index];
+               String title = report['petName'] ?? report['title'] ?? 'Unknown Pet';
+               String desc = report['description'] ?? 'No description';
+               bool isLost = report['type'] == 'Lost' || report['status'] == 'Lost';
+               String? imageUrl = report['imageUrl'] ?? report['photoUrl'];
+
+               return _buildLostCard(title, desc, imageUrl, isLost);
+             },
+           );
+        }
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppTheme.activeOrange,
@@ -26,8 +59,16 @@ class LostFoundScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLostCard(String title, String description, String imagePath, bool isLost) {
+  Widget _buildLostCard(String title, String description, String? imagePath, bool isLost) {
+    ImageProvider imageProvider;
+    if (imagePath != null && imagePath.startsWith('http')) {
+      imageProvider = NetworkImage(imagePath);
+    } else {
+      imageProvider = const AssetImage('assets/images/login_dog.png');
+    }
+
     return Card(
+      margin: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -35,7 +76,7 @@ class LostFoundScreen extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                child: Image.asset(imagePath, height: 180, width: double.infinity, fit: BoxFit.cover),
+                child: Image(image: imageProvider, height: 180, width: double.infinity, fit: BoxFit.cover),
               ),
               Positioned(
                 top: 16,

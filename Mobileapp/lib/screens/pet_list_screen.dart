@@ -1,8 +1,36 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/pet_service.dart';
+import '../services/auth_service.dart';
 
-class PetListScreen extends StatelessWidget {
+class PetListScreen extends StatefulWidget {
   const PetListScreen({super.key});
+
+  @override
+  State<PetListScreen> createState() => _PetListScreenState();
+}
+
+class _PetListScreenState extends State<PetListScreen> {
+  late Future<List<dynamic>> _petsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _petsFuture = _loadPets();
+  }
+
+  Future<List<dynamic>> _loadPets() async {
+    final userId = await AuthService().getUserId();
+    if (userId != null && userId.isNotEmpty) {
+      try {
+        return await PetService().getUserPets(userId);
+      } catch (e) {
+        // Fallback onto all pets if single query fails or route doesn't match perfectly
+        return await PetService().getAllPets();
+      }
+    }
+    return [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,13 +38,31 @@ class PetListScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("My Furry Friends"),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          _buildPetCard("Milo", "Golden Retriever", "1 Year • Male", "assets/images/login_dog.png"),
-          const SizedBox(height: 16),
-          _buildPetCard("Luna", "Ginger Cat", "2 Years • Female", "assets/images/dashboard_cat.png"),
-        ],
+      body: FutureBuilder<List<dynamic>>(
+        future: _petsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBrown));
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error fetching pets: ${snapshot.error}", style: const TextStyle(color: Colors.red)));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+             return const Center(child: Text("No pets found! Register one.", style: TextStyle(fontSize: 18, color: AppTheme.primaryBrown)));
+          }
+
+          final pets = snapshot.data!;
+          return ListView.builder(
+            padding: const EdgeInsets.all(20),
+            itemCount: pets.length,
+            itemBuilder: (context, index) {
+              final pet = pets[index];
+              String name = pet['name'] ?? 'Unknown Pet';
+              String breed = pet['breed'] ?? 'Unknown Breed';
+              String details = "${pet['age'] ?? '?'} Years • ${pet['gender'] ?? 'Unknown'}";
+              String? imagePath = pet['photoUrl'] ?? pet['imageUrl'] ?? pet['image'];
+              return _buildPetCard(name, breed, details, imagePath);
+            },
+          );
+        }
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppTheme.activeOrange,
@@ -26,15 +72,23 @@ class PetListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPetCard(String name, String breed, String details, String imagePath) {
+  Widget _buildPetCard(String name, String breed, String details, String? imagePath) {
+    ImageProvider imageProvider;
+    if (imagePath != null && imagePath.startsWith('http')) {
+      imageProvider = NetworkImage(imagePath);
+    } else {
+      imageProvider = const AssetImage('assets/images/dashboard_cat.png');
+    }
+
     return Card(
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(imagePath, width: 80, height: 80, fit: BoxFit.cover),
+              child: Image(image: imageProvider, width: 80, height: 80, fit: BoxFit.cover),
             ),
             const SizedBox(width: 16),
             Expanded(
