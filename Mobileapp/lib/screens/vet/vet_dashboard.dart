@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../login_screen.dart';
+import 'record_vaccine_screen.dart';
 
 class VetDashboard extends StatefulWidget {
   const VetDashboard({super.key});
@@ -36,16 +37,46 @@ class _VetDashboardState extends State<VetDashboard> {
             IconButton(icon: const Icon(Icons.logout, color: Color(0xFF5C4033)), onPressed: _logout)
          ]
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.local_hospital, size: 80, color: Color(0xFF8B5A2B)),
-            SizedBox(height: 16),
-            Text("Veterinarian Portal", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
-            Padding(padding: EdgeInsets.all(32.0), child: Text("Tools for logging vaccinations and performing health checks will populate here.", textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF9E6D4E)))),
-          ],
-        ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Row(
+              children: [
+                Icon(Icons.local_hospital, size: 50, color: Color(0xFF8B5A2B)),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Vet Checkpoint", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+                      Text("Registered Clinical Portal", style: TextStyle(color: Color(0xFF9E6D4E))),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ),
+          
+          Expanded(
+            child: GridView.count(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.0,
+              children: [
+                _buildVetCard(context, "Log New\nVaccination", Icons.vaccines, const Color(0xFF5C4033), Colors.white, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const RecordVaccineScreen()));
+                }),
+                _buildVetCard(context, "Search\nRegistry", Icons.manage_search, const Color(0xFF9E6D4E), Colors.white, () {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Registry interface available via web.")));
+                }),
+              ]
+            ),
+          )
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -69,6 +100,27 @@ class _VetDashboardState extends State<VetDashboard> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildVetCard(BuildContext context, String title, IconData icon, Color bgColor, Color textColor, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black.withAlpha(20), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 5))]
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48, color: textColor),
+            const SizedBox(height: 12),
+            Text(title, textAlign: TextAlign.center, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
+          ]
+        ),
+      )
     );
   }
 }

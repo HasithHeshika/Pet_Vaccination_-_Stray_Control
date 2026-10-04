@@ -66,10 +66,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
               mainAxisSpacing: 16,
               childAspectRatio: 1.0,
               children: [
-                _buildAdminCard("Manage\nUsers", Icons.people_alt, const Color(0xFF5C4033), Colors.white),
-                _buildAdminCard("Pet\nRegistry", Icons.pets, const Color(0xFF9E6D4E), Colors.white),
-                _buildAdminCard("Verify\nLicenses", Icons.workspace_premium, const Color(0xFFDEC49B), const Color(0xFF5C4033)),
-                _buildAdminCard("Vaccine\nLedgers", Icons.vaccines, const Color(0xFFFFFDF5), const Color(0xFF5C4033)),
+                _buildAdminCard(context, "Manage\nUsers", Icons.people_alt, const Color(0xFF5C4033), Colors.white),
+                _buildAdminCard(context, "Pet\nRegistry", Icons.pets, const Color(0xFF9E6D4E), Colors.white),
+                _buildAdminCard(context, "Verify\nLicenses", Icons.workspace_premium, const Color(0xFFDEC49B), const Color(0xFF5C4033)),
+                _buildAdminCard(context, "Vaccine\nLedgers", Icons.vaccines, const Color(0xFFFFFDF5), const Color(0xFF5C4033)),
               ]
             ),
           )
@@ -101,21 +101,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildAdminCard(String title, IconData icon, Color bgColor, Color textColor) {
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(20), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 5))]
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: textColor),
-          const SizedBox(height: 12),
-          Text(title, textAlign: TextAlign.center, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
-        ]
-      ),
+  Widget _buildAdminCard(BuildContext context, String title, IconData icon, Color bgColor, Color textColor) {
+    return GestureDetector(
+      onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$title requires Web Admin Portal."))),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black.withAlpha(20), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 5))]
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48, color: textColor),
+            const SizedBox(height: 12),
+            Text(title, textAlign: TextAlign.center, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
+          ]
+        ),
+      )
     );
   }
 }
