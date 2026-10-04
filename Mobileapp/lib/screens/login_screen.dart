@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'home_screen.dart';
+import 'admin/admin_dashboard.dart';
+import 'vet/vet_dashboard.dart';
+import 'breeder/breeder_dashboard.dart';
 import 'signup_screen.dart';
 import '../services/auth_service.dart';
 
@@ -26,11 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
     
     setState(() => _isLoading = true);
     try {
-      await _authService.login(_emailController.text.trim(), _passwordController.text);
+      final data = await _authService.login(_emailController.text.trim(), _passwordController.text);
       if (mounted) {
+        final role = data?['user']?['role'] ?? 'pet_owner';
+        Widget target = const HomeScreen();
+        if (role == 'admin') target = const AdminDashboard();
+        else if (role == 'veterinarian') target = const VetDashboard();
+        else if (role == 'breeder') target = const BreederDashboard();
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => target),
         );
       }
     } catch (e) {

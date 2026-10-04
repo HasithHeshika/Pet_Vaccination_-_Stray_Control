@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/lost_and_found_service.dart';
+import 'report_lost_screen.dart';
+import 'report_stray_screen.dart';
 
 class LostFoundScreen extends StatefulWidget {
   const LostFoundScreen({super.key});
@@ -51,10 +53,52 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
            );
         }
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppTheme.activeOrange,
-        child: const Icon(Icons.add_alert, color: Colors.white),
-        onPressed: () {},
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF5C4033),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text("Create Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: const Color(0xFFF9EED9),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+            builder: (ctx) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text("Create Report", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+                    const SizedBox(height: 32),
+                    ListTile(
+                      leading: const CircleAvatar(backgroundColor: Color(0xFF8B3A3A), child: Icon(Icons.pets, color: Colors.white)),
+                      title: const Text("Lost or Found Pet", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+                      subtitle: const Text("Post to the community feed"),
+                      onTap: () async {
+                         Navigator.pop(ctx);
+                         final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportLostScreen()));
+                         if (result == true && mounted) {
+                           setState(() => _reportsFuture = LostAndFoundService().getLostAndFoundList());
+                         }
+                      }
+                    ),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      leading: const CircleAvatar(backgroundColor: Color(0xFF9E6D4E), child: Icon(Icons.add_location_alt, color: Colors.white)),
+                      title: const Text("Report a Stray", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+                      subtitle: const Text("Alert authorities to animals in need"),
+                      onTap: () {
+                         Navigator.pop(ctx);
+                         Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportStrayScreen()));
+                      }
+                    ),
+                    const SizedBox(height: 24),
+                  ]
+                )
+              );
+            }
+          );
+        },
       ),
     );
   }

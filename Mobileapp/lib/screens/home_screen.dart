@@ -3,6 +3,8 @@ import '../theme/app_theme.dart';
 import 'pet_list_screen.dart';
 import 'lost_found_screen.dart';
 import 'vaccination_screen.dart';
+import 'profile_screen.dart';
+import 'lost_found_screen.dart';
 import '../services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,8 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
       target = const PetListScreen();
     } else if (index == 2) {
       target = const VaccinationScreen();
+    } else if (index == 3) {
+      target = const ProfileScreen();
     } else {
-      // Profile screen isn't fully scaffolded yet, so ignoring for the moment.
       return; 
     }
     
@@ -199,13 +202,13 @@ class _HomeScreenState extends State<HomeScreen> {
                      textColor: const Color(0xFF5C4033),
                      onTap: () {} // Pending impl
                   ),
-                  // Report a Stray (Cream White)
+                  // Community Feeds (Cream White)
                   _buildActionCard(
-                     title: "Report a Stray",
+                     title: "Community\nFeed",
                      iconWidget: const Stack(
                        children: [
                          Icon(Icons.pets, color: Color(0xFF5C4033), size: 55), 
-                         Positioned(right:-10, bottom:-5, child: Icon(Icons.search, color: Color(0xFF8B5A2B), size: 35))
+                         Positioned(right:-10, bottom:-5, child: Icon(Icons.forum, color: Color(0xFF8B5A2B), size: 30))
                        ]
                      ),
                      bgColor: const Color(0xFFFFFDF5),

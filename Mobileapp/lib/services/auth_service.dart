@@ -23,6 +23,10 @@ class AuthService {
         } else if (data['user'] != null && data['user']['_id'] != null) {
           await prefs.setString('userId', data['user']['_id'].toString());
         }
+        
+        if (data['user'] != null && data['user']['role'] != null) {
+          await prefs.setString('role', data['user']['role'].toString());
+        }
       }
       return data;
     }
@@ -60,9 +64,15 @@ class AuthService {
     return prefs.getString('userId');
   }
 
+  Future<String?> getUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('role');
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('userId');
+    await prefs.remove('role');
   }
 }

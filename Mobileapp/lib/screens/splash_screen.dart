@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
+import 'admin/admin_dashboard.dart';
+import 'vet/vet_dashboard.dart';
+import 'breeder/breeder_dashboard.dart';
+import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
 
@@ -27,7 +31,27 @@ class _SplashScreenState extends State<SplashScreen> {
     
     if (mounted) {
       if (token != null && token.isNotEmpty) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+        String role = prefs.getString('role') ?? '';
+        
+        // Critical: If role is empty (e.g. they logged in BEFORE we added roles to memory), manually fetch it so Admins don't get stuck on the User screen!
+        if (role.isEmpty) {
+           try {
+             final meData = await AuthService().getMe();
+             role = meData?['user']?['role'] ?? 'pet_owner';
+             await prefs.setString('role', role); // Cache for next time
+           } catch (_) {
+             role = 'pet_owner'; // Safe fallback if offline
+           }
+        }
+        
+        Widget target = const HomeScreen();
+        if (role == 'admin') target = const AdminDashboard();
+        else if (role == 'veterinarian') target = const VetDashboard();
+        else if (role == 'breeder') target = const BreederDashboard();
+
+        if (mounted) {
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => target));
+        }
       } else {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
       }
