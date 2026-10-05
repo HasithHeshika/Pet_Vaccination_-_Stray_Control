@@ -172,6 +172,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
      );
   }
 
+  ImageProvider _getProfileImage() {
+    final pic = _user?['profilePicture']?.toString();
+    if (pic == null || pic.isEmpty) {
+      return const AssetImage('assets/images/dashboard_cat.png');
+    }
+    if (pic.startsWith('http')) {
+      return NetworkImage(pic);
+    }
+    if (pic.startsWith('data:image')) {
+      try {
+        final base64String = pic.split(',').last;
+        // Need to remove whitespaces/newlines just in case
+        final cleanBase64 = base64String.replaceAll(RegExp(r'\s+'), '');
+        return MemoryImage(base64Decode(cleanBase64));
+      } catch (e) {
+        // Fallback if decode fails
+      }
+    }
+    return const AssetImage('assets/images/dashboard_cat.png');
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -195,9 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                children: [
                  CircleAvatar(
                    radius: 60,
-                   backgroundImage: (_user?['profilePicture'] != null && _user!['profilePicture'].toString().isNotEmpty)
-                       ? NetworkImage(_user!['profilePicture'])
-                       : const AssetImage('assets/images/dashboard_cat.png') as ImageProvider,
+                   backgroundImage: _getProfileImage(),
                    backgroundColor: const Color(0xFFDEC49B),
                  ),
                  Positioned(

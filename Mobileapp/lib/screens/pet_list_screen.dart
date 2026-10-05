@@ -178,7 +178,8 @@ class _PetListScreenState extends State<PetListScreen> {
     } else if (imagePath != null && imagePath.startsWith('data:image')) {
       try {
         final base64String = imagePath.split(',').last;
-        imageProvider = MemoryImage(dart_convert.base64Decode(base64String));
+        final cleanBase64 = base64String.replaceAll(RegExp(r'\s+'), '');
+        imageProvider = MemoryImage(dart_convert.base64Decode(cleanBase64));
       } catch (_) {
         imageProvider = const AssetImage('assets/images/dashboard_cat.png');
       }

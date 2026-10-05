@@ -113,7 +113,9 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
     if (path.startsWith('http')) return NetworkImage(path);
     if (path.startsWith('data:image')) {
       try {
-        return MemoryImage(base64Decode(path.split(',').last));
+        final base64String = path.split(',').last;
+        final cleanBase64 = base64String.replaceAll(RegExp(r'\s+'), '');
+        return MemoryImage(base64Decode(cleanBase64));
       } catch (_) {}
     }
     return fallback ?? const AssetImage('assets/images/dashboard_cat.png');
@@ -960,8 +962,10 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
   Widget _renderQR(String qrString) {
     try {
       if (qrString.startsWith('data:image')) {
+        final base64String = qrString.split(',').last;
+        final cleanBase64 = base64String.replaceAll(RegExp(r'\s+'), '');
         return Image.memory(
-          base64Decode(qrString.split(',').last),
+          base64Decode(cleanBase64),
           width: 220,
           height: 220,
           fit: BoxFit.contain,
