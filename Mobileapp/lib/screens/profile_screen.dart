@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
 import 'login_screen.dart';
@@ -43,6 +45,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
         (route) => false
       );
     }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    
+    if (image != null) {
+       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Uploading new profile picture...")));
+       try {
+          final bytes = await image.readAsBytes();
+          final String base64Image = "data:image/jpeg;base64," + base64Encode(bytes);
+          await UserService().updateProfilePicture(base64Image);
+          _fetchProfile(); // Refresh Data seamlessly
+       } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Upload Error: $e"), backgroundColor: Colors.red));
+       }
+    }
+  }
+
+  void _showEditProfileDialog() {
+     final nameController = TextEditingController(text: _user?['fullName'] ?? '');
+     final phoneController = TextEditingController(text: _user?['phone'] ?? '');
+     final nicController = TextEditingController(text: _user?['nicNumber'] ?? '');
+     bool isSaving = false;
+
+     showDialog(
+       context: context,
+       builder: (ctx) => StatefulBuilder(
+         builder: (context, setStateModal) {
+           return AlertDialog(
+              backgroundColor: const Color(0xFFF9EED9),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text("Edit Profile Details", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.bold)),
+              content: SingleChildScrollView(
+                child: Column(
+                   mainAxisSize: MainAxisSize.min,
+                   children: [
+                     TextField(controller: nameController, decoration: const InputDecoration(labelText: "Full Name")),
+                     const SizedBox(height: 16),
+                     TextField(controller: phoneController, decoration: const InputDecoration(labelText: "Phone Number"), keyboardType: TextInputType.phone),
+                     const SizedBox(height: 16),
+                     TextField(controller: nicController, decoration: const InputDecoration(labelText: "NIC Number")),
+                   ]
+                ),
+              ),
+              actions: [
+                 TextButton(child: const Text("CANCEL", style: TextStyle(color: Color(0xFF9E6D4E))), onPressed: () => Navigator.pop(ctx)),
+                 ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF5C4033), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                    child: isSaving 
+                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                        : const Text("SAVE", style: TextStyle(color: Colors.white)),
+                    onPressed: isSaving ? null : () async {
+                       setStateModal(() => isSaving = true);
+                       try {
+                         await UserService().updateProfile({
+                           'fullName': nameController.text,
+                           'phone': phoneController.text,
+                           'nicNumber': nicController.text
+                         });
+                         if (mounted) {
+                           Navigator.pop(ctx);
+                           _fetchProfile(); // Refresh screen silently
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile details updated successfully!")));
+                         }
+                       } catch (e) {
+                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red));
+                         setStateModal(() => isSaving = false);
+                       }
+                    }
+                 )
+              ]
+           );
+         }
+       )
+     );
   }
   
   void _showChangePasswordDialog() {
@@ -127,9 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                    child: CircleAvatar(
                       backgroundColor: const Color(0xFF8B5A2B),
                       radius: 20,
-                      child: IconButton(icon: const Icon(Icons.camera_alt, color: Colors.white, size: 18), onPressed: () {
-                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Photo upload logic is pending server storage config.")));
-                      }),
+                      child: IconButton(icon: const Icon(Icons.camera_alt, color: Colors.white, size: 18), onPressed: _pickImage),
                    )
                  )
                ],
@@ -159,6 +235,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0,5))]),
                child: Column(
                  children: [
+                   ListTile(
+                     leading: const Icon(Icons.edit, color: Color(0xFF8B5A2B)), 
+                     title: const Text("Edit Profile Details", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+                     trailing: const Icon(Icons.chevron_right),
+                     onTap: _showEditProfileDialog
+                   ),
+                   const Divider(height: 0),
                    ListTile(
                      leading: const Icon(Icons.lock_reset, color: Color(0xFF8B5A2B)), 
                      title: const Text("Change Password", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),

@@ -7,7 +7,11 @@ class PetService {
   Future<List<dynamic>> getAllPets() async {
     final response = await _client.get('/api/pets');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      // Handle both array response and { pets: [...] } envelope
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['pets'] != null) return decoded['pets'];
+      return [];
     }
     throw Exception('Failed to load pets');
   }
@@ -31,9 +35,13 @@ class PetService {
   Future<List<dynamic>> getUserPets(String userId) async {
     final response = await _client.get('/api/users/$userId/pets');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      // Web uses response.data.pets — API returns { pets: [...] }
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['pets'] != null) return decoded['pets'];
+      return [];
     }
-    throw Exception('Failed to load user pets');
+    throw Exception('Failed to load user pets: ${response.statusCode}');
   }
 
   Future<Map<String, dynamic>> registerPet(Map<String, dynamic> data) async {

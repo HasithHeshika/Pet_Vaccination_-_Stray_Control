@@ -28,6 +28,16 @@ class UserService {
     throw Exception('Failed to update profile');
   }
 
+  Future<Map<String, dynamic>> updateProfilePicture(String profilePictureBase64) async {
+    final response = await _client.put('/api/users/profile-picture', body: {
+      'profilePicture': profilePictureBase64
+    });
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to update profile picture');
+  }
+
   Future<Map<String, dynamic>> changePassword(String currentPassword, String newPassword) async {
     final response = await _client.put('/api/users/change-password', body: {
       'currentPassword': currentPassword,

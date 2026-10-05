@@ -15,7 +15,13 @@ class VaccinationService {
   Future<List<dynamic>> getPetVaccinations(String petId) async {
     final response = await _client.get('/api/vaccinations/pet/$petId');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      // Backend returns { vaccinations: [...] } or direct array
+      if (decoded is Map && decoded['vaccinations'] != null) {
+        return decoded['vaccinations'];
+      }
+      if (decoded is List) return decoded;
+      return [];
     }
     throw Exception('Failed to load pet vaccinations');
   }
@@ -37,7 +43,12 @@ class VaccinationService {
   Future<List<dynamic>> getUpcomingUserVaccinations() async {
     final response = await _client.get('/api/vaccinations/user/upcoming');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map && decoded['vaccinations'] != null) {
+        return decoded['vaccinations'];
+      }
+      if (decoded is List) return decoded;
+      return [];
     }
     throw Exception('Failed to load upcoming user vaccinations');
   }
