@@ -7,6 +7,7 @@ import 'breeder/breeder_dashboard.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
+import 'get_started_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -53,7 +54,16 @@ class _SplashScreenState extends State<SplashScreen> {
            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => target));
         }
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+        // If not logged in, check if they've seen the onboarding screen
+        final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+        
+        if (mounted) {
+           if (!hasSeenOnboarding) {
+             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const GetStartedScreen()));
+           } else {
+             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+           }
+        }
       }
     }
   }
