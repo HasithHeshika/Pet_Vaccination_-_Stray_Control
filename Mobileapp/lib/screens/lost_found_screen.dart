@@ -26,32 +26,77 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
       appBar: AppBar(
         title: const Text("Lost & Found"),
       ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _reportsFuture,
-        builder: (context, snapshot) {
-           if (snapshot.connectionState == ConnectionState.waiting) {
-             return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBrown));
-           } else if (snapshot.hasError) {
-             return Center(child: Text("Error fetching posts: ${snapshot.error}"));
-           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-             return const Center(child: Text("No missing pets currently. Yay!", style: TextStyle(color: AppTheme.primaryBrown)));
-           }
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFDEC49B), Color(0xFFF9EED9)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppTheme.secondaryGold, width: 2),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withAlpha(20), blurRadius: 10, offset: const Offset(0, 5))
+              ]
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.search, size: 28, color: AppTheme.primaryBrown),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "Lost or Found a Pet?",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.primaryBrown),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "If you lost your pet, we can help you reunite! Or, if you found a pet roaming around, you can help alert others here.",
+                  style: TextStyle(fontSize: 15, color: AppTheme.primaryText, height: 1.4),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: _reportsFuture,
+              builder: (context, snapshot) {
+                 if (snapshot.connectionState == ConnectionState.waiting) {
+                   return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBrown));
+                 } else if (snapshot.hasError) {
+                   return Center(child: Text("Error fetching posts: ${snapshot.error}"));
+                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                   return const Center(child: Text("No missing pets currently. Yay!", style: TextStyle(color: AppTheme.primaryBrown)));
+                 }
 
-           final reports = snapshot.data!;
-           return ListView.builder(
-             padding: const EdgeInsets.all(20),
-             itemCount: reports.length,
-             itemBuilder: (context, index) {
-               final report = reports[index];
-               String title = report['petName'] ?? report['title'] ?? 'Unknown Pet';
-               String desc = report['description'] ?? 'No description';
-               bool isLost = report['type'] == 'Lost' || report['status'] == 'Lost';
-               String? imageUrl = report['imageUrl'] ?? report['photoUrl'];
+                 final reports = snapshot.data!;
+                 return ListView.builder(
+                   padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                   itemCount: reports.length,
+                   itemBuilder: (context, index) {
+                     final report = reports[index];
+                     String title = report['petName'] ?? report['title'] ?? 'Unknown Pet';
+                     String desc = report['description'] ?? 'No description';
+                     bool isLost = report['type'] == 'Lost' || report['status'] == 'Lost';
+                     String? imageUrl = report['imageUrl'] ?? report['photoUrl'];
 
-               return _buildLostCard(title, desc, imageUrl, isLost);
-             },
-           );
-        }
+                     return _buildLostCard(title, desc, imageUrl, isLost);
+                   },
+                 );
+              }
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xFF5C4033),

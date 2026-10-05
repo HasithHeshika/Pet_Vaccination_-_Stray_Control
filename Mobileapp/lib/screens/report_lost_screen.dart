@@ -10,15 +10,25 @@ class ReportLostScreen extends StatefulWidget {
 }
 
 class _ReportLostScreenState extends State<ReportLostScreen> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _petNameController = TextEditingController();
+  final _breedController = TextEditingController();
+  final _colorController = TextEditingController();
   final _locationController = TextEditingController();
+  final _descriptionController = TextEditingController();
   final _imageController = TextEditingController();
+  final _contactController = TextEditingController();
+  
+  DateTime? _lastSeenDate;
   String _type = 'Lost';
   bool _isLoading = false;
 
   void _submitReport() async {
-    if (_titleController.text.isEmpty || _descriptionController.text.isEmpty || _locationController.text.isEmpty) {
+    if (_petNameController.text.isEmpty ||
+        _breedController.text.isEmpty ||
+        _colorController.text.isEmpty ||
+        _locationController.text.isEmpty ||
+        _lastSeenDate == null ||
+        _contactController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all required fields")));
       return;
     }
@@ -26,17 +36,20 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
     setState(() => _isLoading = true);
     try {
       await LostAndFoundService().reportLost({
-        "petName": _titleController.text, // Fallbacks matching the backend schemas
-        "title": _titleController.text,
+        "petName": _petNameController.text,
+        "breed": _breedController.text,
+        "color": _colorController.text,
+        "lastSeenLocation": _locationController.text,
+        "lastSeenDate": _lastSeenDate!.toIso8601String(),
         "description": _descriptionController.text,
-        "location": _locationController.text,
+        "contactInfo": _contactController.text,
         "type": _type,
         "status": _type,
         "imageUrl": _imageController.text.isNotEmpty ? _imageController.text : null,
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Successfully created $_type report.")));
-        Navigator.pop(context, true); // Return true to trigger refresh on underlying list
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
@@ -47,12 +60,34 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
     }
   }
 
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _lastSeenDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppTheme.primaryBrown,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _lastSeenDate = picked);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9EED9),
       appBar: AppBar(
-        title: const Text("Lost & Found Report", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.bold)),
+        title: const Text("Report a Missing Pet", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.bold, fontSize: 20)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF5C4033)),
@@ -60,7 +95,16 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Center(
+              child: Text(
+                "Please provide as much detail as possible to help identify the pet.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppTheme.primaryBrown, fontSize: 15),
+              ),
+            ),
+            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -70,40 +114,140 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
               ],
             ),
             const SizedBox(height: 32),
+            _buildLabel("Pet Name (or \"Unknown\" if found)"),
             TextField(
-              controller: _titleController,
-              decoration: _buildInputDecoration("Title / Pet Name", Icons.pets),
+              controller: _petNameController,
+              decoration: _buildInputDecoration("Enter pet name", Icons.pets),
             ),
             const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel("Breed / Type"),
+                      TextField(
+                        controller: _breedController,
+                        decoration: _buildInputDecoration("e.g. Golden Retriever", null),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel("Color / Markings"),
+                      TextField(
+                        controller: _colorController,
+                        decoration: _buildInputDecoration("e.g. Black with white spots", null),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildLabel("Last Seen Location"),
             TextField(
               controller: _locationController,
-              decoration: _buildInputDecoration("Last Known Location", Icons.location_on),
+              decoration: _buildInputDecoration("e.g., Central Park near 72nd St entrance", Icons.location_on),
             ),
             const SizedBox(height: 16),
+            _buildLabel("Last Seen Date"),
+            GestureDetector(
+              onTap: _pickDate,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFDECAAE), width: 1.5),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_month, color: AppTheme.primaryBrown),
+                    const SizedBox(width: 12),
+                    Text(
+                      _lastSeenDate != null
+                          ? "${_lastSeenDate!.month}/${_lastSeenDate!.day}/${_lastSeenDate!.year}"
+                          : "mm/dd/yyyy",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _lastSeenDate != null ? Colors.black87 : Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildLabel("Additional Description"),
             TextField(
               controller: _descriptionController,
-              maxLines: 3,
-              decoration: _buildInputDecoration("Description (Collar, breed, size)", Icons.notes),
+              maxLines: 4,
+              decoration: _buildInputDecoration("Describe any collar, tags, behaviors, etc.", null),
             ),
             const SizedBox(height: 16),
+            _buildLabel("Photo URL (Optional)"),
             TextField(
               controller: _imageController,
-              decoration: _buildInputDecoration("Image URL (Optional)", Icons.link),
+              decoration: _buildInputDecoration("https://example.com/pet-image.jpg", Icons.link),
+            ),
+            const SizedBox(height: 16),
+            _buildLabel("Contact Information"),
+            TextField(
+              controller: _contactController,
+              decoration: _buildInputDecoration("Phone number or email", Icons.contact_phone),
             ),
             const SizedBox(height: 48),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _submitReport,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _type == 'Lost' ? const Color(0xFF8B3A3A) : const Color(0xFF5C4033),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: AppTheme.primaryBrown, width: 2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text("Cancel", style: TextStyle(color: AppTheme.primaryBrown, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
                 ),
-                child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text("SUBMIT REPORT", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-              ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _submitReport,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent.shade700,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
+                    ),
+                    child: _isLoading 
+                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                        : const Text("Submit Report", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                  ),
+                ),
+              ],
             )
           ]
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8, left: 4),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF333333),
         ),
       ),
     );
@@ -131,11 +275,11 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
     );
   }
 
-  InputDecoration _buildInputDecoration(String labelText, IconData icon) {
+  InputDecoration _buildInputDecoration(String hintText, IconData? icon) {
     return InputDecoration(
-      labelText: labelText,
-      labelStyle: const TextStyle(color: AppTheme.primaryBrown),
-      prefixIcon: Icon(icon, color: AppTheme.primaryBrown),
+      hintText: hintText,
+      hintStyle: const TextStyle(color: Colors.black45, fontSize: 14),
+      prefixIcon: icon != null ? Icon(icon, color: AppTheme.primaryBrown, size: 20) : null,
       filled: true,
       fillColor: Colors.white,
       enabledBorder: OutlineInputBorder(
@@ -146,6 +290,7 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFF5C4033), width: 2.0),
       ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 }

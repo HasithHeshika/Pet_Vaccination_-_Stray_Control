@@ -51,7 +51,18 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
               });
             }
           } catch (_) {
-            // skip individual failures
+            // Workaround: Fallback to the working 'upcoming' list to show at least some data
+            final filteredHistory = upcoming.where((v) {
+              final p = v['pet'];
+              if (p is Map) return p['_id']?.toString() == petMongoId;
+              return p?.toString() == petMongoId;
+            }).toList();
+
+            if (mounted) {
+              setState(() {
+                _petVaccinations[petMongoId] = filteredHistory;
+              });
+            }
           }
         }
       }
