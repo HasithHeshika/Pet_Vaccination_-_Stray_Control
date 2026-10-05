@@ -93,6 +93,14 @@ class _ApplyLicenseScreenState extends State<ApplyLicenseScreen> {
               maxLines: 4,
               decoration: _buildInputDecoration("Facility Description\n(Describe your environment, housing, etc.)", Icons.house),
             ),
+            const SizedBox(height: 32),
+            const Text("Document Submission", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+            const SizedBox(height: 16),
+            _buildDocUploadCard("Upload ID Proof", Icons.badge),
+            const SizedBox(height: 12),
+            _buildDocUploadCard("Facility Images", Icons.photo_library),
+            const SizedBox(height: 12),
+            _buildDocUploadCard("Supporting Certificates", Icons.card_membership),
             const SizedBox(height: 48),
             ElevatedButton(
               onPressed: _isLoading ? null : _submitApplication,
@@ -133,5 +141,29 @@ class _ApplyLicenseScreenState extends State<ApplyLicenseScreen> {
         borderSide: const BorderSide(color: Color(0xFF5C4033), width: 2.0),
       ),
     );
+  }
+
+  Widget _buildDocUploadCard(String title, IconData icon) {
+     return InkWell(
+        onTap: () {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$title upload logic is pending server file storage API setup.")));
+        },
+        child: Container(
+           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+           decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFDECAAE), width: 1.5),
+           ),
+           child: Row(
+              children: [
+                 Icon(icon, color: const Color(0xFF8B5A2B), size: 28),
+                 const SizedBox(width: 16),
+                 Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF5C4033), fontSize: 16))),
+                 const Icon(Icons.cloud_upload, color: Color(0xFF9E6D4E))
+              ]
+           )
+        )
+     );
   }
 }

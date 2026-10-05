@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import 'pet_list_screen.dart';
-import 'lost_found_screen.dart';
 import 'vaccination_screen.dart';
 import 'profile_screen.dart';
 import 'lost_found_screen.dart';
+import 'breeder/breeder_dashboard.dart';
 import '../services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -200,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                      ),
                      bgColor: const Color(0xFFDEC49B),
                      textColor: const Color(0xFF5C4033),
-                     onTap: () {} // Pending impl
+                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BreederDashboard()))
                   ),
                   // Community Feeds (Cream White)
                   _buildActionCard(
