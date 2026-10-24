@@ -137,13 +137,15 @@ const LostFoundFeed = () => {
                         Mark In Progress
                       </button>
                     )}
-                    <button 
-                      onClick={() => handleStatusUpdate(pet._id, 'Resolved')}
-                      className="btn btn-success btn-small"
-                      style={{ flex: 1, padding: '6px', fontSize: '12px' }}
-                    >
-                      Mark Resolved
-                    </button>
+                    {(user.id === pet.reportedBy?._id || user.id === pet.reportedBy || isAdmin) && (
+                      <button
+                        onClick={() => handleStatusUpdate(pet._id, 'Resolved')}
+                        className="btn btn-success btn-small"
+                        style={{ flex: 1, padding: '6px', fontSize: '12px' }}
+                      >
+                        Mark Resolved
+                      </button>
+                    )}
                   </div>
                 )}
                 {user && (user.id === pet.reportedBy?._id || user.id === pet.reportedBy || isAdmin) && (

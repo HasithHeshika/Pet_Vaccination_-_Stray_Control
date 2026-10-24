@@ -19,9 +19,9 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 ## ✨ Features
 
 - **Role-Based Access Control**: Granular permissions for **Admins**, **Veterinarians**, and **Pet Owners / Breeders**.
-- **Pet Registration & Unique QR Codes**: Admin pet registration with instant QR code generation and scan tracking.
+- **Pet Registration & Unique QR Codes**: Admin pet registration with instant QR code generation. Scanning the QR opens a public pet profile; finders can message the owner without the owner's email or phone being shown.
 - **Veterinarian Portal**: Dedicated doctor interface to lookup patient records by Pet ID, view medical history, log vaccinations/treatments, and send reminders.
-- **Automated Vaccination Reminders**: Background `node-cron` service and `nodemailer` integration to deliver email reminders for upcoming/overdue vaccinations.
+- **Automated Vaccination Reminders**: Background `node-cron` service and `nodemailer` integration to deliver email reminders for upcoming/overdue vaccinations (requires SMTP settings; a reminder is only marked as sent after it is delivered).
 - **Breeder Licensing System**: Full breeder application workflow, status tracking, renewal requests, and municipal authority approval dashboards.
 - **Stray & Lost Pet Reporting**: Citizen stray animal reporting, lost pet feed, and municipal progress dashboards.
 
@@ -32,11 +32,11 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 | Sprint | Goal / Description | Status | Key Components |
 | :--- | :--- | :---: | :--- |
 | **Sprint 1** | Setup of Pet Registration & QR ID system | ✅ Completed | `Pet.js`, `PetRegistration.jsx`, QR generation, JWT Auth |
-| **Sprint 2** | Vaccination Scheduler & Automated Reminder service | ✅ Completed | `Vaccination.js`, `reminderService.js`, `node-cron`, `nodemailer` email notifications |
+| **Sprint 2** | Vaccination Scheduler & Automated Reminder service | ✅ Completed | `Vaccination.js`, `vaccinationScheduler.js` (daily `node-cron` job), `notificationService.js` (`nodemailer` email; requires SMTP settings). SMS is not yet implemented |
 | **Sprint 3** | Implementation of Veterinarian Portal | ✅ Completed | `VetDashboard.jsx`, Vet role middleware (`vet.js`), patient lookup & treatment logger |
 | **Sprint 4** | Lost-and-Found & Stray Reporting modules | ✅ Completed | `LostReport.js`, `StrayReport.js`, `ReportStrayForm.jsx`, `LostFoundFeed.jsx` |
-| **Sprint 5** | Breeder Licensing & Admin Dashboards | ✅ Completed | `BreederLicense.js`, `ApplyBreederLicense.jsx`, `MyBreederLicenses.jsx`, `AdminBreederLicenses.jsx` |
-| **Sprint 6** | Testing, UI polish & deployment readiness | ✅ Completed | API validation suite (`validate-api.js`), responsive UI styling, Docker compose setup |
+| **Sprint 5** | Breeder Licensing & Admin Dashboards | ✅ Completed | `BreederLicense.js`, `ApplyLicense.jsx`, `ApplicationStatus.jsx`, `RenewLicense.jsx`, `AdminBreederLicenses.jsx`, `AuthorityDashboard.jsx` |
+| **Sprint 6** | Testing, UI polish & deployment readiness | ✅ Completed | End-to-end API tests (`Backend/tests/api.test.js`) and frontend tests run in CI, responsive UI styling, Docker compose setup |
 
 ---
 
@@ -107,6 +107,35 @@ cp .env.example .env
 # 2. Start Application with hot-reload (Frontend on 3000, Backend on 5001)
 make dev-up
 ```
+
+---
+
+## ⚙️ Backend Environment Variables
+
+| Variable | Purpose |
+| :--- | :--- |
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | Secret for signing login tokens (use a long random value in production) |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Initial administrator account (change the defaults in production) |
+| `FRONTEND_URL` | Public web URL used in pet QR codes and email links (production: the Azure Static Web Apps URL) |
+| `CORS_ORIGINS` | Comma-separated browser origins allowed to call the API |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | Outgoing email for vaccination reminders and finder-to-owner messages. Without these, emails are only logged |
+| `REMINDER_CRON` | Schedule for the daily reminder check (default `0 9 * * *`) |
+
+After changing `FRONTEND_URL`, re-issue existing QR codes with `cd Backend && npm run regenerate-qr`.
+
+## 🧪 Tests
+
+```bash
+# Backend end-to-end API tests (needs a MongoDB; the test database is dropped first)
+docker run -d --rm --name pet-test-mongo -p 27077:27017 mongo:7
+cd Backend && TEST_MONGODB_URI=mongodb://127.0.0.1:27077/pet_management_test npm test
+
+# Frontend tests
+cd Frontend && CI=true npm test -- --watchAll=false
+```
+
+Both suites run automatically in GitHub Actions (`.github/workflows/ci.yml`).
 
 ---
 

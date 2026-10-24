@@ -1,11 +1,53 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Vaccination = require('../models/Vaccination');
 const Pet = require('../models/Pet');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const vet = require('../middleware/vet');
+const validateObjectId = require('../middleware/validateObjectId');
 const { sendVaccinationReminderEmail } = require('../services/reminderService');
+
+const VACCINE_TYPES = Vaccination.schema.path('vaccineType').enumValues;
+
+// Short names used by the vet portal and mobile app, mapped onto the stored vaccine types
+const VACCINE_TYPE_ALIASES = {
+  DHPP: 'DHPP (Distemper, Hepatitis, Parvovirus, Parainfluenza)',
+  Bordetella: 'Bordetella (Kennel Cough)',
+  Lyme: 'Lyme Disease',
+  FVRCP: 'FVRCP (Feline Viral Rhinotracheitis, Calicivirus, Panleukopenia)',
+  FeLV: 'FeLV (Feline Leukemia)',
+  FIV: 'FIV (Feline Immunodeficiency Virus)'
+};
+
+const normalizeVaccineType = (value) => {
+  if (!value) return value;
+  if (VACCINE_TYPES.includes(value)) return value;
+  return VACCINE_TYPE_ALIASES[value] || 'Other';
+};
+
+// Accepts { email, sms } or the strings 'email' | 'sms' | 'both'
+const normalizeNotificationPreference = (value) => {
+  if (value && typeof value === 'object') {
+    return { email: value.email !== false, sms: Boolean(value.sms) };
+  }
+  if (value === 'sms') return { email: false, sms: true };
+  if (value === 'both') return { email: true, sms: true };
+  return { email: true, sms: false };
+};
+
+const UPDATABLE_FIELDS = [
+  'vaccineType', 'vaccineName', 'dateAdministered', 'nextDueDate', 'veterinarianName',
+  'clinicName', 'batchNumber', 'notes', 'status', 'notificationPreference'
+];
+
+// Owners see their own pets; veterinarians and admins see all pets
+const canViewPetRecords = (user, pet) => {
+  if (user.isAdmin || user.role === 'veterinarian' || user.role === 'admin') return true;
+  const ownerId = pet.owner?._id || pet.owner;
+  return Boolean(ownerId) && ownerId.toString() === user._id.toString();
+};
 
 // @route   POST /api/vaccinations
 // @desc    Add a new vaccination record
@@ -26,6 +68,10 @@ router.post('/', [auth, vet], async (req, res) => {
       notificationPreference
     } = req.body;
 
+    if (!petId || !mongoose.Types.ObjectId.isValid(petId)) {
+      return res.status(400).json({ message: 'A valid petId is required' });
+    }
+
     // Verify pet exists
     const pet = await Pet.findById(petId);
     if (!pet) {
@@ -34,8 +80,7 @@ router.post('/', [auth, vet], async (req, res) => {
 
     const vaccination = new Vaccination({
       pet: petId,
-      petId: petId,
-      vaccineType,
+      vaccineType: normalizeVaccineType(vaccineType),
       vaccineName,
       dateAdministered: dateAdministered || new Date(),
       nextDueDate,
@@ -44,12 +89,19 @@ router.post('/', [auth, vet], async (req, res) => {
       batchNumber,
       notes,
       status: status || 'administered',
-      notificationPreference: notificationPreference || 'email',
-      createdBy: req.user._id || req.user.userId,
-      administeredBy: req.user._id
+      notificationPreference: normalizeNotificationPreference(notificationPreference),
+      createdBy: req.user._id
     });
 
-    await vaccination.save();
+    try {
+      await vaccination.save();
+    } catch (validationError) {
+      if (validationError.name === 'ValidationError') {
+        const firstError = Object.values(validationError.errors)[0];
+        return res.status(400).json({ message: firstError?.message || 'Invalid vaccination details' });
+      }
+      throw validationError;
+    }
 
     const populatedVaccination = await Vaccination.findById(vaccination._id)
       .populate('pet')
@@ -61,14 +113,14 @@ router.post('/', [auth, vet], async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating vaccination record:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 // @route   GET /api/vaccinations/pet/:petId
 // @desc    Get all vaccination records for a specific pet
 // @access  Private (owner or admin)
-router.get('/pet/:petId', auth, async (req, res) => {
+router.get('/pet/:petId', auth, validateObjectId('petId'), async (req, res) => {
   try {
     const { petId } = req.params;
 
@@ -78,8 +130,8 @@ router.get('/pet/:petId', auth, async (req, res) => {
       return res.status(404).json({ message: 'Pet not found' });
     }
 
-    // Check if user is owner or admin
-    if (!req.user.isAdmin && pet.owner._id.toString() !== req.user.userId) {
+    // Owner, veterinarian or admin
+    if (!canViewPetRecords(req.user, pet)) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
@@ -97,7 +149,7 @@ router.get('/pet/:petId', auth, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching vaccination records:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -112,7 +164,7 @@ router.get('/upcoming', [auth, admin], async (req, res) => {
     res.json({ vaccinations, count: vaccinations.length });
   } catch (error) {
     console.error('Error fetching upcoming vaccinations:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -126,7 +178,7 @@ router.get('/overdue', [auth, admin], async (req, res) => {
     res.json({ vaccinations, count: vaccinations.length });
   } catch (error) {
     console.error('Error fetching overdue vaccinations:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -154,14 +206,14 @@ router.get('/user/upcoming', auth, async (req, res) => {
     res.json({ vaccinations, count: vaccinations.length });
   } catch (error) {
     console.error('Error fetching user vaccinations:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 // @route   PUT /api/vaccinations/:id
 // @desc    Update a vaccination record
 // @access  Admin only
-router.put('/:id', [auth, admin], async (req, res) => {
+router.put('/:id', [auth, admin, validateObjectId()], async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -171,14 +223,27 @@ router.put('/:id', [auth, admin], async (req, res) => {
       return res.status(404).json({ message: 'Vaccination record not found' });
     }
 
-    // Update fields
-    Object.keys(updateData).forEach(key => {
-      if (updateData[key] !== undefined) {
+    // Update only the editable clinical fields (never pet, createdBy or reminder state)
+    UPDATABLE_FIELDS.forEach(key => {
+      if (updateData[key] === undefined) return;
+      if (key === 'vaccineType') {
+        vaccination.vaccineType = normalizeVaccineType(updateData.vaccineType);
+      } else if (key === 'notificationPreference') {
+        vaccination.notificationPreference = normalizeNotificationPreference(updateData.notificationPreference);
+      } else {
         vaccination[key] = updateData[key];
       }
     });
 
-    await vaccination.save();
+    try {
+      await vaccination.save();
+    } catch (validationError) {
+      if (validationError.name === 'ValidationError') {
+        const firstError = Object.values(validationError.errors)[0];
+        return res.status(400).json({ message: firstError?.message || 'Invalid vaccination details' });
+      }
+      throw validationError;
+    }
 
     const updatedVaccination = await Vaccination.findById(id)
       .populate('pet')
@@ -190,14 +255,14 @@ router.put('/:id', [auth, admin], async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating vaccination record:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 // @route   DELETE /api/vaccinations/:id
 // @desc    Delete a vaccination record
 // @access  Admin only
-router.delete('/:id', [auth, admin], async (req, res) => {
+router.delete('/:id', [auth, admin, validateObjectId()], async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -211,14 +276,14 @@ router.delete('/:id', [auth, admin], async (req, res) => {
     res.json({ message: 'Vaccination record deleted successfully' });
   } catch (error) {
     console.error('Error deleting vaccination record:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 // @route   GET /api/vaccinations/:id
 // @desc    Get a single vaccination record
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', auth, validateObjectId(), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -226,27 +291,26 @@ router.get('/:id', auth, async (req, res) => {
       .populate('pet')
       .populate('createdBy', 'fullName email');
 
-    if (!vaccination) {
+    if (!vaccination || !vaccination.pet) {
       return res.status(404).json({ message: 'Vaccination record not found' });
     }
 
-    // Check if user is owner or admin
-    const pet = await Pet.findById(vaccination.pet._id).populate('owner');
-    if (!req.user.isAdmin && pet.owner._id.toString() !== req.user.userId) {
+    // Owner, veterinarian or admin
+    if (!canViewPetRecords(req.user, vaccination.pet)) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
     res.json({ vaccination });
   } catch (error) {
     console.error('Error fetching vaccination record:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 // @route   POST /api/vaccinations/:id/send-reminder
 // @desc    Send automated or manual vaccination reminder email to pet owner
 // @access  Private (Admin or Vet)
-router.post('/:id/send-reminder', [auth, vet], async (req, res) => {
+router.post('/:id/send-reminder', [auth, vet, validateObjectId()], async (req, res) => {
   try {
     const { id } = req.params;
     const result = await sendVaccinationReminderEmail(id);
@@ -256,7 +320,9 @@ router.post('/:id/send-reminder', [auth, vet], async (req, res) => {
     });
   } catch (error) {
     console.error('Error sending reminder email:', error);
-    res.status(500).json({ message: error.message || 'Failed to send reminder email' });
+    res.status(error.status || 500).json({
+      message: error.status ? error.message : 'Failed to send reminder email'
+    });
   }
 });
 

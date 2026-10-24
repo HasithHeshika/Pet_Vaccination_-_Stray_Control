@@ -34,6 +34,8 @@ const checkAndSendReminders = async () => {
           continue;
         }
 
+        let delivered = false;
+
         // Send email if preference is enabled
         if (vaccination.notificationPreference?.email !== false && owner.email) {
           const emailResult = await sendVaccinationReminderEmail(
@@ -44,6 +46,7 @@ const checkAndSendReminders = async () => {
           );
 
           if (emailResult.success) {
+            delivered = true;
             console.log(`Email reminder sent to ${owner.email} for ${pet.petName}`);
           } else {
             console.error(`Failed to send email to ${owner.email}:`, emailResult.error);
@@ -56,9 +59,11 @@ const checkAndSendReminders = async () => {
           console.log(`SMS reminder queued for ${owner.phone} for ${pet.petName}`);
         }
 
-        // Mark reminder as sent
-        await vaccination.markReminderSent();
-        console.log(`Marked reminder as sent for vaccination ${vaccination._id}`);
+        // Only mark as sent when a reminder was actually delivered, so failures are retried next run
+        if (delivered) {
+          await vaccination.markReminderSent();
+          console.log(`Marked reminder as sent for vaccination ${vaccination._id}`);
+        }
       } catch (error) {
         console.error(`Error processing vaccination ${vaccination._id}:`, error);
       }

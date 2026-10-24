@@ -13,11 +13,6 @@ const Footer = () => {
             A comprehensive platform for managing pet ownership records,
             vaccination tracking, breeder licensing, and stray animal reporting.
           </p>
-          <div className="footer-social" aria-label="Contact channels">
-            <span className="social-icon"><BreederIcon name="mail" /></span>
-            <span className="social-icon"><BreederIcon name="phone" /></span>
-            <span className="social-icon"><BreederIcon name="home" /></span>
-          </div>
         </div>
 
         <div className="footer-section">
@@ -31,21 +26,18 @@ const Footer = () => {
         </div>
 
         <div className="footer-section">
-          <h4>Features</h4>
+          <h4>Report an Animal</h4>
           <ul className="footer-links">
-            <li>Pet Registration</li>
-            <li>Vaccination Management</li>
-            <li>Breeder License Management</li>
-            <li>QR Code Tracking</li>
+            <li><Link to="/report-stray">Report a Stray Animal</Link></li>
+            <li><Link to="/lost-and-found">Lost &amp; Found Pets</Link></li>
           </ul>
         </div>
 
         <div className="footer-section">
           <h4>Contact</h4>
           <ul className="footer-links">
-            <li>info@petmanagement.com</li>
-            <li>+1 (555) 123-4567</li>
-            <li>123 Pet Street, City</li>
+            <li>For registration or vaccination queries, contact your local Municipal Council veterinary office.</li>
+            <li>In an emergency involving an animal bite, seek medical care immediately.</li>
           </ul>
         </div>
       </div>
