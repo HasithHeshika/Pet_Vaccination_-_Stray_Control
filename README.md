@@ -119,7 +119,8 @@ make dev-up
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Initial administrator account (change the defaults in production) |
 | `FRONTEND_URL` | Public web URL used in pet QR codes and email links (production: the Azure Static Web Apps URL) |
 | `CORS_ORIGINS` | Comma-separated browser origins allowed to call the API |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | Outgoing email for vaccination reminders and finder-to-owner messages. Without these, emails are only logged |
+| `ACS_EMAIL_CONNECTION_STRING`, `ACS_EMAIL_SENDER` | Outgoing email through Azure Communication Services (used in production) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | Alternative: outgoing email through any SMTP server. With neither ACS nor SMTP set, emails are only logged |
 | `REMINDER_CRON` | Schedule for the daily reminder check (default `0 9 * * *`) |
 
 After changing `FRONTEND_URL`, re-issue existing QR codes with `cd Backend && npm run regenerate-qr`.

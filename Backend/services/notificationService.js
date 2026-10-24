@@ -1,13 +1,17 @@
 const nodemailer = require('nodemailer');
 const { formatDate } = require('../utils/dateFormatter');
 const { getFrontendUrl } = require('../utils/frontendUrl');
+const { isAcsConfigured, sendAcsEmail } = require('./acsEmail');
 
-const isEmailConfigured = () => Boolean(process.env.SMTP_HOST && process.env.SMTP_USER);
+const isSmtpConfigured = () => Boolean(process.env.SMTP_HOST && process.env.SMTP_USER);
+
+// Email can go out through Azure Communication Services or any SMTP server
+const isEmailConfigured = () => isAcsConfigured() || isSmtpConfigured();
 
 // Email transporter configuration
 const createTransporter = () => {
   // Real SMTP when configured (any environment)
-  if (isEmailConfigured()) {
+  if (isSmtpConfigured()) {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587', 10),
@@ -23,14 +27,19 @@ const createTransporter = () => {
   return nodemailer.createTransport({ jsonTransport: true });
 };
 
-// Sends mail and reports whether it was actually delivered to an SMTP server
+// Sends mail and reports whether it was actually handed to an email service
 const deliver = async (mailOptions) => {
+  if (isAcsConfigured()) {
+    const { messageId } = await sendAcsEmail(mailOptions);
+    return { success: true, messageId };
+  }
+
   const transporter = createTransporter();
   const info = await transporter.sendMail(mailOptions);
 
-  if (!isEmailConfigured()) {
-    console.log(`[EMAIL NOT SENT - SMTP not configured] To: ${mailOptions.to} | Subject: ${mailOptions.subject}`);
-    return { success: false, simulated: true, error: 'SMTP is not configured' };
+  if (!isSmtpConfigured()) {
+    console.log(`[EMAIL NOT SENT - email not configured] To: ${mailOptions.to} | Subject: ${mailOptions.subject}`);
+    return { success: false, simulated: true, error: 'Email is not configured' };
   }
 
   return { success: true, messageId: info.messageId };
