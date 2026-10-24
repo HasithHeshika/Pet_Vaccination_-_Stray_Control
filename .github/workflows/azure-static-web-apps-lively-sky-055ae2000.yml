@@ -23,6 +23,8 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         env:
+          # Don't publish source maps (they expose the full frontend source)
+          GENERATE_SOURCEMAP: "false"
           REACT_APP_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           REACT_APP_APPLE_CLIENT_ID: ${{ secrets.APPLE_CLIENT_ID }}
           REACT_APP_APPLE_REDIRECT_URI: ${{ secrets.APPLE_REDIRECT_URI }}

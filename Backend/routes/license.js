@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+const validateObjectId = require('../middleware/validateObjectId');
 const BreederLicense = require('../models/BreederLicense');
 const Pet = require('../models/Pet');
 
@@ -30,6 +31,31 @@ const normalizeStatus = (license) => {
   return license;
 };
 
+// Uploaded documents are stored as data URLs. Anything else (e.g. a javascript: URL) is dropped
+// so it can never be rendered as a link in the authority's browser.
+const SAFE_DOCUMENT_URL = /^data:(image\/(png|jpe?g|webp|gif)|application\/pdf);base64,[A-Za-z0-9+/]+=*$/;
+
+const sanitizeDocument = (doc) => {
+  if (!doc || typeof doc !== 'object') return undefined;
+  return {
+    label: String(doc.label || 'Document').slice(0, 100),
+    fileName: String(doc.fileName || 'document').slice(0, 200),
+    fileType: String(doc.fileType || '').slice(0, 100),
+    fileSize: Number(doc.fileSize) || 0,
+    previewUrl: typeof doc.previewUrl === 'string' && SAFE_DOCUMENT_URL.test(doc.previewUrl) ? doc.previewUrl : ''
+  };
+};
+
+const sanitizeDocuments = (documents) => {
+  if (!documents || typeof documents !== 'object') return {};
+  const list = (items) => (Array.isArray(items) ? items.map(sanitizeDocument).filter(Boolean) : []);
+  return {
+    idProof: sanitizeDocument(documents.idProof),
+    facilityImages: list(documents.facilityImages),
+    certificates: list(documents.certificates)
+  };
+};
+
 const buildLicensePayload = (body, user, fallback = {}) => ({
   breederName: body.breederName ?? fallback.breederName ?? user.fullName,
   nicOrBusinessRegNo: body.nicOrBusinessRegNo ?? fallback.nicOrBusinessRegNo ?? user.nicNumber,
@@ -46,7 +72,7 @@ const buildLicensePayload = (body, user, fallback = {}) => ({
   numberOfAnimals: Number(body.numberOfAnimals ?? fallback.numberOfAnimals ?? 0),
   facilityDescription: body.facilityDescription ?? fallback.facilityDescription ?? '',
   yearsOfExperience: Number(body.yearsOfExperience ?? fallback.yearsOfExperience ?? 0),
-  documents: body.documents ?? fallback.documents ?? {}
+  documents: body.documents !== undefined ? sanitizeDocuments(body.documents) : (fallback.documents ?? {})
 });
 
 const validateApplication = (payload) => {
@@ -151,7 +177,7 @@ router.get('/my-licenses', auth, async (req, res) => {
 // @route   GET /api/licenses/:id
 // @desc    Get license/application details
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', auth, validateObjectId(), async (req, res) => {
   try {
     const license = await BreederLicense.findById(req.params.id).populate('applicantId', ['fullName', 'email', 'phone']);
     if (!license) return res.status(404).json({ message: 'License application not found' });
@@ -191,7 +217,7 @@ router.get('/', auth, admin, async (req, res) => {
 // @route   PUT /api/licenses/:id/status
 // @desc    Update license status
 // @access  Private/Admin
-router.put('/:id/status', auth, admin, async (req, res) => {
+router.put('/:id/status', auth, admin, validateObjectId(), async (req, res) => {
   try {
     const { status, remarks, issueDate, expiryDate } = req.body;
     const allowedStatuses = ['Pending', 'Approved', 'Rejected', 'Expired'];
@@ -228,13 +254,23 @@ router.put('/:id/status', auth, admin, async (req, res) => {
 // @route   POST /api/licenses/:id/renew
 // @desc    Create a renewal application from an existing license
 // @access  Private
-router.post('/:id/renew', auth, async (req, res) => {
+router.post('/:id/renew', auth, validateObjectId(), async (req, res) => {
   try {
     const license = await BreederLicense.findById(req.params.id);
     if (!license) return res.status(404).json({ message: 'License application not found' });
 
     if (license.applicantId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'User not authorized' });
+    }
+
+    normalizeStatus(license);
+    if (!['Approved', 'Expired'].includes(license.status)) {
+      return res.status(400).json({ message: 'Only approved or expired licenses can be renewed' });
+    }
+
+    const pendingRenewal = await BreederLicense.findOne({ renewalOf: license._id, status: 'Pending' });
+    if (pendingRenewal) {
+      return res.status(400).json({ message: 'A renewal for this license is already pending review' });
     }
 
     const payload = buildLicensePayload(req.body, req.user, license.toObject());

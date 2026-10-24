@@ -1,38 +1,44 @@
 const nodemailer = require('nodemailer');
 const { formatDate } = require('../utils/dateFormatter');
+const { getFrontendUrl } = require('../utils/frontendUrl');
+
+const isEmailConfigured = () => Boolean(process.env.SMTP_HOST && process.env.SMTP_USER);
 
 // Email transporter configuration
 const createTransporter = () => {
-  // For development, use ethereal email (fake SMTP)
-  // For production, use real SMTP credentials from environment variables
-  if (process.env.NODE_ENV === 'production') {
-    return nodemailer.createTransporter({
+  // Real SMTP when configured (any environment)
+  if (isEmailConfigured()) {
+    return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT || 587,
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
       secure: process.env.SMTP_SECURE === 'true',
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
       }
     });
-  } else {
-    // Development: Use console logging or ethereal
-    return nodemailer.createTransporter({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      auth: {
-        user: process.env.ETHEREAL_USER || 'test@ethereal.email',
-        pass: process.env.ETHEREAL_PASS || 'test123'
-      }
-    });
   }
+
+  // No SMTP configured: render the message as JSON and log it instead of sending
+  return nodemailer.createTransport({ jsonTransport: true });
+};
+
+// Sends mail and reports whether it was actually delivered to an SMTP server
+const deliver = async (mailOptions) => {
+  const transporter = createTransporter();
+  const info = await transporter.sendMail(mailOptions);
+
+  if (!isEmailConfigured()) {
+    console.log(`[EMAIL NOT SENT - SMTP not configured] To: ${mailOptions.to} | Subject: ${mailOptions.subject}`);
+    return { success: false, simulated: true, error: 'SMTP is not configured' };
+  }
+
+  return { success: true, messageId: info.messageId };
 };
 
 // Send vaccination reminder email
 const sendVaccinationReminderEmail = async (vaccination, ownerEmail, ownerName, petName) => {
   try {
-    const transporter = createTransporter();
-
     const dueDate = formatDate(vaccination.nextDueDate);
     const daysDiff = Math.ceil((new Date(vaccination.nextDueDate) - new Date()) / (1000 * 60 * 60 * 24));
 
@@ -103,7 +109,7 @@ const sendVaccinationReminderEmail = async (vaccination, ownerEmail, ownerName, 
               <p><strong>Important:</strong> Timely vaccinations are crucial for your pet's health and well-being. Please contact your veterinarian to schedule an appointment.</p>
 
               <div style="text-align: center;">
-                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/user/vaccinations" class="button">View Vaccination Schedule</a>
+                <a href="${getFrontendUrl()}/user/vaccinations" class="button">View Vaccination Schedule</a>
               </div>
 
               <div class="footer">
@@ -139,14 +145,11 @@ This is an automated reminder from Pet Management System
       `
     };
 
-    const info = await transporter.sendMail(mailOptions);
-
-    console.log('Email sent:', info.messageId);
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+    const result = await deliver(mailOptions);
+    if (result.success) {
+      console.log('Email sent:', result.messageId);
     }
-
-    return { success: true, messageId: info.messageId };
+    return result;
   } catch (error) {
     console.error('Error sending email:', error);
     return { success: false, error: error.message };
@@ -156,8 +159,6 @@ This is an automated reminder from Pet Management System
 // Send overdue vaccination alert email
 const sendOverdueVaccinationEmail = async (vaccination, ownerEmail, ownerName, petName) => {
   try {
-    const transporter = createTransporter();
-
     const dueDate = formatDate(vaccination.nextDueDate);
     const daysOverdue = Math.ceil((new Date() - new Date(vaccination.nextDueDate)) / (1000 * 60 * 60 * 24));
 
@@ -222,7 +223,7 @@ const sendOverdueVaccinationEmail = async (vaccination, ownerEmail, ownerName, p
               </div>
 
               <div style="text-align: center;">
-                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/user/vaccinations" class="button">View Vaccination Schedule</a>
+                <a href="${getFrontendUrl()}/user/vaccinations" class="button">View Vaccination Schedule</a>
               </div>
 
               <div class="footer">
@@ -236,12 +237,61 @@ const sendOverdueVaccinationEmail = async (vaccination, ownerEmail, ownerName, p
       `
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Overdue alert sent:', info.messageId);
-
-    return { success: true, messageId: info.messageId };
+    const result = await deliver(mailOptions);
+    if (result.success) {
+      console.log('Overdue alert sent:', result.messageId);
+    }
+    return result;
   } catch (error) {
     console.error('Error sending overdue alert:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+const escapeHtml = (value = '') => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+// Relay a message from someone who scanned a pet's QR code to the owner,
+// so the owner's email and phone are never shown publicly
+const sendFinderContactEmail = async ({ ownerEmail, ownerName, petName, petId, finderName, finderContact, message }) => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || '"Pet Management System" <noreply@petmanagement.com>',
+      to: ownerEmail,
+      subject: `Someone scanned ${petName}'s QR tag`,
+      text: `Dear ${ownerName},
+
+Someone has scanned the QR tag of your pet ${petName} (Pet ID: ${petId}) and sent you this message:
+
+"${message}"
+
+Their name: ${finderName}
+How to reach them: ${finderContact}
+
+Your contact details were not shared with them. Please reply to them directly.
+
+---
+This message was relayed by Pet Management System`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Someone scanned ${escapeHtml(petName)}'s QR tag</h2>
+          <p>Dear ${escapeHtml(ownerName)},</p>
+          <p>Someone has scanned the QR tag of <strong>${escapeHtml(petName)}</strong> (Pet ID: ${escapeHtml(petId)}) and sent you this message:</p>
+          <blockquote style="border-left: 4px solid #667eea; margin: 16px 0; padding: 8px 16px; background: #f9f9f9;">${escapeHtml(message)}</blockquote>
+          <p><strong>Their name:</strong> ${escapeHtml(finderName)}<br/>
+          <strong>How to reach them:</strong> ${escapeHtml(finderContact)}</p>
+          <p>Your contact details were not shared with them. Please reply to them directly.</p>
+        </div>
+      `
+    };
+
+    return await deliver(mailOptions);
+  } catch (error) {
+    console.error('Error relaying finder message:', error);
     return { success: false, error: error.message };
   }
 };
@@ -260,7 +310,9 @@ const sendVaccinationReminderSMS = async (vaccination, phoneNumber, petName) => 
 };
 
 module.exports = {
+  isEmailConfigured,
   sendVaccinationReminderEmail,
   sendOverdueVaccinationEmail,
+  sendFinderContactEmail,
   sendVaccinationReminderSMS
 };

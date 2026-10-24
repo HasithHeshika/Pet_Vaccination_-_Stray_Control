@@ -9,7 +9,7 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page" style={{ position: 'relative' }}>
-      <div style={{ position: 'absolute', top: '20px', right: '40px', display: 'flex', gap: '15px', zIndex: 100 }}>
+      <div className="landing-auth-actions">
         {!isAuthenticated ? (
           <>
             <Link to="/login" className="btn-modern" style={{ backgroundColor: 'transparent', color: '#000', border: '2px solid #000', padding: '6px 20px', borderRadius: '20px', fontWeight: 'bold' }}>

@@ -1,0 +1,21 @@
+name: Keep API warm
+
+# The API runs on the Azure App Service Free (F1) plan, which does not support "Always On"
+# and unloads the app after ~20 minutes idle (first request then takes ~45 s).
+# This pings the health endpoint regularly so users don't hit a cold start.
+# Remove this workflow if the plan is upgraded to Basic (B1) or higher with Always On enabled.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API health endpoint
+        run: |
+          curl --silent --show-error --max-time 90 --output /dev/null \
+            --write-out "HTTP %{http_code} in %{time_total}s\n" \
+            https://pet-control-api-fxhkd7fwa5e2gtem.malaysiawest-01.azurewebsites.net/

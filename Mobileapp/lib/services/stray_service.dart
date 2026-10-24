@@ -15,7 +15,10 @@ class StrayService {
   Future<List<dynamic>> getStrayReports() async {
     final response = await _client.get('/api/stray-reports');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['reports'] is List) return decoded['reports'];
+      return [];
     }
     throw Exception('Failed to load stray reports');
   }

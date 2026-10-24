@@ -61,11 +61,12 @@ export const generatePetPDF = (pet) => {
   doc.text('Owner Information', 20, yPosition);
   yPosition += 5;
   
+  // The public QR profile only carries the owner's first name, so omit contact rows when absent
   const ownerData = [
-    ['Owner Name', pet.owner?.fullName || 'N/A'],
-    ['Email', pet.owner?.email || 'N/A'],
-    ['Phone', pet.owner?.phone || 'N/A'],
+    ['Owner Name', pet.owner?.fullName || pet.owner?.firstName || 'N/A'],
   ];
+  if (pet.owner?.email) ownerData.push(['Email', pet.owner.email]);
+  if (pet.owner?.phone) ownerData.push(['Phone', pet.owner.phone]);
   
   doc.autoTable({
     startY: yPosition,

@@ -15,16 +15,15 @@ const normalizeReport = (report) => ({
 
 exports.createStrayReport = async (req, res) => {
   try {
-    const { location, description, image, status, reportedBy, assignedTo, authorityNotes } = req.body;
+    const { location, description, image } = req.body;
 
+    // Status, assignment and notes are set by the authority; the reporter comes from the login token
     const strayReport = new StrayReport({
       location,
       description,
       image,
-      status: allowedStatuses.includes(status) ? status : 'pending',
-      reportedBy,
-      assignedTo,
-      authorityNotes
+      status: 'pending',
+      reportedBy: req.user?._id
     });
 
     await strayReport.save();

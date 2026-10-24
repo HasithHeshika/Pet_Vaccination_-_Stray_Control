@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from '../../api/axios';
 import { formatDate } from '../../utils/dateFormat';
 import '../Breeder/Breeder.css';
+
+// Only uploaded image/PDF data URLs are rendered as links (never javascript: or other schemes)
+const isSafeDocumentUrl = (url) =>
+  typeof url === 'string' && /^data:(image\/(png|jpe?g|webp|gif)|application\/pdf);base64,/.test(url);
 
 const AdminBreederLicenses = () => {
   const [licenses, setLicenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedLicense, setSelectedLicense] = useState(null);
+  const [licenseDetail, setLicenseDetail] = useState(null);
+  const selectedIdRef = useRef(null);
   const [statusForm, setStatusForm] = useState({
     status: 'Approved',
-    notes: '',
+    remarks: '',
     expiryDate: ''
   });
 
@@ -30,17 +36,37 @@ const AdminBreederLicenses = () => {
     fetchLicenses();
   }, []);
 
-  const handleOpenStatusModal = (license) => {
+  const handleOpenStatusModal = async (license) => {
+    selectedIdRef.current = license._id;
     setSelectedLicense(license);
+    setLicenseDetail(null);
     // Set default expiry 1 year from now
     const nextYear = new Date();
     nextYear.setFullYear(nextYear.getFullYear() + 1);
-    
+
     setStatusForm({
       status: license.status === 'Pending' ? 'Approved' : license.status,
-      notes: license.notes || '',
+      remarks: license.remarks || '',
       expiryDate: license.expiryDate ? new Date(license.expiryDate).toISOString().split('T')[0] : nextYear.toISOString().split('T')[0]
     });
+
+    // The list omits document contents; load the full application for review
+    try {
+      const res = await axios.get(`/api/licenses/${license._id}`);
+      // Ignore a late response if the admin has already opened a different application
+      setLicenseDetail((current) => (selectedIdRef.current === license._id ? res.data : current));
+    } catch (err) {
+      console.error('Failed to load application documents:', err);
+    }
+  };
+
+  const documentList = (detail) => {
+    const docs = detail?.documents || {};
+    return [
+      docs.idProof,
+      ...(docs.facilityImages || []),
+      ...(docs.certificates || [])
+    ].filter((doc) => doc && doc.fileName);
   };
 
   const handleUpdateStatus = async (e) => {
@@ -78,8 +104,8 @@ const AdminBreederLicenses = () => {
             <thead>
               <tr>
                 <th>Applicant</th>
-                <th>Business Name</th>
-                <th>Facility Address</th>
+                <th>Breeder Name</th>
+                <th>Address</th>
                 <th>Status</th>
                 <th>Applied On</th>
                 <th>Expiry Date</th>
@@ -94,8 +120,12 @@ const AdminBreederLicenses = () => {
                     <br />
                     <small style={{ color: '#6b7280' }}>{lic.applicantId?.email} | {lic.applicantId?.phone}</small>
                   </td>
-                  <td><strong>{lic.businessName}</strong></td>
-                  <td style={{ maxWidth: '250px' }}>{lic.facilityAddress}</td>
+                  <td>
+                    <strong>{lic.breederName}</strong>
+                    <br />
+                    <small style={{ color: '#6b7280' }}>{lic.applicationId} · {lic.applicationType}</small>
+                  </td>
+                  <td style={{ maxWidth: '250px' }}>{lic.address}</td>
                   <td>
                     <span className={`status-pill status-${lic.status.toLowerCase()}`}>
                       {lic.status}
@@ -123,16 +153,34 @@ const AdminBreederLicenses = () => {
         <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div className="breeder-card" style={{ width: '100%', maxWidth: '500px', margin: '20px' }}>
             <h3>Review License Application</h3>
-            <p><strong>Business Name:</strong> {selectedLicense.businessName}</p>
+            <p><strong>Breeder Name:</strong> {selectedLicense.breederName}</p>
             <p><strong>Applicant:</strong> {selectedLicense.applicantId?.fullName}</p>
-            
-            {selectedLicense.documentsUrl && (
-              <p style={{ margin: '10px 0' }}>
-                <a href={selectedLicense.documentsUrl} target="_blank" rel="noopener noreferrer" className="link">
-                  🔗 View Uploaded Application Documents
-                </a>
-              </p>
-            )}
+            <p><strong>NIC / Business Reg. No:</strong> {selectedLicense.nicOrBusinessRegNo}</p>
+            <p><strong>Animals:</strong> {selectedLicense.animalTypes?.join(', ')} ({selectedLicense.numberOfAnimals}) · {selectedLicense.yearsOfExperience} yrs experience</p>
+            <p><strong>Facility:</strong> {selectedLicense.facilityDescription}</p>
+
+            <div style={{ margin: '10px 0' }}>
+              <strong>Uploaded documents:</strong>
+              {!licenseDetail ? (
+                <p className="text-muted">Loading documents...</p>
+              ) : documentList(licenseDetail).length === 0 ? (
+                <p className="text-muted">No documents uploaded.</p>
+              ) : (
+                <ul style={{ margin: '6px 0 0', paddingLeft: '18px' }}>
+                  {documentList(licenseDetail).map((doc, index) => (
+                    <li key={`${doc.fileName}-${index}`}>
+                      {isSafeDocumentUrl(doc.previewUrl) ? (
+                        <a href={doc.previewUrl} download={doc.fileName} className="link">
+                          {doc.label}: {doc.fileName}
+                        </a>
+                      ) : (
+                        <span>{doc.label}: {doc.fileName}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
             <form onSubmit={handleUpdateStatus} style={{ marginTop: '20px' }}>
               <div className="form-group">
@@ -166,8 +214,8 @@ const AdminBreederLicenses = () => {
                 <textarea
                   rows="3"
                   placeholder="Reason for approval/rejection or compliance notes..."
-                  value={statusForm.notes}
-                  onChange={(e) => setStatusForm({ ...statusForm, notes: e.target.value })}
+                  value={statusForm.remarks}
+                  onChange={(e) => setStatusForm({ ...statusForm, remarks: e.target.value })}
                 />
               </div>
 

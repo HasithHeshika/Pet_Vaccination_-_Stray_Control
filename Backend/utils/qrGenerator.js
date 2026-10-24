@@ -1,10 +1,10 @@
 const QRCode = require('qrcode');
+const { getFrontendUrl } = require('./frontendUrl');
 
 const generateQRCode = async (petData) => {
   try {
-    // Generate a user-friendly URL that points to the pet profile page
-    // When scanned, this will open a beautiful web page with all pet details
-    const profileUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pet-profile/${petData.petId}`;
+    // Generate a user-friendly URL that points to the public pet profile page
+    const profileUrl = `${getFrontendUrl()}/pet-profile/${encodeURIComponent(petData.petId)}`;
 
     // Generate QR code as Data URL (base64 image)
     const qrCodeDataURL = await QRCode.toDataURL(profileUrl, {
