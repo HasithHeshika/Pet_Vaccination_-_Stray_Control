@@ -81,6 +81,8 @@ before(async () => {
       FRONTEND_URL: FRONTEND_ORIGIN,
       SMTP_HOST: '',
       SMTP_USER: '',
+      ACS_EMAIL_CONNECTION_STRING: '',
+      ACS_EMAIL_SENDER: '',
       NODE_ENV: 'test'
     },
     stdio: process.env.TEST_VERBOSE ? 'inherit' : 'ignore'

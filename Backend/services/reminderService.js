@@ -34,7 +34,7 @@ const sendVaccinationReminderEmail = async (vaccinationId) => {
 
   if (!result.success) {
     const error = new Error(result.simulated
-      ? 'Email is not configured on the server (SMTP settings missing)'
+      ? 'Email is not configured on the server (set ACS_EMAIL_* or SMTP_* settings)'
       : 'Failed to send reminder email');
     error.status = 503;
     throw error;
