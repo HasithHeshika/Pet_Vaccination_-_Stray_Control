@@ -4,6 +4,27 @@ import axios from '../../api/axios';
 import { formatDate } from '../../utils/dateFormat';
 import './VetDashboard.css';
 
+// Must match the vaccineType enum in Backend/models/Vaccination.js
+const VACCINE_TYPES = [
+  'Rabies',
+  'DHPP (Distemper, Hepatitis, Parvovirus, Parainfluenza)',
+  'Bordetella (Kennel Cough)',
+  'Leptospirosis',
+  'Lyme Disease',
+  'Canine Influenza',
+  'FVRCP (Feline Viral Rhinotracheitis, Calicivirus, Panleukopenia)',
+  'FeLV (Feline Leukemia)',
+  'FIV (Feline Immunodeficiency Virus)',
+  'Other'
+];
+
+const formatPetAge = (age) => {
+  if (!age || typeof age !== 'object') return age ? `${age} years` : 'N/A';
+  const years = age.years || 0;
+  const months = age.months || 0;
+  return `${years} yr${years === 1 ? '' : 's'}${months ? ` ${months} mo` : ''}`;
+};
+
 const VetDashboard = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,21 +55,16 @@ const VetDashboard = () => {
 
     try {
       // Try searching by System Pet ID first
+      const query = searchQuery.trim();
       let res;
       try {
-        res = await axios.get(`/api/pets/petid/${searchQuery.trim()}`);
+        res = await axios.get(`/api/pets/petid/${encodeURIComponent(query)}`);
       } catch (err) {
-        // Fallback: search all pets and match by ID or petName
-        const allPetsRes = await axios.get('/api/pets');
-        const found = allPetsRes.data.pets.find(
-          p => p.petId.toLowerCase() === searchQuery.trim().toLowerCase() ||
-               p.petName.toLowerCase().includes(searchQuery.trim().toLowerCase())
-        );
-        if (found) {
-          res = { data: { pet: found } };
-        } else {
-          throw err;
-        }
+        // Fallback: server-side search by Pet ID or pet name, then load the full record
+        const searchRes = await axios.get('/api/pets/search', { params: { q: query } });
+        const found = searchRes.data.pets?.[0];
+        if (!found) throw err;
+        res = await axios.get(`/api/pets/petid/${encodeURIComponent(found.petId)}`);
       }
 
       const pet = res.data.pet || res.data;
@@ -107,8 +123,8 @@ const VetDashboard = () => {
 
   const handleSendReminder = async (vacId) => {
     try {
-      await axios.post(`/api/vaccinations/${vacId}/send-reminder`);
-      alert('Vaccination reminder email sent to pet owner successfully!');
+      const res = await axios.post(`/api/vaccinations/${vacId}/send-reminder`);
+      alert(`Vaccination reminder email sent to ${res.data?.result?.sentTo || 'the pet owner'}.`);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to send reminder email.');
     }
@@ -162,16 +178,16 @@ const VetDashboard = () => {
               <p><strong>Pet ID:</strong> <span className="highlight-text">{searchResult.petId}</span></p>
               <p><strong>Name:</strong> {searchResult.petName}</p>
               <p><strong>Species / Breed:</strong> {searchResult.petType || searchResult.species} ({searchResult.breed})</p>
-              <p><strong>Age / Gender:</strong> {searchResult.age} years | {searchResult.gender}</p>
+              <p><strong>Age / Gender:</strong> {formatPetAge(searchResult.age)} | {searchResult.gender}</p>
               <p><strong>Owner Name:</strong> {searchResult.owner?.fullName || searchResult.ownerName}</p>
               <p><strong>Owner Phone:</strong> {searchResult.owner?.phone || 'N/A'}</p>
               <p><strong>Owner Email:</strong> {searchResult.owner?.email || 'N/A'}</p>
             </div>
 
-            {searchResult.qrCodeUrl && (
+            {(searchResult.qrCode || searchResult.qrCodeUrl) && (
               <div className="qr-preview">
                 <h4>QR Code Identifier</h4>
-                <img src={searchResult.qrCodeUrl} alt="Pet QR Code" style={{ width: '130px', height: '130px' }} />
+                <img src={searchResult.qrCode || searchResult.qrCodeUrl} alt="Pet QR Code" style={{ width: '130px', height: '130px' }} />
               </div>
             )}
           </div>
@@ -189,12 +205,9 @@ const VetDashboard = () => {
                   onChange={(e) => setVacForm({ ...vacForm, vaccineType: e.target.value })}
                   required
                 >
-                  <option value="Rabies">Rabies</option>
-                  <option value="DHPP">DHPP (Distemper, Hepatitis, Parvovirus, Parainfluenza)</option>
-                  <option value="FVRCP">FVRCP (Feline Viral Rhinotracheitis, Calicivirus, Panleukopenia)</option>
-                  <option value="Bordetella">Bordetella</option>
-                  <option value="Lyme">Lyme Disease</option>
-                  <option value="Other">Other Medical Treatment</option>
+                  {VACCINE_TYPES.map((type) => (
+                    <option key={type} value={type}>{type === 'Other' ? 'Other Medical Treatment' : type}</option>
+                  ))}
                 </select>
               </div>
 

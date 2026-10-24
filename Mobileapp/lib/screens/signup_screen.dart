@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
-import 'home_screen.dart';
-import 'admin/admin_dashboard.dart';
-import 'vet/vet_dashboard.dart';
-import 'breeder/breeder_dashboard.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -56,22 +52,27 @@ class _SignupScreenState extends State<SignupScreen> {
       };
 
       await AuthService().signup(userData);
-      
-      // Auto login post registration
-      final data = await AuthService().login(_emailController.text.trim(), _passwordController.text);
 
+      // New accounts must be verified by an administrator before they can log in,
+      // so tell the user instead of attempting an automatic login that the API will reject.
       if (mounted) {
-        final role = data?['user']?['role'] ?? 'pet_owner';
-        Widget target = const HomeScreen();
-        if (role == 'admin') target = const AdminDashboard();
-        else if (role == 'veterinarian') target = const VetDashboard();
-        else if (role == 'breeder') target = const BreederDashboard();
-
-        // Push Replacement to pop out of signup/login loop and drop onto Target
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => target), 
-          (route) => false
+        await showDialog<void>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Registration successful'),
+            content: const Text(
+              'Your account has been created and is awaiting administrator verification. '
+              'You can log in once it has been approved.'
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
         );
+        if (mounted) Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {

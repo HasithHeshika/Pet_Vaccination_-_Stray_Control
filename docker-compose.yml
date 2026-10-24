@@ -40,14 +40,20 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@123}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
     ports:
       - "${BACKEND_PORT:-5000}:5000"
     depends_on:
       mongodb:
         condition: service_healthy
-    volumes:
-      - ./Backend:/app
-      - /app/node_modules
+    # No source bind-mount here: the production image runs the code baked in at build time
     networks:
       - pet-management-network
     healthcheck:

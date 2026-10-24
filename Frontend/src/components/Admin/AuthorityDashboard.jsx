@@ -23,6 +23,7 @@ const AuthorityDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [licenseActionId, setLicenseActionId] = useState('');
+  const [strayActionId, setStrayActionId] = useState('');
   const [lostFoundFilter, setLostFoundFilter] = useState('All');
 
   const loadDashboard = useCallback(async () => {
@@ -56,6 +57,18 @@ const AuthorityDashboard = () => {
       alert(err.response?.data?.message || 'Failed to update license status');
     } finally {
       setLicenseActionId('');
+    }
+  };
+
+  const updateStrayStatus = async (reportId, status) => {
+    try {
+      setStrayActionId(reportId);
+      await axios.patch(`/api/stray-reports/${reportId}/status`, { status });
+      await loadDashboard();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update stray report status');
+    } finally {
+      setStrayActionId('');
     }
   };
 
@@ -169,7 +182,7 @@ const AuthorityDashboard = () => {
                 <h2>Animal Reports and Potential Matches</h2>
               </div>
               <div className="authority-filter">
-                {['All', 'Lost', 'Found', 'Resolved'].map((status) => (
+                {['All', 'Lost', 'Found', 'In Progress', 'Resolved'].map((status) => (
                   <button key={status} type="button" className={lostFoundFilter === status ? 'active' : ''} onClick={() => setLostFoundFilter(status)}>
                     {status}
                   </button>
@@ -256,7 +269,17 @@ const AuthorityDashboard = () => {
                       <strong>{report.location}</strong>
                       <span>{report.description}</span>
                     </div>
-                    <span className={statusClass(report.status)}>{report.status}</span>
+                    <select
+                      className={statusClass(report.status)}
+                      value={report.status}
+                      disabled={strayActionId === report._id}
+                      onChange={(e) => updateStrayStatus(report._id, e.target.value)}
+                      aria-label={`Status of stray report at ${report.location}`}
+                    >
+                      <option value="pending">pending</option>
+                      <option value="in-progress">in-progress</option>
+                      <option value="resolved">resolved</option>
+                    </select>
                   </div>
                 ))}
               </div>

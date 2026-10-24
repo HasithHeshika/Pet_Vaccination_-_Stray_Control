@@ -392,3 +392,38 @@
     max-width: 100%;
   }
 }
+
+/* Contact-owner relay form (finder -> owner, owner details stay private) */
+.contact-owner-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.contact-owner-form label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.contact-owner-form input,
+.contact-owner-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.contact-owner-form button {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+.contact-error {
+  color: #b42318;
+  margin: 4px 0 0;
+}

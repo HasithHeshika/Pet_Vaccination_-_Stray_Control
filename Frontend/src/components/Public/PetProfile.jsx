@@ -12,12 +12,15 @@ const PetProfile = () => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [contactForm, setContactForm] = useState({ finderName: '', finderContact: '', message: '' });
+  const [contactStatus, setContactStatus] = useState({ sending: false, sent: false, error: '' });
 
   useEffect(() => {
     const fetchPetDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/pets/${petId}`);
+        // Public QR lookup by Pet ID (no login needed; owner contact details are not exposed)
+        const response = await axios.get(`/api/pets/petid/${encodeURIComponent(petId)}`);
         setPet(response.data.pet);
         setError('');
       } catch (err) {
@@ -34,6 +37,29 @@ const PetProfile = () => {
   const handleDownloadPDF = () => {
     if (pet) generatePetPDF(pet);
   };
+
+  const handleContactChange = (e) => {
+    setContactForm({ ...contactForm, [e.target.name]: e.target.value });
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactStatus({ sending: true, sent: false, error: '' });
+    try {
+      await axios.post(`/api/pets/petid/${encodeURIComponent(pet.petId)}/contact`, contactForm);
+      setContactStatus({ sending: false, sent: true, error: '' });
+      setContactForm({ finderName: '', finderContact: '', message: '' });
+    } catch (err) {
+      setContactStatus({
+        sending: false,
+        sent: false,
+        error: err.response?.data?.message || 'Could not send your message. Please try again.'
+      });
+    }
+  };
+
+  // Full owner details are only returned to the owner, vets and admins
+  const showFullOwner = Boolean(pet?.owner?.email || pet?.owner?.phone);
 
   const formatAge = () => {
     const years = pet.age.years;
@@ -114,9 +140,9 @@ const PetProfile = () => {
         <div className="info-section">
           <h2 className="section-title">Owner Information</h2>
           <div className="info-grid">
-            <div className="info-item"><span className="info-label">Name</span><span className="info-value">{pet.owner.fullName}</span></div>
-            <div className="info-item"><span className="info-label">Email</span><span className="info-value">{pet.owner.email}</span></div>
-            <div className="info-item"><span className="info-label">Phone</span><span className="info-value">{pet.owner.phone}</span></div>
+            <div className="info-item"><span className="info-label">Name</span><span className="info-value">{pet.owner?.fullName || pet.owner?.firstName}</span></div>
+            {showFullOwner && <div className="info-item"><span className="info-label">Email</span><span className="info-value">{pet.owner.email}</span></div>}
+            {showFullOwner && <div className="info-item"><span className="info-label">Phone</span><span className="info-value">{pet.owner.phone}</span></div>}
           </div>
         </div>
 
@@ -148,9 +174,36 @@ const PetProfile = () => {
           <p className="download-hint">Save or print this pet's information for offline access</p>
         </div>
 
-        <div className="emergency-notice">
-          <p><strong>Lost Pet?</strong> If you found this pet, please contact the owner at the phone number or email listed above.</p>
-        </div>
+        {showFullOwner ? (
+          <div className="emergency-notice">
+            <p><strong>Lost Pet?</strong> If you found this pet, please contact the owner at the phone number or email listed above.</p>
+          </div>
+        ) : pet.canContactOwner && (
+          <div className="info-section contact-owner-section">
+            <h2 className="section-title">Found this pet? Contact the owner</h2>
+            <p className="download-hint">
+              Your message is forwarded to {pet.owner?.firstName || 'the owner'} by email. The owner's contact details stay private.
+            </p>
+            {contactStatus.sent ? (
+              <div className="emergency-notice">
+                <p><strong>Message sent.</strong> Thank you for helping. The owner will contact you directly.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="contact-owner-form">
+                <label htmlFor="finderName">Your name</label>
+                <input id="finderName" name="finderName" value={contactForm.finderName} onChange={handleContactChange} required maxLength={100} autoComplete="name" />
+                <label htmlFor="finderContact">Your phone number or email</label>
+                <input id="finderContact" name="finderContact" value={contactForm.finderContact} onChange={handleContactChange} required maxLength={150} autoComplete="tel" />
+                <label htmlFor="message">Message</label>
+                <textarea id="message" name="message" rows="3" value={contactForm.message} onChange={handleContactChange} required maxLength={1000} placeholder="Where and when did you find the pet?" />
+                {contactStatus.error && <p className="contact-error" role="alert">{contactStatus.error}</p>}
+                <button type="submit" className="btn-download-pdf" disabled={contactStatus.sending}>
+                  {contactStatus.sending ? 'Sending...' : 'Send message to owner'}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

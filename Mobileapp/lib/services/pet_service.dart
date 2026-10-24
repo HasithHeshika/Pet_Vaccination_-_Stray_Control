@@ -25,9 +25,14 @@ class PetService {
   }
 
   Future<Map<String, dynamic>> getPetByPetIdString(String petId) async {
-    final response = await _client.get('/api/pets/petid/$petId');
+    final response = await _client.get('/api/pets/petid/${Uri.encodeComponent(petId)}');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      // API returns { pet: {...} }
+      if (decoded is Map<String, dynamic> && decoded['pet'] is Map<String, dynamic>) {
+        return decoded['pet'];
+      }
+      return decoded;
     }
     throw Exception('Failed to load pet by pet id string');
   }
@@ -45,18 +50,19 @@ class PetService {
   }
 
   Future<Map<String, dynamic>> registerPet(Map<String, dynamic> data) async {
-    final response = await _client.post('/api/pets', body: data);
+    final response = await _client.post('/api/pets/register', body: data);
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
     }
     throw Exception('Failed to register pet');
   }
 
-  Future<Map<String, dynamic>> updatePet(String petId, Map<String, dynamic> data) async {
-    final response = await _client.put('/api/pets/$petId', body: data);
+  // Only pet photos can be edited via the API; other details are changed by an administrator
+  Future<Map<String, dynamic>> updatePetPhotos(String petMongoId, List<String> photoUrls) async {
+    final response = await _client.put('/api/pets/$petMongoId/photos', body: {'photoUrls': photoUrls});
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw Exception('Failed to update pet');
+    throw Exception('Failed to update pet photos');
   }
 }

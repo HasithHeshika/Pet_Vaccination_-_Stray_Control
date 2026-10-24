@@ -6,7 +6,7 @@ import '../LostAndFound/LostFound.css'; // Reusing similar styles
 
 const ReportStrayForm = () => {
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const [formData, setFormData] = useState({
     location: '',
     description: '',
@@ -26,11 +26,9 @@ const ReportStrayForm = () => {
     setError('');
     
     try {
+      // The server identifies the reporter from the login token (if any)
       const submitData = { ...formData };
-      if (user) {
-        submitData.reportedBy = user.id;
-      }
-      
+
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
       await axios.post('/api/stray-reports', submitData, { headers });

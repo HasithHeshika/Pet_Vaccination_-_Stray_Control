@@ -19,6 +19,21 @@ class _RecordVaccineScreenState extends State<RecordVaccineScreen> {
   bool _isLoading = false;
   Map<String, dynamic>? _foundPet;
 
+  // Must match the vaccineType enum in Backend/models/Vaccination.js
+  static const List<String> _vaccineTypes = [
+    'Rabies',
+    'DHPP (Distemper, Hepatitis, Parvovirus, Parainfluenza)',
+    'Bordetella (Kennel Cough)',
+    'Leptospirosis',
+    'Lyme Disease',
+    'Canine Influenza',
+    'FVRCP (Feline Viral Rhinotracheitis, Calicivirus, Panleukopenia)',
+    'FeLV (Feline Leukemia)',
+    'FIV (Feline Immunodeficiency Virus)',
+    'Other',
+  ];
+  String _vaccineType = 'Rabies';
+
   void _searchPet() async {
     if (_petIdController.text.trim().isEmpty) return;
     
@@ -42,12 +57,15 @@ class _RecordVaccineScreenState extends State<RecordVaccineScreen> {
     
     setState(() => _isLoading = true);
     try {
+      // Field names must match POST /api/vaccinations
       await VaccinationService().addVaccination({
-        "pet": _foundPet!['_id'],
+        "petId": _foundPet!['_id'],
+        "vaccineType": _vaccineType,
         "vaccineName": _vaccineNameController.text,
         "batchNumber": _batchController.text,
-        "administeredDate": DateTime.now().toIso8601String(),
-        "nextDueDate": _nextDueDateController.text, 
+        "dateAdministered": DateTime.now().toIso8601String(),
+        "nextDueDate": _nextDueDateController.text,
+        "status": "administered",
         "notes": "Administered via Vet Mobile Portal"
       });
       if (mounted) {
@@ -93,14 +111,24 @@ class _RecordVaccineScreenState extends State<RecordVaccineScreen> {
                      Expanded(child: Column(
                        crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
-                         Text(_foundPet!['name'] ?? 'Unknown', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
-                         Text("${_foundPet!['species']} - ${_foundPet!['breed']}", style: const TextStyle(color: Color(0xFF9E6D4E)))
+                         Text(_foundPet!['petName'] ?? 'Unknown', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+                         Text("${_foundPet!['petType'] ?? ''} - ${_foundPet!['breed'] ?? ''}", style: const TextStyle(color: Color(0xFF9E6D4E)))
                        ]
                      ))
                    ]
                  )
                ),
                const SizedBox(height: 32),
+               DropdownButtonFormField<String>(
+                 value: _vaccineType,
+                 isExpanded: true,
+                 decoration: _inputDec("Vaccine Type", Icons.category),
+                 items: _vaccineTypes
+                     .map((type) => DropdownMenuItem(value: type, child: Text(type, overflow: TextOverflow.ellipsis)))
+                     .toList(),
+                 onChanged: (value) => setState(() => _vaccineType = value ?? 'Rabies'),
+               ),
+               const SizedBox(height: 16),
                TextField(controller: _vaccineNameController, decoration: _inputDec("Vaccine Name (e.g. Rabies)", Icons.vaccines)),
                const SizedBox(height: 16),
                TextField(controller: _batchController, decoration: _inputDec("Batch Number", Icons.confirmation_number)),
