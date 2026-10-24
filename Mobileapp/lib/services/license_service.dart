@@ -38,7 +38,7 @@ class LicenseService {
 
   Future<Map<String, dynamic>> renewLicense(String id, Map<String, dynamic> data) async {
     final response = await _client.post('/api/licenses/$id/renew', body: data);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
     }
     throw Exception('Failed to renew license');

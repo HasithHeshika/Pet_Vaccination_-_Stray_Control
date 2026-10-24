@@ -7,7 +7,10 @@ class UserService {
   Future<List<dynamic>> getUsers() async {
     final response = await _client.get('/api/users');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['users'] is List) return decoded['users'];
+      return [];
     }
     throw Exception('Failed to load users');
   }

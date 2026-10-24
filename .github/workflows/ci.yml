@@ -25,14 +25,27 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run frontend tests
+        run: npm test -- --watchAll=false
+        env:
+          CI: true
+
       - name: Build frontend
         run: npm run build
+        env:
+          CI: true
+          GENERATE_SOURCEMAP: false
 
-  backend-sanity:
+  backend-tests:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: Backend
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,12 +53,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
           cache-dependency-path: Backend/package.json
 
       - name: Install dependencies
         run: npm install
 
-      - name: Syntax check stray-report module
-        run: node -e "require('./models/StrayReport'); require('./controllers/strayReportController'); require('./routes/strayReport'); console.log('Stray report module loaded successfully')"
+      - name: Run API tests
+        env:
+          TEST_MONGODB_URI: mongodb://127.0.0.1:27017/pet_management_test
+        run: npm test

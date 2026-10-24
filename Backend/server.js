@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const User = require('./models/User');
 const { scheduleVaccinationReminders } = require('./services/vaccinationScheduler');
+const securityHeaders = require('./middleware/securityHeaders');
+const rateLimit = require('./middleware/rateLimit');
 
 // Load environment variables
 dotenv.config();
@@ -11,8 +13,32 @@ dotenv.config();
 // Initialize express app
 const app = express();
 
+// Azure App Service sits behind a proxy; needed for correct client IPs in rate limiting
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+
+// Only the deployed web frontend (and local dev) may call the API from a browser.
+// Requests without an Origin header (mobile app, curl, server-to-server) are allowed.
+const allowedOrigins = (process.env.CORS_ORIGINS ||
+  'https://lively-sky-055ae2000.7.azurestaticapps.net,http://localhost:3000')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+// Azure Static Web Apps pull-request preview builds of the same app
+const previewOriginPattern = /^https:\/\/lively-sky-055ae2000-[a-z0-9-]+\.[a-z0-9]+\.7\.azurestaticapps\.net$/;
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || previewOriginPattern.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  }
+}));
+
 // Middleware
-app.use(cors());
+app.use(securityHeaders);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -56,6 +82,16 @@ const createAdminUser = async () => {
   }
 };
 
+// Brute-force protection on credential endpoints
+// Only failed attempts count, so many users behind one campus/office network can still log in
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  skipSuccessfulRequests: true,
+  message: 'Too many failed login or signup attempts. Please try again in 15 minutes.'
+});
+app.use(['/api/auth/login', '/api/auth/signup', '/api/auth/oauth'], authLimiter);
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/user'));
@@ -69,6 +105,11 @@ app.use('/api/authority', require('./routes/authority'));
 // Health check route
 app.get('/', (req, res) => {
   res.json({ message: 'Pet Management System API is running' });
+});
+
+// Unknown API routes return JSON rather than Express's default HTML page
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
 });
 
 // Error handling middleware

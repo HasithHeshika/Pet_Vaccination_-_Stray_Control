@@ -280,3 +280,23 @@
   }
   .modern-hero { padding-bottom: 40px; min-height: auto; }
 }
+
+/* Log In / Sign Up buttons: top-right on desktop, in normal flow on phones so they don't cover the hero */
+.landing-auth-actions {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  display: flex;
+  gap: 15px;
+  z-index: 100;
+}
+
+@media (max-width: 600px) {
+  .landing-auth-actions {
+    position: static;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 16px 0;
+  }
+}

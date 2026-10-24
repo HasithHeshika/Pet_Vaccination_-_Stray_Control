@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "regenerate-qr": "node scripts/regenerate-qr-codes.js",
+    "test": "node --test --test-concurrency=1 tests/api.test.js"
   },
   "keywords": [
     "pet",

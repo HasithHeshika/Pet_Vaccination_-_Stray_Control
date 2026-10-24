@@ -9,7 +9,11 @@ class VaccinationService {
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw Exception('Failed to add vaccination');
+    String message = 'Failed to add vaccination';
+    try {
+      message = jsonDecode(response.body)['message'] ?? message;
+    } catch (_) {}
+    throw Exception(message);
   }
 
   Future<List<dynamic>> getPetVaccinations(String petId) async {
@@ -56,7 +60,10 @@ class VaccinationService {
   Future<List<dynamic>> getUpcomingVaccinations(int days) async {
     final response = await _client.get('/api/vaccinations/upcoming?days=$days');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['vaccinations'] is List) return decoded['vaccinations'];
+      return [];
     }
     throw Exception('Failed to load upcoming vaccinations');
   }
@@ -64,7 +71,10 @@ class VaccinationService {
   Future<List<dynamic>> getOverdueVaccinations() async {
     final response = await _client.get('/api/vaccinations/overdue');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['vaccinations'] is List) return decoded['vaccinations'];
+      return [];
     }
     throw Exception('Failed to load overdue vaccinations');
   }
