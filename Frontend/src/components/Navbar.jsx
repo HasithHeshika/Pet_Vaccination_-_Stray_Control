@@ -28,6 +28,12 @@ const Navbar = () => {
           <NavLink to="/lost-and-found" className={navLinkClass}>
             Lost & Found
           </NavLink>
+          {/* Admins review incidents on the Authority dashboard instead */}
+          {!user?.isAdmin && (
+            <NavLink to="/report-incident" className={navLinkClass}>
+              Report Incident
+            </NavLink>
+          )}
 
           {isAuthenticated ? (
             <>
