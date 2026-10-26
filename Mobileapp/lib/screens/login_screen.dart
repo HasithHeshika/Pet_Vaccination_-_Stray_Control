@@ -58,6 +58,51 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _showForgotPasswordDialog() async {
+    final emailController = TextEditingController(text: _emailController.text.trim());
+    final email = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Forgot password?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Enter the email you signed up with and we'll send you a link to set a new password."),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              autofocus: true,
+              decoration: const InputDecoration(labelText: 'Email Address'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(emailController.text.trim()),
+            child: const Text('Send link'),
+          ),
+        ],
+      ),
+    );
+    // Not disposed here: the dialog's closing animation may still be using the controller
+
+    if (email == null || email.isEmpty || !mounted) return;
+    try {
+      final message = await _authService.requestPasswordReset(email);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), duration: const Duration(seconds: 6)));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -141,8 +186,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               )
                             ),
                       ),
-                      const SizedBox(height: 32),
-                      
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _showForgotPasswordDialog,
+                          child: const Text("Forgot password?", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
                       // Custom Brown Pill Button
                       ElevatedButton(
                         onPressed: _isLoading ? null : _login,

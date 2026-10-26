@@ -20,6 +20,10 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: 'User not found' });
     }
 
+    if (user.tokenIssuedBeforePasswordChange(decoded.iat)) {
+      return res.status(401).json({ message: 'Your password was changed. Please log in again.' });
+    }
+
     if (!user.isAdmin && user.isVerified === false) {
       return res.status(403).json({
         code: 'ACCOUNT_PENDING_VERIFICATION',

@@ -9,6 +9,7 @@ const UserList = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [verifyingId, setVerifyingId] = useState('');
+  const [resettingId, setResettingId] = useState('');
   const navigate = useNavigate();
   const { token } = useAuth();
 
@@ -53,6 +54,22 @@ const UserList = () => {
       setError(verifyError.response?.data?.message || 'Failed to verify user');
     } finally {
       setVerifyingId('');
+    }
+  };
+
+  const handleSendReset = async (user) => {
+    if (!window.confirm(`Email a password reset link to ${user.email}?`)) return;
+    setResettingId(user._id);
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await axios.post(`/api/users/${user._id}/send-password-reset`);
+      setMessage(response.data.message);
+    } catch (resetError) {
+      setError(resetError.response?.data?.message || 'Failed to send the reset link');
+    } finally {
+      setResettingId('');
     }
   };
 
@@ -134,6 +151,14 @@ const UserList = () => {
                         className="btn btn-secondary"
                       >
                         Edit
+                      </button>
+                      <button
+                        onClick={() => handleSendReset(user)}
+                        className="btn btn-secondary"
+                        disabled={resettingId === user._id}
+                        title="Email this user a link to set a new password"
+                      >
+                        {resettingId === user._id ? 'Sending...' : 'Reset Password'}
                       </button>
                       </td>
                     </tr>

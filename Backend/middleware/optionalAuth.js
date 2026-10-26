@@ -11,7 +11,9 @@ const optionalAuth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId).select('-password');
     // Same rule as the auth middleware: unverified accounts are treated as anonymous
-    if (user && (user.isAdmin || user.isVerified !== false)) req.user = user;
+    if (user && (user.isAdmin || user.isVerified !== false) && !user.tokenIssuedBeforePasswordChange(decoded.iat)) {
+      req.user = user;
+    }
   } catch (error) {
     // Invalid or expired token: treat as anonymous
   }
