@@ -379,9 +379,51 @@ This is an automated alert from Pet Management System`,
   }
 };
 
+// Password reset link (requested by the user on the login page, or sent by an administrator)
+const sendPasswordResetEmail = async (to, name, resetLink, { expiresInMinutes, requestedByAdmin }) => {
+  try {
+    const intro = requestedByAdmin
+      ? 'An administrator of Pet Management System has sent you a link to set a new password for your account.'
+      : 'We received a request to reset the password for your Pet Management System account.';
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || '"Pet Management System" <noreply@petmanagement.com>',
+      to,
+      subject: 'Reset your Pet Management System password',
+      text: `Dear ${name},
+
+${intro}
+
+Set a new password here (the link works once and expires in ${expiresInMinutes} minutes):
+${resetLink}
+
+If you did not ask for this, you can ignore this email; your password will not change.
+
+---
+Pet Management System`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Reset your password</h2>
+          <p>Dear ${escapeHtml(name)},</p>
+          <p>${escapeHtml(intro)}</p>
+          <p><a href="${resetLink}" style="display: inline-block; background: #667eea; color: #fff; padding: 12px 24px; border-radius: 5px; text-decoration: none;">Set a new password</a></p>
+          <p style="color: #555; font-size: 0.9em;">The link works once and expires in ${expiresInMinutes} minutes.</p>
+          <p style="color: #555; font-size: 0.9em;">If you did not ask for this, you can ignore this email; your password will not change.</p>
+        </div>
+      `
+    };
+
+    return await deliver(mailOptions);
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   isEmailConfigured,
   sendIncidentAlertEmail,
+  sendPasswordResetEmail,
   sendVaccinationReminderEmail,
   sendOverdueVaccinationEmail,
   sendFinderContactEmail,

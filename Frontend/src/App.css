@@ -655,3 +655,10 @@
     width: min(100%, 280px);
   }
 }
+
+/* "Forgot password?" sits right under the password field */
+.link.forgot-password-link {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}

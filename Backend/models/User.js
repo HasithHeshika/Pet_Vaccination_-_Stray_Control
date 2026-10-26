@@ -71,6 +71,19 @@ const userSchema = new mongoose.Schema({
     default: '',
     select: false
   },
+  // Password reset: only a SHA-256 hash of the emailed token is stored
+  passwordResetTokenHash: {
+    type: String,
+    select: false
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false
+  },
+  // Login tokens issued before this time are rejected (set when a password is reset)
+  passwordChangedAt: {
+    type: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -87,6 +100,13 @@ userSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+// True if a login token issued at `issuedAtSeconds` predates the last password reset
+userSchema.methods.tokenIssuedBeforePasswordChange = function(issuedAtSeconds) {
+  if (!this.passwordChangedAt || !issuedAtSeconds) return false;
+  // 1 s of slack: a token issued in the same second as the reset is still valid
+  return issuedAtSeconds * 1000 < this.passwordChangedAt.getTime() - 1000;
+};
 
 // Method to compare passwords
 userSchema.methods.comparePassword = async function(candidatePassword) {

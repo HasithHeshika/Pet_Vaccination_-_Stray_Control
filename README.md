@@ -148,6 +148,10 @@ Both suites run automatically in GitHub Actions (`.github/workflows/ci.yml`).
 - `POST /signup` - Register user (supports `user` or `veterinarian` role)
 - `POST /login` - Authenticate & receive JWT token
 - `GET /me` - Fetch active authenticated user profile
+- `POST /forgot-password` - Email a one-time reset link valid for 30 minutes (same reply whether or not the account exists; rate limited)
+- `POST /reset-password` - Set a new password with the emailed token; signs the user out of existing sessions
+
+Admins can also email a user a reset link with `POST /api/users/:id/send-password-reset` ("Reset Password" on the user list). Admins never see or set passwords.
 
 ### Veterinarian & Vaccinations (`/api/vaccinations`)
 - `POST /` - Add vaccination record (*Admin or Vet*)

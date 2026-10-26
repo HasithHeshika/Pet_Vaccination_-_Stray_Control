@@ -5,6 +5,28 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
+const rateLimit = require('../middleware/rateLimit');
+const { createAndSendPasswordReset, resetPasswordWithToken } = require('../services/passwordReset');
+
+// Forgot-password requests: per connection, and per email address so one inbox can't be flooded
+const forgotPasswordIpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many password reset requests. Please try again in 15 minutes.'
+});
+const forgotPasswordEmailLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  keyGenerator: (req) => `email:${String(req.body?.email || '').trim().toLowerCase()}`,
+  message: 'Too many password reset requests for this email. Please try again later.'
+});
+const resetPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Too many attempts. Please try again in 15 minutes.'
+});
+
+const FORGOT_PASSWORD_REPLY = 'If an account exists for that email, a password reset link has been sent. Please check your inbox and spam folder.';
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -295,6 +317,60 @@ router.post('/login', [
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
+  }
+});
+
+// @route   POST /api/auth/forgot-password
+// @desc    Email a one-time password reset link
+// @access  Public
+router.post('/forgot-password', forgotPasswordIpLimiter, forgotPasswordEmailLimiter, [
+  // Same form as stored at signup (the schema lowercases emails)
+  body('email').trim().toLowerCase().isEmail().withMessage('Valid email is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      const result = await createAndSendPasswordReset(user);
+      if (!result.success) {
+        console.error(`Password reset email for ${user._id} not delivered:`, result.error);
+      }
+    }
+
+    // Same reply whether or not the account exists, so the form can't be used to find accounts
+    res.json({ message: FORGOT_PASSWORD_REPLY });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/auth/reset-password
+// @desc    Set a new password using the emailed token
+// @access  Public
+router.post('/reset-password', resetPasswordLimiter, [
+  body('token').isString().isLength({ min: 64, max: 64 }).withMessage('This reset link is invalid or has expired'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const user = await resetPasswordWithToken(req.body.token, req.body.password);
+    if (!user) {
+      return res.status(400).json({ message: 'This reset link is invalid or has expired. Please request a new one.' });
+    }
+
+    res.json({ message: 'Your password has been reset. You can now log in with your new password.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

@@ -382,6 +382,66 @@ test('security headers and CORS restrictions are applied', async () => {
   assert.equal(allowed.headers.get('access-control-allow-origin'), FRONTEND_ORIGIN);
 });
 
+test('forgot / reset password: no account discovery, one-time token, old sessions end', async () => {
+  const crypto = require('node:crypto');
+  const user = await signupAndVerify({ fullName: 'Reset Tester', email: 'reset@test.local', nicNumber: '199512345678' });
+
+  const unknown = await api('POST', '/api/auth/forgot-password', { body: { email: 'nobody-here@test.local' } });
+  const known = await api('POST', '/api/auth/forgot-password', { body: { email: 'RESET@test.local' } });
+  assert.equal(unknown.status, 200);
+  assert.equal(known.status, 200);
+  assert.equal(unknown.data.message, known.data.message, 'same reply whether or not the account exists');
+
+  await mongoose.connect(MONGO_URI);
+  const users = mongoose.connection.collection('users');
+  const stored = await users.findOne({ email: 'reset@test.local' });
+  assert.ok(stored.passwordResetTokenHash, 'a token hash was stored');
+  assert.ok(stored.passwordResetExpires > new Date(), 'with an expiry in the future');
+
+  // The emailed token is unknown to the test (only its hash is stored), so plant a known one
+  const token = crypto.randomBytes(32).toString('hex');
+  const hash = crypto.createHash('sha256').update(token).digest('hex');
+  await users.updateOne({ _id: stored._id }, { $set: { passwordResetTokenHash: hash, passwordResetExpires: new Date(Date.now() + 60000) } });
+
+  await new Promise((resolve) => setTimeout(resolve, 1100)); // so the old login token is clearly older than the reset
+  const wrong = await api('POST', '/api/auth/reset-password', { body: { token: 'a'.repeat(64), password: 'NewPassw0rd!' } });
+  assert.equal(wrong.status, 400);
+
+  const reset = await api('POST', '/api/auth/reset-password', { body: { token, password: 'NewPassw0rd!' } });
+  assert.equal(reset.status, 200, JSON.stringify(reset.data));
+
+  const reuse = await api('POST', '/api/auth/reset-password', { body: { token, password: 'Another1!' } });
+  assert.equal(reuse.status, 400, 'a reset link works only once');
+
+  const oldSession = await api('GET', '/api/auth/me', { token: user.token });
+  assert.equal(oldSession.status, 401, 'sessions from before the reset are ended');
+
+  const oldPassword = await api('POST', '/api/auth/login', { body: { email: 'reset@test.local', password: 'Passw0rd!' } });
+  assert.equal(oldPassword.status, 400);
+  const newPassword = await api('POST', '/api/auth/login', { body: { email: 'reset@test.local', password: 'NewPassw0rd!' } });
+  assert.equal(newPassword.status, 200);
+
+  // Expired tokens are rejected
+  const expiredToken = crypto.randomBytes(32).toString('hex');
+  await users.updateOne({ _id: stored._id }, {
+    $set: {
+      passwordResetTokenHash: crypto.createHash('sha256').update(expiredToken).digest('hex'),
+      passwordResetExpires: new Date(Date.now() - 1000)
+    }
+  });
+  const expired = await api('POST', '/api/auth/reset-password', { body: { token: expiredToken, password: 'Expired1!' } });
+  assert.equal(expired.status, 400);
+
+  // Admin "send reset link": admins only; with no email service configured it reports failure honestly
+  const notAdmin = await api('POST', `/api/users/${user.id}/send-password-reset`, { token: newPassword.data.token });
+  assert.equal(notAdmin.status, 403);
+  const byAdmin = await api('POST', `/api/users/${user.id}/send-password-reset`, { token: ctx.adminToken });
+  assert.equal(byAdmin.status, 503);
+  const afterAdmin = await users.findOne({ _id: stored._id });
+  assert.ok(afterAdmin.passwordResetExpires > new Date(), 'admin request created a fresh token');
+  await mongoose.disconnect();
+});
+
 test('failed logins are rate limited, successful logins are not counted', async () => {
   for (let i = 0; i < 25; i += 1) {
     const ok = await api('POST', '/api/auth/login', { body: ADMIN });

@@ -6,6 +6,8 @@ import Footer from './components/Footer';
 import LandingPage from './components/Public/LandingPage';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
+import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetPassword from './components/Auth/ResetPassword';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import AuthorityDashboard from './components/Admin/AuthorityDashboard';
 import VeterinarianDashboard from './components/Admin/VeterinarianDashboard';
@@ -92,7 +94,8 @@ function AppContent() {
   const showNavbar = isAuthenticated || location.pathname !== '/';
 
   // Remove padding for landing, welcome, login, and signup pages to allow full-width backgrounds
-  const isFullWidthPage = ['/', '/welcome', '/login', '/signup'].includes(location.pathname);
+  const isFullWidthPage = ['/', '/welcome', '/login', '/signup', '/forgot-password'].includes(location.pathname)
+    || location.pathname.startsWith('/reset-password/');
   const isWelcomePage = ['/', '/welcome'].includes(location.pathname);
 
   return (
@@ -128,14 +131,24 @@ function AppContent() {
               </PublicRoute>
             } 
           />
-          <Route 
-            path="/signup" 
+          <Route
+            path="/signup"
             element={
               <PublicRoute>
                 <Signup />
               </PublicRoute>
-            } 
+            }
           />
+          <Route
+            path="/forgot-password"
+            element={
+              <PublicRoute>
+                <ForgotPassword />
+              </PublicRoute>
+            }
+          />
+          {/* Reset link from email; works whether or not someone is logged in on this browser */}
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           
           {/* Public Pet Profile - No authentication required */}
           <Route path="/pet-profile/:petId" element={<PetProfile />} />

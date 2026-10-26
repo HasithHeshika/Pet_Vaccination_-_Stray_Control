@@ -51,6 +51,18 @@ class AuthService {
     throw Exception('Failed to signup: ${response.body}');
   }
 
+  // Emails a password reset link; the link opens the web app to set the new password.
+  // Returns the server's message (the same whether or not the account exists).
+  Future<String> requestPasswordReset(String email) async {
+    final response = await _client.post('/api/auth/forgot-password', body: {'email': email});
+    String message = 'Could not send the reset link. Please try again.';
+    try {
+      message = jsonDecode(response.body)['message'] ?? message;
+    } catch (_) {}
+    if (response.statusCode == 200) return message;
+    throw Exception(message);
+  }
+
   Future<Map<String, dynamic>?> getMe() async {
     final response = await _client.get('/api/auth/me');
     if (response.statusCode == 200) {

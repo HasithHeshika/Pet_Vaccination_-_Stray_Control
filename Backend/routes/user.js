@@ -5,6 +5,7 @@ const User = require('../models/User');
 const Pet = require('../models/Pet');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
+const { createAndSendPasswordReset } = require('../services/passwordReset');
 
 const MAX_PROFILE_PICTURE_SIZE = 2 * 1024 * 1024;
 const PROFILE_PICTURE_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/;
@@ -263,6 +264,28 @@ router.put('/change-password', authMiddleware, [
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
     console.error('Change password error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/users/:id/send-password-reset
+// @desc    Email a user a password reset link (Admin only; the admin never sees or sets the password)
+// @access  Private/Admin
+router.post('/:id([0-9a-fA-F]{24})/send-password-reset', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const result = await createAndSendPasswordReset(user, { requestedByAdmin: true });
+    if (!result.success) {
+      return res.status(503).json({ message: 'The reset email could not be sent. Please try again later.' });
+    }
+
+    res.json({ message: `A password reset link has been emailed to ${user.email}` });
+  } catch (error) {
+    console.error('Admin send password reset error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
