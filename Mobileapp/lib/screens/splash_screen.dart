@@ -33,17 +33,19 @@ class _SplashScreenState extends State<SplashScreen> {
     if (mounted) {
       if (token != null && token.isNotEmpty) {
         String role = prefs.getString('role') ?? '';
-        
-        // Critical: If role is empty (e.g. they logged in BEFORE we added roles to memory), manually fetch it so Admins don't get stuck on the User screen!
-        if (role.isEmpty) {
-           try {
-             final meData = await AuthService().getMe();
-             role = meData?['user']?['role'] ?? 'pet_owner';
-             await prefs.setString('role', role); // Cache for next time
-           } catch (_) {
-             role = 'pet_owner'; // Safe fallback if offline
-           }
+
+        // Refresh the role from the server so a stale cached role (e.g. an admin saved as 'user'
+        // by an older app version) never sends someone to the wrong side of the app
+        try {
+          final meData = await AuthService().getMe();
+          if (meData?['user'] is Map) {
+            role = AuthService.effectiveRole(Map<String, dynamic>.from(meData!['user']));
+            await prefs.setString('role', role);
+          }
+        } catch (_) {
+          // Offline: keep the cached role
         }
+        if (role.isEmpty) role = 'user';
         
         Widget target = const HomeScreen();
         if (role == 'admin') target = const AdminDashboard();
