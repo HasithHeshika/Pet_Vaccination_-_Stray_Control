@@ -94,11 +94,17 @@ router.get('/dashboard', auth, admin, async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(30),
       StrayReport.countDocuments(),
+      // Open incidents first, most urgent first; photos are loaded separately per report
       StrayReport.find()
+        .select('-images')
         .populate('reportedBy', 'fullName email phone')
-        .sort({ reportedAt: -1 })
-        .limit(12)
+        .sort(StrayReport.QUEUE_SORT)
+        .limit(20)
     ]);
+    const openUrgentIncidents = await StrayReport.countDocuments({
+      status: { $ne: 'resolved' },
+      urgency: { $in: ['emergency', 'urgent'] }
+    });
 
     const foundReports = lostFoundReports.filter((report) => report.status === 'Found');
     const lostFound = lostFoundReports.map((report) => normalizeLostReport(report, foundReports));
@@ -110,7 +116,8 @@ router.get('/dashboard', auth, admin, async (req, res) => {
         pendingLicenseRequests,
         vaccinationComplianceRate: vaccinationCompliance.complianceRate,
         compliantPets: vaccinationCompliance.compliantPets,
-        strayReportsCount
+        strayReportsCount,
+        openUrgentIncidents
       },
       licenses,
       pets,

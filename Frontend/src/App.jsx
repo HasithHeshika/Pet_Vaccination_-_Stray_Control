@@ -140,7 +140,8 @@ function AppContent() {
           {/* Public Pet Profile - No authentication required */}
           <Route path="/pet-profile/:petId" element={<PetProfile />} />
 
-          {/* Public Stray Report */}
+          {/* Public animal incident report (violence, sick/injured, stray, other); /report-stray kept for old links */}
+          <Route path="/report-incident" element={<ReportStrayForm />} />
           <Route path="/report-stray" element={<ReportStrayForm />} />
 
           {/* Lost and Found Routes */}

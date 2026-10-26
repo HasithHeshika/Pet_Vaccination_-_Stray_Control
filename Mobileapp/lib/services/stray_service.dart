@@ -9,7 +9,11 @@ class StrayService {
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw Exception('Failed to report stray pet');
+    String message = 'Failed to send the report';
+    try {
+      message = jsonDecode(response.body)['message'] ?? message;
+    } catch (_) {}
+    throw Exception(message);
   }
 
   Future<List<dynamic>> getStrayReports() async {

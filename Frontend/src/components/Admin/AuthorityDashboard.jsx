@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from '../../api/axios';
 import { formatDate } from '../../utils/dateFormat';
 import BreederIcon from '../Breeder/BreederIcons';
+import IncidentReports from './IncidentReports';
 import './AdminDashboard.css';
 
 const statusClass = (status = '') => `authority-status ${status.toLowerCase().replace(/\s+/g, '-')}`;
@@ -66,7 +67,7 @@ const AuthorityDashboard = () => {
       await axios.patch(`/api/stray-reports/${reportId}/status`, { status });
       await loadDashboard();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update stray report status');
+      alert(err.response?.data?.message || 'Failed to update incident report status');
     } finally {
       setStrayActionId('');
     }
@@ -105,7 +106,15 @@ const AuthorityDashboard = () => {
             <MetricCard label="Total Breeders" value={metrics.totalBreeders || 0} helper="Breeders with license records" icon="shield" />
             <MetricCard label="Pending License Requests" value={metrics.pendingLicenseRequests || 0} helper="Awaiting authority decision" icon="document" />
             <MetricCard label="Vaccination Compliance Rate" value={`${metrics.vaccinationComplianceRate || 0}%`} helper={`${metrics.compliantPets || 0} pets compliant`} icon="check" />
-            <MetricCard label="Stray Reports Count" value={metrics.strayReportsCount || 0} helper="Municipal stray reports" icon="alert" />
+            <MetricCard label="Animal Incident Reports" value={metrics.strayReportsCount || 0} helper={`${metrics.openUrgentIncidents || 0} open urgent or emergency`} icon="alert" />
+          </section>
+
+          <section>
+            <IncidentReports
+              reports={dashboard.strayReports || []}
+              actionId={strayActionId}
+              onStatusChange={updateStrayStatus}
+            />
           </section>
 
           <section className="authority-grid two-columns">
@@ -220,7 +229,7 @@ const AuthorityDashboard = () => {
             </div>
           </section>
 
-          <section className="authority-grid two-columns">
+          <section>
             <article className="authority-card">
               <div className="authority-section-header">
                 <div>
@@ -250,38 +259,6 @@ const AuthorityDashboard = () => {
                     ))}
                   </tbody>
                 </table>
-              </div>
-            </article>
-
-            <article className="authority-card">
-              <div className="authority-section-header">
-                <div>
-                  <p className="authority-eyebrow">Stray Monitoring</p>
-                  <h2>Recent Stray Reports</h2>
-                </div>
-              </div>
-              <div className="authority-list compact">
-                {(dashboard.strayReports || []).length === 0 ? (
-                  <p className="authority-empty">No stray reports available.</p>
-                ) : dashboard.strayReports.map((report) => (
-                  <div key={report._id} className="stray-row">
-                    <div>
-                      <strong>{report.location}</strong>
-                      <span>{report.description}</span>
-                    </div>
-                    <select
-                      className={statusClass(report.status)}
-                      value={report.status}
-                      disabled={strayActionId === report._id}
-                      onChange={(e) => updateStrayStatus(report._id, e.target.value)}
-                      aria-label={`Status of stray report at ${report.location}`}
-                    >
-                      <option value="pending">pending</option>
-                      <option value="in-progress">in-progress</option>
-                      <option value="resolved">resolved</option>
-                    </select>
-                  </div>
-                ))}
               </div>
             </article>
           </section>

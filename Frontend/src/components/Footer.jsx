@@ -11,7 +11,7 @@ const Footer = () => {
           <h3 className="footer-title"><BreederIcon name="shield" size={22} /> Pet Management System</h3>
           <p className="footer-description">
             A comprehensive platform for managing pet ownership records,
-            vaccination tracking, breeder licensing, and stray animal reporting.
+            vaccination tracking, breeder licensing, and animal incident reporting.
           </p>
         </div>
 
@@ -28,7 +28,7 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Report an Animal</h4>
           <ul className="footer-links">
-            <li><Link to="/report-stray">Report a Stray Animal</Link></li>
+            <li><Link to="/report-incident">Report an Animal Incident</Link></li>
             <li><Link to="/lost-and-found">Lost &amp; Found Pets</Link></li>
           </ul>
         </div>

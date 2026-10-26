@@ -230,6 +230,87 @@ test('stray reports: anonymous submission cannot spoof the reporter; admin can u
   assert.equal(updated.data.report.status, 'resolved');
 });
 
+test('animal incidents: types, default urgency, photos, location and reporter contact', async () => {
+  const tinyPng = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+
+  const violence = await api('POST', '/api/incidents', {
+    body: {
+      incidentType: 'violence', location: 'Galle market', description: 'Dog being beaten with a stick',
+      coordinates: { lat: 6.0329, lng: 80.2168 }, images: [tinyPng],
+      reporterName: 'Kamal', reporterContact: '0771112223'
+    }
+  });
+  assert.equal(violence.status, 201, JSON.stringify(violence.data));
+  assert.equal(violence.data.report.urgency, 'urgent');
+  assert.equal(violence.data.report.imageCount, 1);
+  assert.deepEqual(violence.data.report.coordinates, { lat: 6.0329, lng: 80.2168 });
+
+  const emergency = await api('POST', '/api/stray-reports', {
+    body: { incidentType: 'sick_injured', urgency: 'emergency', location: 'Matara beach', description: 'Cat hit by a vehicle' }
+  });
+  assert.equal(emergency.status, 201, JSON.stringify(emergency.data));
+
+  const missingOtherType = await api('POST', '/api/incidents', {
+    body: { incidentType: 'other', location: 'Hapugala', description: 'Something odd' }
+  });
+  assert.equal(missingOtherType.status, 400);
+
+  const badType = await api('POST', '/api/incidents', { body: { incidentType: 'robbery', location: 'X', description: 'Y' } });
+  assert.equal(badType.status, 400);
+
+  const badPhoto = await api('POST', '/api/incidents', {
+    body: { incidentType: 'stray', location: 'X', description: 'Y', images: ['javascript:alert(1)'] }
+  });
+  assert.equal(badPhoto.status, 400);
+
+  const list = await api('GET', '/api/stray-reports', { token: ctx.adminToken });
+  assert.equal(list.status, 200);
+  assert.equal(list.data.reports[0].urgency, 'emergency', 'emergencies are listed first');
+  const listedViolence = list.data.reports.find((r) => r._id === violence.data.report._id);
+  assert.equal(listedViolence.images, undefined, 'photos are not sent in the list');
+  assert.equal(listedViolence.imageCount, 1);
+  assert.equal(listedViolence.reporterContact, '0771112223');
+
+  const detail = await api('GET', `/api/incidents/${violence.data.report._id}`, { token: ctx.adminToken });
+  assert.deepEqual(detail.data.report.images, [tinyPng]);
+
+  const dashboard = await api('GET', '/api/authority/dashboard', { token: ctx.adminToken });
+  assert.equal(dashboard.status, 200);
+  assert.ok(dashboard.data.metrics.openUrgentIncidents >= 2);
+
+  const publicList = await api('GET', '/api/incidents');
+  assert.equal(publicList.status, 401, 'incident reports (and reporter contacts) are not public');
+});
+
+test('incident review fixes: no link photos, pending listed before in-progress, no automatic name', async () => {
+  const linkPhoto = await api('POST', '/api/incidents', {
+    body: { incidentType: 'stray', location: 'X', description: 'Y', images: ['https://example.com/pixel.png'] }
+  });
+  assert.equal(linkPhoto.status, 400, 'incident photos must be uploaded files');
+
+  // A logged-in reporter who leaves the name blank is not named on the report
+  const loggedIn = await api('POST', '/api/incidents', {
+    token: ctx.owner.token,
+    body: { incidentType: 'stray', location: 'Unawatuna', description: 'Puppy alone' }
+  });
+  assert.equal(loggedIn.status, 201, JSON.stringify(loggedIn.data));
+  assert.equal(loggedIn.data.report.reporterName, undefined);
+
+  // Move the emergency to in-progress: a pending report must now come first
+  const before = await api('GET', '/api/stray-reports', { token: ctx.adminToken });
+  const emergency = before.data.reports.find((r) => r.urgency === 'emergency');
+  await api('PATCH', `/api/stray-reports/${emergency._id}/status`, { token: ctx.adminToken, body: { status: 'in-progress' } });
+
+  const after = await api('GET', '/api/stray-reports', { token: ctx.adminToken });
+  const ranks = { pending: 0, 'in-progress': 1, resolved: 2 };
+  const order = after.data.reports.map((r) => ranks[r.status]);
+  assert.deepEqual(order, [...order].sort((a, b) => a - b), 'pending, then in-progress, then resolved');
+
+  const dashboard = await api('GET', '/api/authority/dashboard', { token: ctx.adminToken });
+  const dashOrder = dashboard.data.strayReports.map((r) => ranks[r.status]);
+  assert.deepEqual(dashOrder, [...dashOrder].sort((a, b) => a - b), 'dashboard uses the same order');
+});
+
 test('breeder licence renewal is only allowed for approved or expired licences', async () => {
   const applied = await api('POST', '/api/licenses/apply', {
     token: ctx.owner.token,

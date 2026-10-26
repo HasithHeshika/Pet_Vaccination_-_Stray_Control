@@ -469,3 +469,118 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Animal incident reports (authority dashboard) */
+.incident-reports-card {
+  margin-bottom: 24px;
+}
+
+.incident-list {
+  display: grid;
+  gap: 12px;
+  max-height: 640px;
+  overflow: auto;
+}
+
+.incident-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(219, 234, 254, 0.46);
+  border-left: 4px solid #94a3b8;
+}
+
+.incident-row.urgency-emergency {
+  border-left-color: #b42318;
+  background: #fef3f2;
+}
+
+.incident-row.urgency-urgent {
+  border-left-color: #d97706;
+  background: #fffaeb;
+}
+
+.incident-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.incident-main strong {
+  color: var(--pet-ember-espresso);
+}
+
+.incident-main > span {
+  color: #405a75;
+  font-size: 0.9rem;
+}
+
+.incident-main .incident-reporter {
+  color: #52677f;
+  font-size: 0.84rem;
+}
+
+.incident-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.incident-urgency {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  background: #64748b;
+}
+
+.incident-urgency.urgency-emergency {
+  background: #b42318;
+}
+
+.incident-urgency.urgency-urgent {
+  background: #d97706;
+}
+
+.incident-type {
+  font-weight: 700;
+  color: var(--pet-ember-espresso);
+  font-size: 0.88rem;
+}
+
+.incident-date {
+  color: #52677f;
+  font-size: 0.8rem;
+}
+
+.incident-photos-button {
+  align-self: flex-start;
+  color: #1d4ed8;
+}
+
+.incident-photos {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.incident-photos img {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+  .incident-row {
+    flex-direction: column;
+  }
+}

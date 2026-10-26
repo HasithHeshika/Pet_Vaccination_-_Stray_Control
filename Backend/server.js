@@ -82,6 +82,29 @@ const createAdminUser = async () => {
   }
 };
 
+const backfillIncidentFields = async () => {
+  try {
+    const StrayReport = require('./models/StrayReport');
+    const legacy = await StrayReport.updateMany(
+      { urgencyRank: { $exists: false } },
+      { $set: { incidentType: 'stray', urgency: 'normal', urgencyRank: 2 } }
+    );
+    let ranked = 0;
+    for (const [status, rank] of Object.entries(StrayReport.STATUS_RANK)) {
+      const result = await StrayReport.updateMany(
+        { status, statusRank: { $ne: rank } },
+        { $set: { statusRank: rank } }
+      );
+      ranked += result.modifiedCount;
+    }
+    if (legacy.modifiedCount > 0 || ranked > 0) {
+      console.log(`Backfilled incident fields on ${legacy.modifiedCount} older report(s), status order on ${ranked}`);
+    }
+  } catch (error) {
+    console.error('Error backfilling incident fields:', error);
+  }
+};
+
 // Brute-force protection on credential endpoints
 // Only failed attempts count, so many users behind one campus/office network can still log in
 const authLimiter = rateLimit({
@@ -97,7 +120,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/user'));
 app.use('/api/pets', require('./routes/pet'));
 app.use('/api/vaccinations', require('./routes/vaccination'));
-app.use('/api/stray-reports', require('./routes/strayReport'));
+const incidentRoutes = require('./routes/strayReport');
+app.use('/api/stray-reports', incidentRoutes);
+app.use('/api/incidents', incidentRoutes);
 app.use('/api/lost-and-found', require('./routes/lostReport'));
 app.use('/api/licenses', require('./routes/license'));
 app.use('/api/authority', require('./routes/authority'));
@@ -159,6 +184,9 @@ const startServer = async () => {
     
     // Initialize admin user
     await createAdminUser();
+
+    // Reports created before incident types existed are stray sightings of normal urgency
+    await backfillIncidentFields();
     
     // Start vaccination reminder scheduler
     scheduleVaccinationReminders();
