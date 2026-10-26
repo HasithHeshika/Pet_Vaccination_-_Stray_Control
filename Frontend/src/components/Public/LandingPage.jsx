@@ -34,11 +34,11 @@ const LandingPage = () => {
           <p className="hero-subtitle">
             A centralized system connecting pet owners, breeders, and municipal authorities.
             Register pets, track vaccinations securely via QR codes, apply for breeder licenses,
-            and report stray animals to keep the community safe and healthy.
+            and report animals in danger, sick or injured, or straying to keep the community safe and healthy.
           </p>
           <div className="hero-buttons">
-            <Link to="/report-stray" className="btn-modern btn-black">
-              <BreederIcon name="alert" /> Report a Stray
+            <Link to="/report-incident" className="btn-modern btn-black">
+              <BreederIcon name="alert" /> Report an Incident
             </Link>
             <Link to="/lost-and-found" className="btn-modern btn-outline">
               <BreederIcon name="search" /> Lost & Found

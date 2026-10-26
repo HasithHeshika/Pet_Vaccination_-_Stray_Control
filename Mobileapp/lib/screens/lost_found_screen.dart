@@ -129,9 +129,9 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
                     ),
                     const SizedBox(height: 16),
                     ListTile(
-                      leading: const CircleAvatar(backgroundColor: Color(0xFF9E6D4E), child: Icon(Icons.add_location_alt, color: Colors.white)),
-                      title: const Text("Report a Stray", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
-                      subtitle: const Text("Alert authorities to animals in need"),
+                      leading: const CircleAvatar(backgroundColor: Color(0xFF9E6D4E), child: Icon(Icons.report_problem_outlined, color: Colors.white)),
+                      title: const Text("Report an Animal Incident", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+                      subtitle: const Text("Violence, sick or injured animals, strays and more"),
                       onTap: () {
                          Navigator.pop(ctx);
                          Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportStrayScreen()));

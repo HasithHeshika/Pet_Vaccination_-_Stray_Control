@@ -1,0 +1,138 @@
+.incident-form-container {
+  max-width: 680px;
+}
+
+.incident-emergency-note {
+  background: #fff4e5;
+  border-left: 4px solid #d97706;
+  color: #7a4a00;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.report-form fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+
+.report-form legend {
+  font-weight: bold;
+  color: var(--pet-ember-espresso);
+  margin-bottom: 0.5rem;
+}
+
+.incident-type-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.report-form .incident-type-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  border-radius: 8px;
+  cursor: pointer;
+  background: #fff;
+  font-weight: normal;
+  margin: 0;
+}
+
+.incident-type-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.incident-type-option.selected {
+  border-color: var(--pet-rustic-apricot);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+  background: #f0f6ff;
+}
+
+.incident-type-option:focus-within {
+  outline: 2px solid var(--pet-rustic-apricot);
+  outline-offset: 2px;
+}
+
+.incident-type-label {
+  font-weight: bold;
+  color: var(--pet-ember-espresso);
+}
+
+.incident-type-hint,
+.incident-field-hint {
+  font-size: 0.85rem;
+  color: #52677f;
+}
+
+.incident-field-hint {
+  margin: 0.4rem 0 0;
+}
+
+.incident-field-error {
+  color: #b42318;
+  font-size: 0.9rem;
+  margin: 0.4rem 0 0;
+}
+
+.incident-location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #b42318;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.incident-photo-previews {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.incident-photo-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.incident-photo-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.incident-photo-preview button {
+  background: none;
+  border: none;
+  color: #b42318;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .incident-type-options {
+    grid-template-columns: 1fr;
+  }
+}

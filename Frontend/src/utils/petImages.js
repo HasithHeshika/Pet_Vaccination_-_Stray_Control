@@ -22,16 +22,16 @@ export const readPetImageFiles = async (fileList, existingCount = 0) => {
   const files = Array.from(fileList || []);
 
   if (existingCount + files.length > MAX_PET_IMAGES) {
-    throw new Error('You can upload a maximum of two images for each pet.');
+    throw new Error('You can upload a maximum of two images.');
   }
 
   files.forEach((file) => {
     if (!SUPPORTED_PET_IMAGE_TYPES.includes(file.type)) {
-      throw new Error('Pet images must be JPEG, PNG, or WebP files.');
+      throw new Error('Images must be JPEG, PNG, or WebP files.');
     }
 
     if (file.size > MAX_PET_IMAGE_BYTES) {
-      throw new Error('Each pet image must be 2 MB or smaller.');
+      throw new Error('Each image must be 2 MB or smaller.');
     }
   });
 

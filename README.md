@@ -23,7 +23,8 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 - **Veterinarian Portal**: Dedicated doctor interface to lookup patient records by Pet ID, view medical history, log vaccinations/treatments, and send reminders.
 - **Automated Vaccination Reminders**: Background `node-cron` service and `nodemailer` integration to deliver email reminders for upcoming/overdue vaccinations (requires SMTP settings; a reminder is only marked as sent after it is delivered).
 - **Breeder Licensing System**: Full breeder application workflow, status tracking, renewal requests, and municipal authority approval dashboards.
-- **Stray & Lost Pet Reporting**: Citizen stray animal reporting, lost pet feed, and municipal progress dashboards.
+- **Animal Incident Reporting**: Anyone can report violence or abuse, a sick or injured animal in a public place, a stray, or any other animal incident, with urgency, photos, GPS location and optional contact details. Urgent reports are emailed to the authority and listed first on the authority dashboard.
+- **Lost & Found**: Public lost pet feed with reporter-managed status.
 
 ---
 
@@ -122,6 +123,7 @@ make dev-up
 | `ACS_EMAIL_CONNECTION_STRING`, `ACS_EMAIL_SENDER` | Outgoing email through Azure Communication Services (used in production) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | Alternative: outgoing email through any SMTP server. With neither ACS nor SMTP set, emails are only logged |
 | `REMINDER_CRON` | Schedule for the daily reminder check (default `0 9 * * *`) |
+| `AUTHORITY_ALERT_EMAILS` | Comma-separated addresses emailed about urgent or emergency animal incidents (default: all administrator accounts) |
 
 After changing `FRONTEND_URL`, re-issue existing QR codes with `cd Backend && npm run regenerate-qr`.
 
@@ -159,9 +161,15 @@ Both suites run automatically in GitHub Actions (`.github/workflows/ci.yml`).
 - `PUT /:id/status` - Approve, reject, or set expiry dates for license (*Admin Only*)
 - `POST /:id/renew` - Request license renewal (*Private*)
 
-### Stray & Lost Reports (`/api/stray-reports`, `/api/lost-and-found`)
-- `POST /` - Submit stray sighting or lost pet report
-- `GET /` - List reports with status filters
+### Animal Incident Reports (`/api/incidents`, also `/api/stray-reports`)
+- `POST /` - Report an animal incident (*Public, login optional*). Body: `incidentType` (`violence`, `sick_injured`, `stray`, `other` + `otherIncidentType`), `urgency` (`emergency`, `urgent`, `normal`; defaults by type), `location`, optional `coordinates` `{lat, lng}`, `description`, up to 2 `images` (JPEG/PNG/WebP data URLs, 2 MB each), optional `reporterName` / `reporterContact`. Urgent and emergency reports email `AUTHORITY_ALERT_EMAILS` (or all admins)
+- `GET /` - List reports, open and most urgent first, without photos (*Admin Only*)
+- `GET /:id` - One report including photos (*Admin Only*)
 - `PATCH /:id/status` - Update report progress (*Admin Only*)
+
+### Lost & Found (`/api/lost-and-found`)
+- `POST /` - Submit a lost pet report (*Private*)
+- `GET /` - Public lost and found feed
+- `PATCH /:id/status` - Update report status (*reporter or Admin*)
 
 ---

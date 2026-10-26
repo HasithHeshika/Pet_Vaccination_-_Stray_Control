@@ -318,8 +318,70 @@ const sendVaccinationReminderSMS = async (vaccination, phoneNumber, petName) => 
   return { success: false, message: 'SMS service not configured' };
 };
 
+const INCIDENT_TYPE_LABELS = {
+  violence: 'Violence / abuse / cruelty',
+  sick_injured: 'Sick or injured animal in a public place',
+  stray: 'Stray animal sighting',
+  other: 'Other incident'
+};
+
+// Alert the authority about an urgent or emergency animal incident report
+const sendIncidentAlertEmail = async (to, report) => {
+  try {
+    const typeLabel = report.incidentType === 'other' && report.otherIncidentType
+      ? `Other: ${report.otherIncidentType}`
+      : INCIDENT_TYPE_LABELS[report.incidentType] || 'Animal incident';
+    const urgencyLabel = String(report.urgency || 'normal').toUpperCase();
+    const mapLink = report.coordinates?.lat !== undefined && report.coordinates?.lng !== undefined
+      ? `https://www.google.com/maps?q=${report.coordinates.lat},${report.coordinates.lng}`
+      : '';
+    const dashboardLink = `${getFrontendUrl()}/admin/authority`;
+    const reporter = [report.reporterName, report.reporterContact].filter(Boolean).join(' - ') || 'Anonymous';
+    const photoCount = (report.images || []).length;
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || '"Pet Management System" <noreply@petmanagement.com>',
+      to,
+      subject: `[${urgencyLabel}] Animal incident reported: ${typeLabel}`,
+      text: `A new ${urgencyLabel.toLowerCase()} animal incident has been reported.
+
+Type: ${typeLabel}
+Urgency: ${urgencyLabel}
+Location: ${report.location}${mapLink ? `\nMap: ${mapLink}` : ''}
+Description: ${report.description}
+Reported by: ${reporter}
+Photos attached to the report: ${photoCount}
+
+Review and update the report on the authority dashboard:
+${dashboardLink}
+
+---
+This is an automated alert from Pet Management System`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #b42318; margin-bottom: 4px;">${escapeHtml(urgencyLabel)} animal incident reported</h2>
+          <p style="margin-top: 0; color: #555;">${escapeHtml(typeLabel)}</p>
+          <table style="border-collapse: collapse; width: 100%;">
+            <tr><td style="padding: 6px 0; font-weight: bold; width: 140px;">Location</td><td>${escapeHtml(report.location)}${mapLink ? ` (<a href="${mapLink}">open map</a>)` : ''}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Description</td><td>${escapeHtml(report.description)}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Reported by</td><td>${escapeHtml(reporter)}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Photos</td><td>${photoCount}</td></tr>
+          </table>
+          <p><a href="${dashboardLink}" style="display: inline-block; background: #667eea; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Open authority dashboard</a></p>
+        </div>
+      `
+    };
+
+    return await deliver(mailOptions);
+  } catch (error) {
+    console.error('Error sending incident alert:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   isEmailConfigured,
+  sendIncidentAlertEmail,
   sendVaccinationReminderEmail,
   sendOverdueVaccinationEmail,
   sendFinderContactEmail,

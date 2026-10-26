@@ -13,26 +13,7 @@ const crypto = require('crypto');
 const { generateQRCode } = require('../utils/qrGenerator');
 const { sendFinderContactEmail } = require('../services/notificationService');
 
-const MAX_PET_IMAGES = 2;
-const MAX_PET_IMAGE_SIZE = 2 * 1024 * 1024;
-const PET_IMAGE_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/;
-
-const validatePetImage = (image) => {
-  if (typeof image === 'string' && /^https?:\/\/\S+$/i.test(image)) {
-    return true;
-  }
-
-  const match = typeof image === 'string' && image.match(PET_IMAGE_DATA_URL);
-  if (!match) {
-    throw new Error('Images must be JPEG, PNG, or WebP files');
-  }
-
-  if (Buffer.byteLength(match[1], 'base64') > MAX_PET_IMAGE_SIZE) {
-    throw new Error('Each pet image must be 2 MB or smaller');
-  }
-
-  return true;
-};
+const { MAX_IMAGES: MAX_PET_IMAGES, validateImage: validatePetImage } = require('../utils/imageValidation');
 
 // Generate unique Pet ID
 const generatePetId = () => {

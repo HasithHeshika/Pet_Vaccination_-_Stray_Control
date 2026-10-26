@@ -53,8 +53,8 @@ const UserDashboard = () => {
           <Link to="/breeder/dashboard" className="btn quick-action">
             Breeder Licensing
           </Link>
-          <Link to="/report-stray" className="btn quick-action">
-            Report a Stray
+          <Link to="/report-incident" className="btn quick-action">
+            Report an Animal Incident
           </Link>
           <Link to="/user/edit-profile" className="btn quick-action">
             Edit Profile
