@@ -87,7 +87,8 @@ const verifyProviderToken = async (provider, idToken) => {
 };
 
 const authUserPayload = (user) => {
-  const effectiveRole = user.role || (user.isAdmin ? 'admin' : 'user');
+  // The seeded admin account has isAdmin=true but the schema's default role 'user'
+  const effectiveRole = user.isAdmin ? 'admin' : (user.role || 'user');
   return {
     id: user._id,
     fullName: user.fullName,
@@ -379,7 +380,7 @@ router.post('/reset-password', resetPasswordLimiter, [
 // @access  Private
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const effectiveRole = req.user.role || (req.user.isAdmin ? 'admin' : 'user');
+    const effectiveRole = req.user.isAdmin ? 'admin' : (req.user.role || 'user');
     res.json({
       user: {
         id: req.user._id,

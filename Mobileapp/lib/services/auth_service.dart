@@ -5,6 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   final ApiClient _client = ApiClient();
 
+  // Admin accounts carry isAdmin=true; older API versions report their role as 'user'
+  static String effectiveRole(Map<String, dynamic>? user) {
+    if (user == null) return 'user';
+    if (user['isAdmin'] == true) return 'admin';
+    return (user['role'] ?? 'user').toString();
+  }
+
   Future<Map<String, dynamic>?> login(String email, String password) async {
     final response = await _client.post('/api/auth/login', body: {
       'email': email,
@@ -24,8 +31,10 @@ class AuthService {
           await prefs.setString('userId', data['user']['_id'].toString());
         }
         
-        if (data['user'] != null && data['user']['role'] != null) {
-          await prefs.setString('role', data['user']['role'].toString());
+        if (data['user'] != null) {
+          final role = effectiveRole(Map<String, dynamic>.from(data['user']));
+          await prefs.setString('role', role);
+          data['user']['role'] = role;
         }
       }
       return data;
