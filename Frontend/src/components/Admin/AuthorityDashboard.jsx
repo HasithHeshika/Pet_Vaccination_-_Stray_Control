@@ -107,6 +107,9 @@ const AuthorityDashboard = () => {
             <MetricCard label="Pending License Requests" value={metrics.pendingLicenseRequests || 0} helper="Awaiting authority decision" icon="document" />
             <MetricCard label="Vaccination Compliance Rate" value={`${metrics.vaccinationComplianceRate || 0}%`} helper={`${metrics.compliantPets || 0} pets compliant`} icon="check" />
             <MetricCard label="Animal Incident Reports" value={metrics.strayReportsCount || 0} helper={`${metrics.openUrgentIncidents || 0} open urgent or emergency`} icon="alert" />
+            <Link to="/admin/matches" className="authority-metric-link">
+              <MetricCard label="Lost & Found Matches" value={metrics.pendingMatches || 0} helper="Possible matches to review" icon="search" />
+            </Link>
           </section>
 
           <section>
@@ -188,7 +191,10 @@ const AuthorityDashboard = () => {
             <div className="authority-section-header">
               <div>
                 <p className="authority-eyebrow">Lost & Found Monitoring</p>
-                <h2>Animal Reports and Potential Matches</h2>
+                <h2>Lost and Found Reports</h2>
+                <Link to="/admin/matches" className="text-link">
+                  {metrics.pendingMatches ? `${metrics.pendingMatches} possible match${metrics.pendingMatches === 1 ? '' : 'es'} to review →` : 'Review possible matches →'}
+                </Link>
               </div>
               <div className="authority-filter">
                 {['All', 'Lost', 'Found', 'In Progress', 'Resolved'].map((status) => (
@@ -212,17 +218,10 @@ const AuthorityDashboard = () => {
                       <strong>{report.petName}</strong>
                       <span className={statusClass(report.status)}>{report.status}</span>
                     </div>
+                    <p><strong>Type:</strong> {report.reportType === 'found' ? 'Found pet' : 'Lost pet'}{report.species ? ` · ${report.species}` : ''}</p>
                     <p><strong>Location:</strong> {report.location}</p>
                     <p><strong>Reported by:</strong> {report.reportedBy?.fullName || 'Unknown user'}</p>
                     <p><strong>Breed / Color:</strong> {report.breed} / {report.color}</p>
-                    {report.possibleMatches?.length > 0 && (
-                      <div className="match-box">
-                        <strong>Possible matches</strong>
-                        {report.possibleMatches.map((match) => (
-                          <span key={match._id}>{match.petName} · {match.location}</span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </article>
               ))}

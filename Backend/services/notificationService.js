@@ -305,6 +305,58 @@ This message was relayed by Pet Management System`,
   }
 };
 
+// Lost & Found: tell an owner or a finder that the authority has confirmed a possible match.
+// `role` is 'owner' (their lost pet may have been found) or 'finder' (the pet they found may have an owner).
+const sendPetMatchEmail = async (to, { role, name, petDescription, otherContact, foundLocation, foundDate, reviewNote, link }) => {
+  try {
+    const isOwner = role === 'owner';
+    const subject = isOwner
+      ? 'Good news: a pet matching yours has been found'
+      : 'The pet you found may have been identified';
+    const intro = isOwner
+      ? `A municipal officer has reviewed a "found" report and believes it may be your pet (${petDescription}).`
+      : `A municipal officer has reviewed your "found" report (${petDescription}) and believes the owner may have been identified.`;
+    const contactLine = otherContact
+      ? (isOwner ? `The finder can be reached at: ${otherContact}` : `The owner can be reached at: ${otherContact}`)
+      : (isOwner ? '' : 'The owner has been given your contact details and will get in touch with you.');
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || '"Pet Management System" <noreply@petmanagement.com>',
+      to,
+      subject,
+      text: `Dear ${name},
+
+${intro}
+${foundLocation ? `\nFound at: ${foundLocation}${foundDate ? ` on ${foundDate}` : ''}` : ''}
+${reviewNote ? `\nNote from the officer: ${reviewNote}` : ''}
+${contactLine ? `\n${contactLine}` : ''}
+
+Please check carefully that it is the same animal before arranging a hand-over.
+See the details here: ${link}
+
+---
+Pet Management System`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>${escapeHtml(subject)}</h2>
+          <p>Dear ${escapeHtml(name)},</p>
+          <p>${escapeHtml(intro)}</p>
+          ${foundLocation ? `<p><strong>Found at:</strong> ${escapeHtml(foundLocation)}${foundDate ? ` on ${escapeHtml(foundDate)}` : ''}</p>` : ''}
+          ${reviewNote ? `<p><strong>Note from the officer:</strong> ${escapeHtml(reviewNote)}</p>` : ''}
+          ${contactLine ? `<p><strong>${escapeHtml(contactLine)}</strong></p>` : ''}
+          <p>Please check carefully that it is the same animal before arranging a hand-over.</p>
+          <p><a href="${link}" style="display: inline-block; background: #667eea; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none;">View the match</a></p>
+        </div>
+      `
+    };
+
+    return await deliver(mailOptions);
+  } catch (error) {
+    console.error('Error sending pet match email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 // SMS notification placeholder (requires Twilio or similar service)
 const sendVaccinationReminderSMS = async (vaccination, phoneNumber, petName) => {
   // TODO: Implement SMS using Twilio
@@ -424,6 +476,7 @@ module.exports = {
   isEmailConfigured,
   sendIncidentAlertEmail,
   sendPasswordResetEmail,
+  sendPetMatchEmail,
   sendVaccinationReminderEmail,
   sendOverdueVaccinationEmail,
   sendFinderContactEmail,
