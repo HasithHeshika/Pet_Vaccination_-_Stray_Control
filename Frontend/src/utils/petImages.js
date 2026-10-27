@@ -18,31 +18,6 @@ const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
   reader.readAsDataURL(file);
 });
 
-// Shrink a photo (data URL) so its longest side is at most maxSize px, as JPEG.
-// Keeps lists light (e.g. the Lost & Found feed) without visibly losing detail.
-export const resizeImageDataUrl = (dataUrl, maxSize = 1024, quality = 0.82) => new Promise((resolve) => {
-  const image = new Image();
-  image.onload = () => {
-    const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
-    if (scale === 1 && dataUrl.length < 400 * 1024) {
-      resolve(dataUrl);
-      return;
-    }
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.round(image.width * scale);
-    canvas.height = Math.round(image.height * scale);
-    const context = canvas.getContext('2d');
-    if (!context) {
-      resolve(dataUrl);
-      return;
-    }
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    resolve(canvas.toDataURL('image/jpeg', quality));
-  };
-  image.onerror = () => resolve(dataUrl);
-  image.src = dataUrl;
-});
-
 export const readPetImageFiles = async (fileList, existingCount = 0) => {
   const files = Array.from(fileList || []);
 

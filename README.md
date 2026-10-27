@@ -24,7 +24,7 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 - **Automated Vaccination Reminders**: Background `node-cron` service and `nodemailer` integration to deliver email reminders for upcoming/overdue vaccinations (requires SMTP settings; a reminder is only marked as sent after it is delivered).
 - **Breeder Licensing System**: Full breeder application workflow, status tracking, renewal requests, and municipal authority approval dashboards.
 - **Animal Incident Reporting**: Anyone can report violence or abuse, a sick or injured animal in a public place, a stray, or any other animal incident, with urgency, photos, GPS location and optional contact details. Urgent reports are emailed to the authority and listed first on the authority dashboard.
-- **Lost & Found**: Lost and found reports (species, up to 2 photos, GPS, collar-tag Pet ID). Found reports are matched against open lost reports and registered pets; the authority reviews each suggested match and, on confirmation, the owner and finder are emailed. An AI photo check can be plugged in later (`Backend/services/matching/aiProviders/`).
+- **Lost & Found**: Public lost pet feed with reporter-managed status.
 
 ---
 
@@ -122,8 +122,6 @@ make dev-up
 | `CORS_ORIGINS` | Comma-separated browser origins allowed to call the API |
 | `ACS_EMAIL_CONNECTION_STRING`, `ACS_EMAIL_SENDER` | Outgoing email through Azure Communication Services (used in production) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | Alternative: outgoing email through any SMTP server. With neither ACS nor SMTP set, emails are only logged |
-| `MATCH_MAX_KM`, `MATCH_MAX_DAYS`, `MATCH_MIN_SCORE` | Optional Lost & Found matching limits (defaults 15 km, 30 days, score 40) |
-| `MATCH_AI_PROVIDER` | Optional AI photo check for matches; default `none` (no provider implemented yet) |
 | `REMINDER_CRON` | Schedule for the daily reminder check (default `0 9 * * *`) |
 | `AUTHORITY_ALERT_EMAILS` | Comma-separated addresses emailed about urgent or emergency animal incidents (default: all administrator accounts) |
 
@@ -174,17 +172,8 @@ Admins can also email a user a reset link with `POST /api/users/:id/send-passwor
 - `PATCH /:id/status` - Update report progress (*Admin Only*)
 
 ### Lost & Found (`/api/lost-and-found`)
-- `POST /` - Submit a lost or found report, `reportType: lost|found` (*Private*)
-- `GET /?type=lost|found` - Public feed (first photo of each report only)
-- `GET /:id` - One report with all photos
-- `PUT /:id`, `DELETE /:id` - Edit or delete a report (*reporter or Admin*)
+- `POST /` - Submit a lost pet report (*Private*)
+- `GET /` - Public lost and found feed
 - `PATCH /:id/status` - Update report status (*reporter or Admin*)
-
-### Lost & Found matches (`/api/matches`)
-- `GET /mine` - Confirmed matches for my reports and registered pets (*Private*)
-- `GET /?status=suggested|confirmed|rejected` - Matches to review, highest score first (*Admin Only*)
-- `GET /:id` - Both sides in full, score breakdown and AI result (*Admin Only*)
-- `PATCH /:id` - `{decision: confirm|reject, note}`; confirming emails the owner and finder (*Admin Only*)
-- `POST /rerun/:reportId` - Run matching again for one report (*Admin Only*)
 
 ---

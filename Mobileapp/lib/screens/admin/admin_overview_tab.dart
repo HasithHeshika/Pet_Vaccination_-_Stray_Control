@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/admin_service.dart';
 import '../../utils/admin_ui.dart';
-import 'admin_matches_screen.dart';
 
 // Municipal overview: the same figures as the web Authority Dashboard
 class AdminOverviewTab extends StatefulWidget {
@@ -38,17 +37,11 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     }
   }
 
-  Future<void> _openMatches() async {
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminMatchesScreen()));
-    if (mounted) _load();
-  }
-
   @override
   Widget build(BuildContext context) {
     final metrics = Map<String, dynamic>.from(_dashboard?['metrics'] ?? {});
     final urgent = (metrics['openUrgentIncidents'] ?? 0) as num;
     final pendingLicences = (metrics['pendingLicenseRequests'] ?? 0) as num;
-    final pendingMatches = (metrics['pendingMatches'] ?? 0) as num;
 
     return AdminListState(
       loading: _loading,
@@ -73,12 +66,6 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
               onTap: () => widget.onOpenTab(3),
               color: Colors.orange.shade800,
             ),
-          if (pendingMatches > 0)
-            _AlertBanner(
-              text: '$pendingMatches possible lost & found match${pendingMatches == 1 ? '' : 'es'} to review',
-              onTap: _openMatches,
-              color: Colors.green.shade800,
-            ),
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -97,15 +84,6 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
             ],
           ),
           const SizedBox(height: 16),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.compare_arrows, color: adminLightBrown),
-              title: const Text('Lost & Found matches'),
-              subtitle: Text('$pendingMatches awaiting review · confirm to notify owner and finder'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: _openMatches,
-            ),
-          ),
           Card(
             child: ListTile(
               leading: const Icon(Icons.people_alt, color: adminLightBrown),

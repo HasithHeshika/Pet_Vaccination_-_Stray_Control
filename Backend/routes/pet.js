@@ -12,7 +12,6 @@ const rateLimit = require('../middleware/rateLimit');
 const crypto = require('crypto');
 const { generateQRCode } = require('../utils/qrGenerator');
 const { sendFinderContactEmail } = require('../services/notificationService');
-const { queueMatchingForPet } = require('../services/matching/matchService');
 
 const { MAX_IMAGES: MAX_PET_IMAGES, validateImage: validatePetImage } = require('../utils/imageValidation');
 
@@ -118,8 +117,6 @@ router.post('/register', authMiddleware, adminMiddleware, [
     });
 
     await pet.save();
-    // A newly registered pet may match a pet someone has already reported found
-    queueMatchingForPet(pet);
 
     // Populate owner details
     await pet.populate('owner', 'fullName email phone address');
