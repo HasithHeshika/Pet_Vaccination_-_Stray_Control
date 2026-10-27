@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../utils/admin_ui.dart';
 import '../login_screen.dart';
+import '../profile_screen.dart';
 import 'admin_incidents_tab.dart';
 import 'admin_licences_tab.dart';
 import 'admin_overview_tab.dart';
@@ -47,6 +48,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         elevation: 0,
         iconTheme: const IconThemeData(color: adminBrown),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle, color: adminBrown),
+            tooltip: 'My profile',
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
+          ),
           IconButton(icon: const Icon(Icons.logout, color: adminBrown), tooltip: 'Log out', onPressed: _logout),
         ],
       ),
