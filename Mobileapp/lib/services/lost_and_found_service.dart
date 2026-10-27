@@ -1,29 +1,15 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'api_client.dart';
 
 class LostAndFoundService {
   final ApiClient _client = ApiClient();
 
-  Exception _error(http.Response response, String fallback) {
-    String message = fallback;
-    try {
-      message = jsonDecode(response.body)['message'] ?? fallback;
-    } catch (_) {}
-    // The server's catch-all 404 means this app is newer than the server
-    if (message == 'Route not found') {
-      message = 'This feature is not available on the server yet. Please try again after the next server update.';
-    }
-    return Exception(message);
-  }
-
-  // type: 'lost', 'found' or null for all. Lists include only the first photo of each report.
-  Future<List<dynamic>> getLostAndFoundList({String? type}) async {
-    final response = await _client.get('/api/lost-and-found${type != null ? '?type=$type' : ''}');
+  Future<List<dynamic>> getLostAndFoundList() async {
+    final response = await _client.get('/api/lost-and-found');
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw _error(response, 'Failed to load lost and found reports');
+    throw Exception('Failed to load lost and found items');
   }
 
   Future<Map<String, dynamic>> getLostAndFoundById(String id) async {
@@ -31,16 +17,15 @@ class LostAndFoundService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw _error(response, 'Failed to load the report');
+    throw Exception('Failed to load lost and found item');
   }
 
-  // data['reportType'] is 'lost' or 'found'
   Future<Map<String, dynamic>> reportLost(Map<String, dynamic> data) async {
     final response = await _client.post('/api/lost-and-found', body: data);
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw _error(response, 'Failed to submit the report');
+    throw Exception('Failed to report lost item');
   }
 
   Future<Map<String, dynamic>> updateLostAndFound(String id, Map<String, dynamic> data) async {
@@ -48,7 +33,7 @@ class LostAndFoundService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw _error(response, 'Failed to update the report');
+    throw Exception('Failed to update lost and found item');
   }
 
   Future<Map<String, dynamic>> updateStatus(String id, String status) async {
@@ -56,23 +41,13 @@ class LostAndFoundService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    throw _error(response, 'Failed to update status');
+    throw Exception('Failed to update status');
   }
 
   Future<void> deleteLostAndFound(String id) async {
     final response = await _client.delete('/api/lost-and-found/$id');
     if (response.statusCode != 200) {
-      throw _error(response, 'Failed to delete the report');
+      throw Exception('Failed to delete item');
     }
-  }
-
-  // Matches the authority has confirmed for my reports or registered pets
-  Future<List<dynamic>> getMyMatches() async {
-    final response = await _client.get('/api/matches/mine');
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      return decoded is Map && decoded['matches'] is List ? decoded['matches'] : [];
-    }
-    throw _error(response, 'Failed to load your matches');
   }
 }

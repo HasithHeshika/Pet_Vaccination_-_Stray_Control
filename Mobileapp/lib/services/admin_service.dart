@@ -14,10 +14,6 @@ class AdminService {
       body = null;
     }
     if (ok.contains(response.statusCode)) return body;
-    // The server's catch-all 404 means this app is newer than the server
-    if (body is Map && body['message'] == 'Route not found') {
-      throw Exception('This feature is not available on the server yet. Please try again after the next server update.');
-    }
     final message = body is Map && body['message'] != null ? body['message'].toString() : fallbackMessage;
     throw Exception(message);
   }
@@ -94,29 +90,5 @@ class AdminService {
 
   Future<void> updateIncidentStatus(String id, String status) async {
     _decode(await _client.patch('/api/stray-reports/$id/status', body: {'status': status}), 'Failed to update the report');
-  }
-
-  // ---- Lost & Found matches ----
-  // Returns {matches: [...], counts: {suggested, confirmed, rejected}}
-  Future<Map<String, dynamic>> getMatches(String status) async =>
-      Map<String, dynamic>.from(_decode(await _client.get('/api/matches?status=$status'), 'Failed to load matches') ?? {});
-
-  Future<Map<String, dynamic>> getMatch(String id) async {
-    final body = _decode(await _client.get('/api/matches/$id'), 'Failed to load the match');
-    return Map<String, dynamic>.from(body?['match'] ?? {});
-  }
-
-  // decision: 'confirm' or 'reject'
-  Future<String> reviewMatch(String id, String decision, String note) async {
-    final body = _decode(
-      await _client.patch('/api/matches/$id', body: {'decision': decision, if (note.isNotEmpty) 'note': note}),
-      'Failed to save the decision',
-    );
-    return (body?['message'] ?? 'Saved').toString();
-  }
-
-  Future<String> rerunMatching(String reportId) async {
-    final body = _decode(await _client.post('/api/matches/rerun/$reportId'), 'Failed to re-run matching');
-    return (body?['message'] ?? 'Matching re-run').toString();
   }
 }

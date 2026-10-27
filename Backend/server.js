@@ -100,20 +100,6 @@ const backfillIncidentFields = async () => {
     if (legacy.modifiedCount > 0 || ranked > 0) {
       console.log(`Backfilled incident fields on ${legacy.modifiedCount} older report(s), status order on ${ranked}`);
     }
-
-    // Lost & Found reports created before report types existed: "Found" status meant a found report
-    const LostReport = require('./models/LostReport');
-    const found = await LostReport.updateMany(
-      { reportType: { $exists: false }, status: 'Found' },
-      { $set: { reportType: 'found' } }
-    );
-    const lost = await LostReport.updateMany(
-      { reportType: { $exists: false } },
-      { $set: { reportType: 'lost' } }
-    );
-    if (found.modifiedCount > 0 || lost.modifiedCount > 0) {
-      console.log(`Backfilled report type on ${found.modifiedCount} found and ${lost.modifiedCount} lost report(s)`);
-    }
   } catch (error) {
     console.error('Error backfilling incident fields:', error);
   }
@@ -138,7 +124,6 @@ const incidentRoutes = require('./routes/strayReport');
 app.use('/api/stray-reports', incidentRoutes);
 app.use('/api/incidents', incidentRoutes);
 app.use('/api/lost-and-found', require('./routes/lostReport'));
-app.use('/api/matches', require('./routes/match'));
 app.use('/api/licenses', require('./routes/license'));
 app.use('/api/authority', require('./routes/authority'));
 

@@ -195,35 +195,3 @@
     gap: 0;
   }
 }
-
-/* Report type + status badges */
-.lost-found-badge.match {
-  background-color: #16a34a;
-}
-
-.lost-found-status {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 5px 10px;
-  border-radius: 20px;
-  background: rgba(15, 23, 42, 0.75);
-  color: #fff;
-  font-weight: bold;
-  font-size: 0.75rem;
-}
-
-.pet-photo-count {
-  font-size: 0.85rem !important;
-  color: #52677f !important;
-}
-
-.match-card .pet-info h3 {
-  font-size: 1.05rem;
-}
-
-.match-warning {
-  margin-top: 0.75rem !important;
-  font-size: 0.85rem !important;
-  color: #92400e !important;
-}

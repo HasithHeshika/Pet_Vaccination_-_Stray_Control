@@ -4,7 +4,6 @@ import axios from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import { readPetImageFiles, MAX_PET_IMAGES } from '../../utils/petImages';
 import { INCIDENT_TYPES, URGENCY_LEVELS, mapLink } from '../../utils/incidents';
-import { useCurrentLocation } from '../../utils/geolocation';
 import '../LostAndFound/LostFound.css'; // Reusing similar styles
 import './ReportIncident.css';
 
@@ -23,9 +22,9 @@ const ReportStrayForm = () => {
     reporterName: user?.fullName || '',
     reporterContact: ''
   });
-  const {
-    coordinates, setCoordinates, locating, locationError, requestLocation: handleUseMyLocation
-  } = useCurrentLocation();
+  const [coordinates, setCoordinates] = useState(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
   const [photos, setPhotos] = useState([]);
   const [photoError, setPhotoError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,6 +38,29 @@ const ReportStrayForm = () => {
   const handleTypeChange = (type) => {
     // Violence and injuries default to Urgent; the reporter can still change it
     setFormData({ ...formData, incidentType: type.value, urgency: type.defaultUrgency });
+  };
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Your browser cannot share your location. Please describe the location instead.');
+      return;
+    }
+    setLocating(true);
+    setLocationError('');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoordinates({
+          lat: Number(position.coords.latitude.toFixed(6)),
+          lng: Number(position.coords.longitude.toFixed(6))
+        });
+        setLocating(false);
+      },
+      () => {
+        setLocationError('Could not get your location. Please allow location access or describe the location instead.');
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
   };
 
   const handlePhotoChange = async (e) => {
