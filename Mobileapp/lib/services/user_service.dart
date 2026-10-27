@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_client.dart';
 
 class UserService {
@@ -46,10 +47,20 @@ class UserService {
       'currentPassword': currentPassword,
       'newPassword': newPassword,
     });
+    dynamic body;
+    try {
+      body = jsonDecode(response.body);
+    } catch (_) {}
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      // The server signs out all older sessions on a password change; keep this one with the new token
+      if (body is Map && body['token'] is String) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', body['token']);
+      }
+      return Map<String, dynamic>.from(body ?? {});
     }
-    throw Exception('Failed to change password');
+    // e.g. "Current password is incorrect"
+    throw Exception(body is Map && body['message'] != null ? body['message'] : 'Failed to change password');
   }
 
   Future<void> verifyUser(String userId) async {

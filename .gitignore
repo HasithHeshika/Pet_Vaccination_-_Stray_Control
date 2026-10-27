@@ -34,6 +34,7 @@ dist/
 
 # Testing
 coverage/
+.c8tmp/
 .nyc_output/
 
 # Docker

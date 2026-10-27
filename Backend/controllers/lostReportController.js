@@ -28,9 +28,6 @@ const sendValidationOr500 = (res, error, logLabel) => {
   return res.status(500).json({ message: 'Server error' });
 };
 
-// Feed and lists send only the first photo; GET /:id returns all of them
-const LIST_PROJECTION = { images: { $slice: 1 } };
-
 exports.createLostReport = async (req, res) => {
   try {
     // The mobile app historically sent `type`; accept it as an alias
@@ -79,10 +76,9 @@ exports.getLostReports = async (req, res) => {
   try {
     const filter = {};
     if (REPORT_TYPES.includes(req.query.type)) filter.reportType = req.query.type;
-    // Public feed: show the reporter's name only; the reporter chooses what goes in contactInfo
-    const reports = await LostReport.find(filter, LIST_PROJECTION)
-      .sort({ createdAt: -1 })
-      .populate('reportedBy', 'fullName');
+    // Public feed: show the reporter's name only; the reporter chooses what goes in contactInfo.
+    // Each item carries a small preview photo; GET /:id returns the full photos.
+    const reports = await LostReport.findForList(filter, { populate: { path: 'reportedBy', select: 'fullName' } });
     res.status(200).json(reports);
   } catch (error) {
     console.error('Get reports error:', error);
@@ -92,7 +88,7 @@ exports.getLostReports = async (req, res) => {
 
 exports.getLostReportById = async (req, res) => {
   try {
-    const report = await LostReport.findById(req.params.id).populate('reportedBy', 'fullName');
+    const report = await LostReport.findById(req.params.id).select('-thumbnail').populate('reportedBy', 'fullName');
     if (!report) {
       return res.status(404).json({ message: 'Report not found' });
     }

@@ -1,0 +1,143 @@
+{
+  "when": "2026-10-27T10:09:05.902Z",
+  "api": "https://pet-control-api-fxhkd7fwa5e2gtem.malaysiawest-01.azurewebsites.net",
+  "web": "https://lively-sky-055ae2000.7.azurestaticapps.net",
+  "checks": [
+    {
+      "name": "API is up",
+      "pass": true,
+      "detail": "first request 67425 ms"
+    },
+    {
+      "name": "Web app loads",
+      "pass": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Deep links work (single-page app fallback)",
+      "pass": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Plain HTTP is redirected to HTTPS",
+      "pass": true,
+      "detail": "HTTP 301"
+    },
+    {
+      "name": "API sends X-Content-Type-Options: nosniff",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "API sends a frame-blocking header",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "API does not advertise Express (X-Powered-By)",
+      "pass": true,
+      "detail": "absent"
+    },
+    {
+      "name": "CORS allows the web app",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "CORS refuses other websites",
+      "pass": true,
+      "detail": "no allow-origin header"
+    },
+    {
+      "name": "Guest is refused /api/users",
+      "pass": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Guest is refused /api/pets",
+      "pass": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Guest is refused /api/matches",
+      "pass": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Guest is refused /api/authority/dashboard",
+      "pass": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Unknown routes return JSON 404",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Wrong credentials are refused",
+      "pass": true,
+      "detail": "HTTP 400"
+    },
+    {
+      "name": "Admin can log in",
+      "pass": true,
+      "detail": "HTTP 200, 454 ms"
+    },
+    {
+      "name": "Authority dashboard loads",
+      "pass": true,
+      "detail": "1252 ms"
+    },
+    {
+      "name": "Match review list loads",
+      "pass": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "A lost report can be created",
+      "pass": true,
+      "detail": "HTTP 201"
+    },
+    {
+      "name": "It appears in the public feed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "It can be deleted (clean-up)",
+      "pass": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "It is gone afterwards",
+      "pass": true,
+      "detail": "HTTP 404"
+    }
+  ],
+  "responseTimes": [
+    {
+      "label": "API health check",
+      "url": "{API}/",
+      "samples": 10,
+      "minMs": 69,
+      "medianMs": 173,
+      "maxMs": 967
+    },
+    {
+      "label": "Public Lost & Found feed",
+      "url": "{API}/api/lost-and-found",
+      "samples": 10,
+      "minMs": 151,
+      "medianMs": 209,
+      "maxMs": 492
+    },
+    {
+      "label": "Web app landing page (HTML)",
+      "url": "{WEB}/",
+      "samples": 10,
+      "minMs": 91,
+      "medianMs": 102,
+      "maxMs": 943
+    }
+  ]
+}

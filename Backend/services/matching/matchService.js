@@ -42,10 +42,13 @@ const scoreSpecies = (a, b) => (isUnknown(a) || isUnknown(b) ? 10 : (clean(a) ==
 
 const scoreBreed = (a, b) => {
   if (isUnknown(a) || isUnknown(b)) return 8;
-  const x = clean(a).replace(/[^a-z ]/g, '');
-  const y = clean(b).replace(/[^a-z ]/g, '');
+  const x = clean(a).replace(/[^a-z ]/g, '').trim();
+  const y = clean(b).replace(/[^a-z ]/g, '').trim();
+  // No letters left (e.g. "123"): as good as unknown, and "" would otherwise be "part of" every breed
+  if (!x || !y) return 8;
   if (x === y) return 25;
-  if (x.includes(y) || y.includes(x)) return 18;
+  // Partial names ("Labrador" vs "Labrador Retriever"), but not single letters or fragments
+  if (Math.min(x.length, y.length) >= 3 && (x.includes(y) || y.includes(x))) return 18;
   return 0;
 };
 

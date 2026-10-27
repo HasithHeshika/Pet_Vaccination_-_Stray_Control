@@ -5,7 +5,11 @@ const User = require('../models/User');
 const Pet = require('../models/Pet');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
+const jwt = require('jsonwebtoken');
 const { createAndSendPasswordReset } = require('../services/passwordReset');
+
+// Optional text field: isString() first, so objects such as {"$gt": ""} are refused with 400
+const textField = (field, message) => body(field).optional().isString().withMessage(message).bail().trim().notEmpty().withMessage(message);
 
 const MAX_PROFILE_PICTURE_SIZE = 2 * 1024 * 1024;
 const PROFILE_PICTURE_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/;
@@ -83,12 +87,12 @@ router.get('/:id([0-9a-fA-F]{24})/pets', authMiddleware, async (req, res) => {
 // @desc    Update own profile (any authenticated user)
 // @access  Private
 router.put('/profile', authMiddleware, [
-  body('fullName').optional().trim().notEmpty().withMessage('Full name cannot be empty'),
-  body('phone').optional().notEmpty().withMessage('Phone cannot be empty'),
-  body('address.street').optional().notEmpty().withMessage('Street cannot be empty'),
-  body('address.city').optional().notEmpty().withMessage('City cannot be empty'),
-  body('address.province').optional().notEmpty().withMessage('Province cannot be empty'),
-  body('address.postalCode').optional().notEmpty().withMessage('Postal code cannot be empty'),
+  textField('fullName', 'Full name cannot be empty'),
+  textField('phone', 'Phone cannot be empty'),
+  textField('address.street', 'Street cannot be empty'),
+  textField('address.city', 'City cannot be empty'),
+  textField('address.province', 'Province cannot be empty'),
+  textField('address.postalCode', 'Postal code cannot be empty'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -237,8 +241,10 @@ router.patch('/:id([0-9a-fA-F]{24})/verify', authMiddleware, adminMiddleware, as
 // @desc    Change own password
 // @access  Private
 router.put('/change-password', authMiddleware, [
-  body('currentPassword').notEmpty().withMessage('Current password is required'),
-  body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
+  body('currentPassword').isString().withMessage('Current password is required').bail()
+    .notEmpty().withMessage('Current password is required'),
+  body('newPassword').isString().withMessage('New password must be at least 6 characters').bail()
+    .isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -259,9 +265,12 @@ router.put('/change-password', authMiddleware, [
     }
 
     user.password = newPassword;
+    // Sign out every other session (a stolen token stops working), and give this one a fresh token
+    user.passwordChangedAt = new Date();
     await user.save();
 
-    res.json({ message: 'Password changed successfully' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.json({ message: 'Password changed successfully', token });
   } catch (error) {
     console.error('Change password error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -294,14 +303,15 @@ router.post('/:id([0-9a-fA-F]{24})/send-password-reset', authMiddleware, adminMi
 // @desc    Update any user (Admin only)
 // @access  Private/Admin
 router.put('/:id([0-9a-fA-F]{24})', authMiddleware, adminMiddleware, [
-  body('fullName').optional().trim().notEmpty().withMessage('Full name cannot be empty'),
-  body('phone').optional().notEmpty().withMessage('Phone cannot be empty'),
-  body('email').optional().isEmail().withMessage('Valid email is required'),
-  body('nicNumber').optional().notEmpty().withMessage('NIC cannot be empty'),
-  body('address.street').optional().notEmpty().withMessage('Street cannot be empty'),
-  body('address.city').optional().notEmpty().withMessage('City cannot be empty'),
-  body('address.province').optional().notEmpty().withMessage('Province cannot be empty'),
-  body('address.postalCode').optional().notEmpty().withMessage('Postal code cannot be empty'),
+  textField('fullName', 'Full name cannot be empty'),
+  textField('phone', 'Phone cannot be empty'),
+  body('email').optional().isString().withMessage('Valid email is required').bail()
+    .trim().toLowerCase().isEmail().withMessage('Valid email is required'),
+  textField('nicNumber', 'NIC cannot be empty'),
+  textField('address.street', 'Street cannot be empty'),
+  textField('address.city', 'City cannot be empty'),
+  textField('address.province', 'Province cannot be empty'),
+  textField('address.postalCode', 'Postal code cannot be empty'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);

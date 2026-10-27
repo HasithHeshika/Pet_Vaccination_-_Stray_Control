@@ -5,7 +5,7 @@ import axios from '../../api/axios';
 import ProfileAvatar from '../ProfileAvatar';
 
 const EditProfile = () => {
-  const { user, token, refreshUser } = useAuth();
+  const { user, token, refreshUser, updateToken } = useAuth();
   const navigate = useNavigate();
   const pictureInputRef = useRef(null);
   const cropDragRef = useRef(null);
@@ -114,6 +114,8 @@ const EditProfile = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
+      // Other devices are now signed out; keep this one signed in with the new token
+      if (response.data.token) updateToken(response.data.token);
       setPwMessage(response.data.message);
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
@@ -385,8 +387,9 @@ const EditProfile = () => {
           <form onSubmit={handleProfileSubmit}>
             <div className="profile-form-grid">
               <div className="form-group">
-                <label>Full Name</label>
+                <label htmlFor="profile-fullName">Full Name</label>
                 <input
+                  id="profile-fullName"
                   type="text"
                   name="fullName"
                   value={formData.fullName}
@@ -395,8 +398,9 @@ const EditProfile = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Phone</label>
+                <label htmlFor="profile-phone">Phone</label>
                 <input
+                  id="profile-phone"
                   type="text"
                   name="phone"
                   value={formData.phone}
@@ -405,8 +409,9 @@ const EditProfile = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Street</label>
+                <label htmlFor="profile-street">Street</label>
                 <input
+                  id="profile-street"
                   type="text"
                   name="street"
                   value={formData.street}
@@ -415,8 +420,9 @@ const EditProfile = () => {
                 />
               </div>
               <div className="form-group">
-                <label>City</label>
+                <label htmlFor="profile-city">City</label>
                 <input
+                  id="profile-city"
                   type="text"
                   name="city"
                   value={formData.city}
@@ -425,8 +431,9 @@ const EditProfile = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Province</label>
+                <label htmlFor="profile-province">Province</label>
                 <input
+                  id="profile-province"
                   type="text"
                   name="province"
                   value={formData.province}
@@ -435,8 +442,9 @@ const EditProfile = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Postal Code</label>
+                <label htmlFor="profile-postalCode">Postal Code</label>
                 <input
+                  id="profile-postalCode"
                   type="text"
                   name="postalCode"
                   value={formData.postalCode}
@@ -471,9 +479,10 @@ const EditProfile = () => {
 
           <form onSubmit={handlePasswordSubmit} style={{ maxWidth: '450px' }}>
             <div className="form-group">
-              <label>Current Password</label>
+              <label htmlFor="profile-currentPassword">Current Password</label>
               <input
-                type="password"
+                id="profile-currentPassword"
+                  type="password"
                 name="currentPassword"
                 value={passwordData.currentPassword}
                 onChange={handlePasswordChange}
@@ -481,9 +490,10 @@ const EditProfile = () => {
               />
             </div>
             <div className="form-group">
-              <label>New Password</label>
+              <label htmlFor="profile-newPassword">New Password</label>
               <input
-                type="password"
+                id="profile-newPassword"
+                  type="password"
                 name="newPassword"
                 value={passwordData.newPassword}
                 onChange={handlePasswordChange}
@@ -492,9 +502,10 @@ const EditProfile = () => {
               />
             </div>
             <div className="form-group">
-              <label>Confirm New Password</label>
+              <label htmlFor="profile-confirmPassword">Confirm New Password</label>
               <input
-                type="password"
+                id="profile-confirmPassword"
+                  type="password"
                 name="confirmPassword"
                 value={passwordData.confirmPassword}
                 onChange={handlePasswordChange}

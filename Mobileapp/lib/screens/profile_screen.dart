@@ -160,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password updated successfully!")));
                          }
                        } catch (e) {
-                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red));
+                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red));
                          setStateModal(() => isChanging = false);
                        }
                     }

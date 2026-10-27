@@ -75,10 +75,7 @@ router.get('/dashboard', auth, admin, async (req, res) => {
         .populate('owner', 'fullName email phone')
         .sort({ registrationDate: -1 })
         .limit(12),
-      LostReport.find({}, { images: { $slice: 1 } })
-        .populate('reportedBy', 'fullName email phone')
-        .sort({ createdAt: -1 })
-        .limit(30),
+      LostReport.findForList({}, { limit: 30, populate: { path: 'reportedBy', select: 'fullName email phone' } }),
       StrayReport.countDocuments(),
       // Open incidents first, most urgent first; photos are loaded separately per report
       StrayReport.find()
@@ -92,6 +89,7 @@ router.get('/dashboard', auth, admin, async (req, res) => {
       urgency: { $in: ['emergency', 'urgent'] }
     });
 
+    // Preview photos only (the full photos open from the report itself)
     const lostFound = lostFoundReports.map((report) => normalizeLostReport(report));
     const pendingMatches = await PetMatch.countDocuments({ status: 'suggested' });
 

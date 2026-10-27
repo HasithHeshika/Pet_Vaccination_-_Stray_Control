@@ -52,9 +52,8 @@ const VaccinationSchedule = () => {
   useEffect(() => {
     if (token && user) {
       setLoading(true);
-      fetchUserPets();
-      fetchUpcomingVaccinations();
-      setLoading(false);
+      // Wait for both, so "All your pets are up to date" is not shown before the data arrives
+      Promise.all([fetchUserPets(), fetchUpcomingVaccinations()]).finally(() => setLoading(false));
     }
   }, [token, user, fetchUserPets, fetchUpcomingVaccinations]);
 
@@ -123,8 +122,9 @@ const VaccinationSchedule = () => {
         
         {pets.length > 1 && (
           <div style={{ marginBottom: '20px', animation: 'fadeIn 0.6s ease-in-out' }}>
-            <label style={{ marginRight: '15px', fontWeight: '700', fontSize: '16px', color: 'var(--pet-ember-espresso)' }}>Filter by Pet:</label>
-            <select 
+            <label htmlFor="vaccination-pet-filter" style={{ marginRight: '15px', fontWeight: '700', fontSize: '16px', color: 'var(--pet-ember-espresso)' }}>Filter by Pet:</label>
+            <select
+              id="vaccination-pet-filter"
               value={selectedPetId}
               onChange={(e) => setSelectedPetId(e.target.value)}
               style={{

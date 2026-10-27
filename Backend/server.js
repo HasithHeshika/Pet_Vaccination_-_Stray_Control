@@ -119,6 +119,26 @@ const backfillIncidentFields = async () => {
   }
 };
 
+// Preview photos for Lost & Found reports saved before thumbnails existed.
+// Runs in the background after start-up, one report at a time, so it never delays requests.
+const backfillThumbnails = async () => {
+  try {
+    const { thumbnailsEnabled } = require('./utils/thumbnail');
+    if (!thumbnailsEnabled()) return;
+    const LostReport = require('./models/LostReport');
+    const ids = await LostReport.find({ thumbnail: { $exists: false }, 'images.0': { $exists: true } }).distinct('_id');
+    for (const id of ids) {
+      const report = await LostReport.findById(id);
+      if (!report) continue;
+      report.markModified('images'); // the save hook then creates the preview
+      await report.save();
+    }
+    if (ids.length > 0) console.log(`Created preview photos for ${ids.length} Lost & Found report(s)`);
+  } catch (error) {
+    console.error('Error creating preview photos:', error);
+  }
+};
+
 // Brute-force protection on credential endpoints
 // Only failed attempts count, so many users behind one campus/office network can still log in
 const authLimiter = rateLimit({
@@ -154,6 +174,13 @@ app.use((req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  // Client mistakes from the JSON body parser are not server errors
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ message: 'The request body is not valid JSON' });
+  }
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'The request is too large. Please use smaller photos.' });
+  }
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
@@ -209,6 +236,7 @@ const startServer = async () => {
     
     // Start server
     const server = await listenOnAvailablePort(process.env.PORT);
+    backfillThumbnails();
 
     // Graceful shutdown
     process.on('SIGTERM', () => {
@@ -226,6 +254,14 @@ const startServer = async () => {
         process.exit(0);
       });
     });
+
+    // When started by the test harness (IPC channel), shut down on request.
+    // Windows cannot deliver SIGTERM, and a clean exit lets coverage data be written.
+    if (process.send) {
+      process.on('message', (message) => {
+        if (message === 'shutdown') process.exit(0);
+      });
+    }
 
     return server;
   } catch (error) {

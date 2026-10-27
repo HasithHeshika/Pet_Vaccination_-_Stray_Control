@@ -85,7 +85,7 @@ before(async () => {
       ACS_EMAIL_SENDER: '',
       NODE_ENV: 'test'
     },
-    stdio: process.env.TEST_VERBOSE ? 'inherit' : 'ignore'
+    stdio: process.env.TEST_VERBOSE ? ['inherit', 'inherit', 'inherit', 'ipc'] : ['ignore', 'ignore', 'ignore', 'ipc']
   });
   await waitForServer();
 
@@ -112,7 +112,13 @@ before(async () => {
 });
 
 after(async () => {
-  if (server) server.kill();
+  if (!server || server.exitCode !== null) return;
+  // Ask for a clean exit (so coverage is written), then force it if needed
+  const exited = new Promise(resolve => server.once('exit', resolve));
+  server.send('shutdown');
+  const timer = setTimeout(() => server.kill(), 5000);
+  await exited;
+  clearTimeout(timer);
 });
 
 test('QR code points at the public profile on the configured frontend', () => {
@@ -570,6 +576,230 @@ test('forgot / reset password: no account discovery, one-time token, old session
   const afterAdmin = await users.findOne({ _id: stored._id });
   assert.ok(afterAdmin.passwordResetExpires > new Date(), 'admin request created a fresh token');
   await mongoose.disconnect();
+});
+
+// ---------------------------------------------------------------------------
+// QA: security and access-control tests
+// ---------------------------------------------------------------------------
+
+test('access control matrix: admin-only endpoints reject guests (401) and normal users (403)', async () => {
+  const adminOnly = [
+    '/api/users', '/api/pets', '/api/stray-reports', '/api/licenses', '/api/authority/dashboard',
+    '/api/matches', '/api/vaccinations/upcoming', '/api/vaccinations/overdue'
+  ];
+  for (const url of adminOnly) {
+    assert.equal((await api('GET', url)).status, 401, `${url} without a token`);
+    assert.equal((await api('GET', url, { token: ctx.owner.token })).status, 403, `${url} as a normal user`);
+    assert.equal((await api('GET', url, { token: ctx.adminToken })).status, 200, `${url} as admin`);
+  }
+  // Vet-only patient search
+  assert.equal((await api('GET', '/api/pets/search?q=Rex', { token: ctx.owner.token })).status, 403);
+  assert.equal((await api('GET', '/api/pets/search?q=Rex', { token: ctx.vet.token })).status, 200);
+  // Recording vaccinations is for vets only
+  const asOwner = await api('POST', '/api/vaccinations', {
+    token: ctx.owner.token, body: { petId: ctx.pet._id, vaccineName: 'Rabies', dateAdministered: '2026-10-01' }
+  });
+  assert.equal(asOwner.status, 403);
+});
+
+test("users cannot read other users' pets, licences or profiles (no IDOR)", async () => {
+  assert.equal((await api('GET', `/api/users/${ctx.owner.id}/pets`, { token: ctx.other.token })).status, 403);
+  assert.equal((await api('GET', `/api/pets/${ctx.pet._id}`, { token: ctx.other.token })).status, 403);
+  assert.equal((await api('GET', `/api/users/${ctx.owner.id}`, { token: ctx.other.token })).status, 403);
+  const mine = await api('GET', `/api/users/${ctx.owner.id}/pets`, { token: ctx.owner.token });
+  assert.equal(mine.status, 200);
+  assert.equal(mine.data.pets.length, 1);
+
+  const licence = await api('POST', '/api/licenses/apply', {
+    token: ctx.owner.token,
+    body: { animalTypes: ['Cat'], numberOfAnimals: 2, facilityDescription: 'Cattery', yearsOfExperience: 1 }
+  });
+  assert.equal(licence.status, 201);
+  assert.equal((await api('GET', `/api/licenses/${licence.data._id}`, { token: ctx.other.token })).status, 403);
+  assert.equal((await api('GET', `/api/licenses/${licence.data._id}`, { token: ctx.owner.token })).status, 200);
+});
+
+test('tampered, foreign, unsigned and expired tokens are all rejected', async () => {
+  const jwt = require('jsonwebtoken');
+  const [header, payload, signature] = ctx.owner.token.split('.');
+  const flipped = `${header}.${payload}.${signature.slice(0, -2)}${signature.endsWith('AA') ? 'BB' : 'AA'}`;
+  const forged = jwt.sign({ userId: ctx.owner.id }, 'not-the-server-secret');
+  const unsigned = `${Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url')}.${payload}.`;
+  const expired = jwt.sign({ userId: ctx.owner.id, exp: Math.floor(Date.now() / 1000) - 60 }, 'test-secret');
+  const ghost = jwt.sign({ userId: '64b000000000000000000000' }, 'test-secret');
+  // Same signature, but the payload edited to point at the admin account
+  const adminId = (await api('GET', '/api/auth/me', { token: ctx.adminToken })).data.user.id;
+  const editedPayload = { ...JSON.parse(Buffer.from(payload, 'base64url').toString()), userId: adminId };
+  const swapped = `${header}.${Buffer.from(JSON.stringify(editedPayload)).toString('base64url')}.${signature}`;
+
+  for (const [name, token] of Object.entries({ flipped, forged, unsigned, expired, ghost, swapped })) {
+    const res = await api('GET', '/api/auth/me', { token });
+    assert.equal(res.status, 401, `${name} token should be rejected`);
+  }
+  assert.equal((await api('GET', '/api/auth/me', { token: ctx.owner.token })).status, 200);
+});
+
+test('signup and profile updates cannot grant admin rights or skip verification', async () => {
+  const signup = await api('POST', '/api/auth/signup', {
+    body: {
+      fullName: 'Sneaky', email: 'sneaky@test.local', password: 'Passw0rd!', phone: '0770000000',
+      nicNumber: '199512340001', role: 'admin', isAdmin: true, isVerified: true,
+      address: { street: 'x', city: 'Galle', province: 'Southern', postalCode: '80000' }
+    }
+  });
+  assert.equal(signup.status, 201);
+  assert.equal(signup.data.user.role, 'user');
+  assert.equal(signup.data.user.isAdmin, false);
+  // Still pending: cannot log in until an administrator verifies the account
+  const pending = await api('POST', '/api/auth/login', { body: { email: 'sneaky@test.local', password: 'Passw0rd!' } });
+  assert.equal(pending.status, 403);
+  assert.equal(pending.data.code, 'ACCOUNT_PENDING_VERIFICATION');
+
+  const update = await api('PUT', '/api/users/profile', {
+    token: ctx.other.token, body: { fullName: 'Other Person', isAdmin: true, role: 'admin', isVerified: true, email: 'x@test.local' }
+  });
+  assert.equal(update.status, 200);
+  assert.equal(update.data.user.isAdmin, false);
+  assert.equal(update.data.user.role, 'user');
+  assert.equal(update.data.user.email, 'other@test.local');
+  assert.equal((await api('GET', '/api/users', { token: ctx.other.token })).status, 403);
+});
+
+test('query-operator objects in text fields are rejected with 400 (no NoSQL injection, no 500s)', async () => {
+  const login = await api('POST', '/api/auth/login', { body: { email: { $ne: null }, password: { $ne: null } } });
+  assert.equal(login.status, 400);
+  assert.equal(login.data.token, undefined);
+
+  const signup = await api('POST', '/api/auth/signup', {
+    body: {
+      fullName: 'Inject', email: 'inject@test.local', password: 'Passw0rd!', phone: '0770000001',
+      nicNumber: { $ne: null }, address: { street: 'x', city: 'Galle', province: 'Southern', postalCode: '80000' }
+    }
+  });
+  assert.equal(signup.status, 400, JSON.stringify(signup.data));
+
+  const profile = await api('PUT', '/api/users/profile', { token: ctx.other.token, body: { phone: { $gt: '' } } });
+  assert.equal(profile.status, 400, JSON.stringify(profile.data));
+
+  const adminEdit = await api('PUT', `/api/users/${ctx.other.id}`, { token: ctx.adminToken, body: { fullName: ['a', 'b'] } });
+  assert.equal(adminEdit.status, 400, JSON.stringify(adminEdit.data));
+});
+
+test('email addresses are unique regardless of capital letters', async () => {
+  const dup = await api('POST', '/api/auth/signup', {
+    body: {
+      fullName: 'Dup', email: 'OWNER@Test.Local', password: 'Passw0rd!', phone: '0770000002',
+      nicNumber: '199612345678', address: { street: 'x', city: 'Galle', province: 'Southern', postalCode: '80000' }
+    }
+  });
+  assert.equal(dup.status, 400, JSON.stringify(dup.data));
+
+  // Admin editing another user's email to an existing address in different case
+  const clash = await api('PUT', `/api/users/${ctx.other.id}`, { token: ctx.adminToken, body: { email: 'Owner@TEST.local' } });
+  assert.equal(clash.status, 400, JSON.stringify(clash.data));
+
+  // Login works with any capitalisation
+  const login = await api('POST', '/api/auth/login', { body: { email: 'Owner@Test.Local', password: 'Passw0rd!' } });
+  assert.equal(login.status, 200);
+});
+
+test('admin can edit a user; invalid and duplicate values are refused', async () => {
+  const ok = await api('PUT', `/api/users/${ctx.other.id}`, {
+    token: ctx.adminToken, body: { fullName: 'Other Person', address: { city: 'Matara' } }
+  });
+  assert.equal(ok.status, 200);
+  assert.equal(ok.data.user.address.city, 'Matara');
+  assert.equal(ok.data.user.password, undefined);
+
+  assert.equal((await api('PUT', `/api/users/${ctx.other.id}`, { token: ctx.adminToken, body: { email: 'not-an-email' } })).status, 400);
+  assert.equal((await api('PUT', `/api/users/${ctx.other.id}`, { token: ctx.adminToken, body: { nicNumber: '199012345678' } })).status, 400);
+  assert.equal((await api('PUT', `/api/users/${ctx.other.id}`, { token: ctx.adminToken, body: {} })).status, 400);
+  assert.equal((await api('PUT', '/api/users/64b000000000000000000000', { token: ctx.adminToken, body: { fullName: 'X' } })).status, 404);
+});
+
+test('profile picture: only small JPEG/PNG/WebP images, and it can be removed', async () => {
+  const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+  assert.equal((await api('PUT', '/api/users/profile-picture', { token: ctx.other.token, body: { profilePicture: 'data:image/svg+xml;base64,PHN2Zz4=' } })).status, 400);
+  assert.equal((await api('PUT', '/api/users/profile-picture', { token: ctx.other.token, body: { profilePicture: 'https://evil.example/x.png' } })).status, 400);
+  const set = await api('PUT', '/api/users/profile-picture', { token: ctx.other.token, body: { profilePicture: png } });
+  assert.equal(set.status, 200);
+  assert.equal((await api('GET', '/api/auth/me', { token: ctx.other.token })).data.user.profilePicture, png);
+  assert.equal((await api('DELETE', '/api/users/profile-picture', { token: ctx.other.token })).status, 200);
+  assert.equal((await api('GET', '/api/auth/me', { token: ctx.other.token })).data.user.profilePicture, '');
+});
+
+test('changing the password needs the current one and signs out old sessions', async () => {
+  const user = await signupAndVerify({ fullName: 'Pass Changer', email: 'changer@test.local', nicNumber: '199712345678' });
+  const wrong = await api('PUT', '/api/users/change-password', { token: user.token, body: { currentPassword: 'nope', newPassword: 'NewPassw0rd!' } });
+  assert.equal(wrong.status, 400);
+  const short = await api('PUT', '/api/users/change-password', { token: user.token, body: { currentPassword: 'Passw0rd!', newPassword: '123' } });
+  assert.equal(short.status, 400);
+
+  await new Promise(resolve => setTimeout(resolve, 1100)); // token iat has 1-second resolution
+  const changed = await api('PUT', '/api/users/change-password', { token: user.token, body: { currentPassword: 'Passw0rd!', newPassword: 'NewPassw0rd!' } });
+  assert.equal(changed.status, 200);
+  assert.equal((await api('GET', '/api/auth/me', { token: user.token })).status, 401);
+  // The session that changed the password carries on with the new token it was given
+  assert.equal((await api('GET', '/api/auth/me', { token: changed.data.token })).status, 200);
+  const relogin = await api('POST', '/api/auth/login', { body: { email: 'changer@test.local', password: 'NewPassw0rd!' } });
+  assert.equal(relogin.status, 200);
+});
+
+test('social login reports clearly when it is not configured or the provider is unknown', async () => {
+  const google = await api('POST', '/api/auth/oauth/google', { body: { idToken: 'abc' } });
+  assert.equal(google.status, 503);
+  const unknown = await api('POST', '/api/auth/oauth/myspace', { body: { idToken: 'abc' } });
+  assert.equal(unknown.status, 400);
+});
+
+test("vaccination dashboards: the owner's own upcoming list needs a login", async () => {
+  const upcoming = await api('GET', '/api/vaccinations/user/upcoming', { token: ctx.owner.token });
+  assert.equal(upcoming.status, 200);
+  assert.equal((await api('GET', '/api/vaccinations/user/upcoming')).status, 401);
+});
+
+test('lists send a small preview photo; the report itself keeps the full photos', async () => {
+  const sharp = require('sharp');
+  const big = await sharp({ create: { width: 1200, height: 900, channels: 3, background: { r: 30, g: 90, b: 160 } } })
+    .jpeg({ quality: 95 }).toBuffer();
+  const photo = `data:image/jpeg;base64,${big.toString('base64')}`;
+  const created = await api('POST', '/api/lost-and-found', {
+    token: ctx.owner.token,
+    body: {
+      reportType: 'lost', petName: 'Preview', species: 'Cat', breed: 'Persian', color: 'grey',
+      lastSeenLocation: 'Matara', lastSeenDate: new Date().toISOString(), contactInfo: '0770001111', images: [photo, photo]
+    }
+  });
+  assert.equal(created.status, 201, JSON.stringify(created.data));
+
+  const feedItem = (await api('GET', '/api/lost-and-found')).data.find((r) => r._id === created.data._id);
+  assert.equal(feedItem.images.length, 1);
+  assert.match(feedItem.images[0], /^data:image\/webp;base64,/);
+  assert.ok(feedItem.images[0].length < photo.length / 3, 'preview is much smaller than the photo');
+  assert.equal(feedItem.imageCount, 2);
+  assert.equal(feedItem.thumbnail, undefined);
+
+  const full = (await api('GET', `/api/lost-and-found/${created.data._id}`)).data;
+  assert.deepEqual(full.images, [photo, photo]);
+  assert.equal(full.thumbnail, undefined);
+
+  const dashboard = await api('GET', '/api/authority/dashboard', { token: ctx.adminToken });
+  const card = dashboard.data.lostFound.find((r) => r._id === created.data._id);
+  assert.match(card.imageUrl, /^data:image\/webp;base64,/);
+});
+
+test('oversized and malformed request bodies are refused without crashing the server', async () => {
+  const res = await fetch(`${BASE}/api/auth/login`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"email": "a@b.c", '
+  });
+  assert.equal(res.status, 400);
+  const huge = await fetch(`${BASE}/api/lost-and-found`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${ctx.owner.token}` },
+    body: JSON.stringify({ description: 'x'.repeat(11 * 1024 * 1024) })
+  });
+  assert.equal(huge.status, 413);
+  assert.equal((await api('GET', '/')).status, 200, 'server still up');
 });
 
 test('failed logins are rate limited, successful logins are not counted', async () => {

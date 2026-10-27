@@ -131,16 +131,33 @@ After changing `FRONTEND_URL`, re-issue existing QR codes with `cd Backend && np
 
 ## 🧪 Tests
 
-```bash
-# Backend end-to-end API tests (needs a MongoDB; the test database is dropped first)
-docker run -d --rm --name pet-test-mongo -p 27077:27017 mongo:7
-cd Backend && TEST_MONGODB_URI=mongodb://127.0.0.1:27077/pet_management_test npm test
+The full Software Testing & QA results are in the QA report (`qa/` holds the raw coverage, load-test and live smoke-test results).
 
-# Frontend tests
-cd Frontend && CI=true npm test -- --watchAll=false
+```bash
+# A throwaway MongoDB for the backend and end-to-end tests (test databases are dropped first)
+docker run -d --rm --name pet-test-mongo -p 27077:27017 mongo:7
+
+# Backend: unit tests + API tests (61 tests); add :coverage for a coverage report
+cd Backend && TEST_MONGODB_URI=mongodb://127.0.0.1:27077/pet_management_test npm test
+cd Backend && TEST_MONGODB_URI=mongodb://127.0.0.1:27077/pet_management_test npm run test:coverage
+
+# Web frontend: component and unit tests (99 tests)
+cd Frontend && CI=true npm test -- --watchAll=false --coverage
+
+# Mobile app: unit and widget tests (65 tests)
+cd Mobileapp && flutter test --coverage
+
+# End-to-end browser tests (Playwright, 27 tests incl. accessibility and phone layout)
+cd e2e && npm install && npx playwright install chromium
+npm run build:web      # once after frontend changes
+npm test
+
+# Load test of the API (local) and smoke test of the live Azure deployment
+node scripts/load-test.js
+LIVE_ADMIN_EMAIL=... LIVE_ADMIN_PASSWORD=... node scripts/live-smoke.js
 ```
 
-Both suites run automatically in GitHub Actions (`.github/workflows/ci.yml`).
+The backend and frontend suites run automatically in GitHub Actions (`.github/workflows/ci.yml`).
 
 ---
 

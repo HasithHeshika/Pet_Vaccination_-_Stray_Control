@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../api/axios';
 import { formatDate } from '../../utils/dateFormat';
+import { isSafeImageSrc } from '../../utils/lostFound';
 import BreederIcon from '../Breeder/BreederIcons';
 import IncidentReports from './IncidentReports';
 import './AdminDashboard.css';
@@ -211,7 +212,7 @@ const AuthorityDashboard = () => {
               ) : filteredLostFound.map((report) => (
                 <article key={report._id} className="animal-report-card">
                   <div className="animal-report-image">
-                    {report.imageUrl ? <img src={report.imageUrl} alt={report.petName} /> : <BreederIcon name="search" size={34} />}
+                    {isSafeImageSrc(report.imageUrl) ? <img src={report.imageUrl} alt={report.petName} /> : <BreederIcon name="search" size={34} />}
                   </div>
                   <div className="animal-report-body">
                     <div className="animal-report-title">

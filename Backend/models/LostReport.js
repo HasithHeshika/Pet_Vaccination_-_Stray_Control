@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { makeThumbnail } = require('../utils/thumbnail');
 
 // Lost & Found reports. A "lost" report is filed by an owner whose pet is missing;
 // a "found" report by someone who has found a pet. Both feed the match-review system.
@@ -35,6 +36,8 @@ const lostReportSchema = new mongoose.Schema({
   },
   // Kept in sync with images so lists can show it without loading the photos
   imageCount: { type: Number, default: 0 },
+  // Small WebP preview of the first photo, sent by lists instead of the full photo
+  thumbnail: { type: String },
   // Lost reports: the owner's registered pet this report is about
   linkedPet: { type: mongoose.Schema.Types.ObjectId, ref: 'Pet' },
   // Found reports: Pet ID read from the animal's QR tag, if any
@@ -50,9 +53,39 @@ lostReportSchema.pre('validate', function syncImageCount(next) {
   next();
 });
 
+lostReportSchema.pre('save', async function syncThumbnail() {
+  if (this.isModified('images') || this.isNew) {
+    this.thumbnail = (await makeThumbnail((this.images || [])[0])) || undefined;
+  }
+});
+
 lostReportSchema.index({ reportType: 1, status: 1, lastSeenDate: -1 });
+lostReportSchema.index({ createdAt: -1 });
 
 const LostReport = mongoose.model('LostReport', lostReportSchema);
+
+// Lists (feed, dashboards): newest first, each with only its preview photo as images[0].
+// The full photos never leave the database here; reports without a preview yet send their first photo.
+LostReport.findForList = async (filter = {}, { limit, populate } = {}) => {
+  const reports = await LostReport.aggregate([
+    { $match: filter },
+    { $sort: { createdAt: -1 } },
+    ...(limit ? [{ $limit: limit }] : []),
+    {
+      $addFields: {
+        images: {
+          $cond: [
+            { $ifNull: ['$thumbnail', false] },
+            ['$thumbnail'],
+            { $slice: [{ $ifNull: ['$images', []] }, 1] }
+          ]
+        }
+      }
+    },
+    { $project: { thumbnail: 0 } }
+  ]);
+  return populate ? LostReport.populate(reports, populate) : reports;
+};
 
 module.exports = LostReport;
 module.exports.REPORT_TYPES = REPORT_TYPES;

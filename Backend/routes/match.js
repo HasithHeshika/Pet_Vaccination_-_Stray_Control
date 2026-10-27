@@ -125,10 +125,12 @@ router.get('/', auth, admin, async (req, res) => {
     res.json({
       matches: matches.map((m) => {
         const view = matchView(m);
-        // Lists only need one photo per side
+        // Lists only need one photo per side: the small preview where there is one
         ['found', 'lost', 'pet'].forEach((side) => {
           if (view[side]?.images) view[side].images = view[side].images.slice(0, 1);
         });
+        if (view.found && m.foundReport?.thumbnail) view.found.images = [m.foundReport.thumbnail];
+        if (view.lost && m.lostReport?.thumbnail) view.lost.images = [m.lostReport.thumbnail];
         return view;
       }),
       counts: Object.fromEntries(counts.map((c) => [c._id, c.count]))
