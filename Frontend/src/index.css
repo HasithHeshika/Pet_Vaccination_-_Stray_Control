@@ -12,11 +12,12 @@
   --pet-rustic-apricot: var(--pet-bright-blue);
   --pet-terra-spice: var(--pet-royal-blue);
   --pet-ember-espresso: var(--pet-deep-navy);
-  --primary: var(--pet-bright-blue);
-  --primary-hover: var(--pet-royal-blue);
+  /* Button colours meet WCAG AA contrast (4.5:1) with white text */
+  --primary: var(--pet-royal-blue);
+  --primary-hover: #1d4ed8;
   --secondary: #0ea5e9;
   --success: #10b981;
-  --danger: #ef4444;
+  --danger: #dc2626;
   --background: var(--pet-soft-honey-cream);
   --surface: #ffffff;
   --text-main: var(--pet-ember-espresso);

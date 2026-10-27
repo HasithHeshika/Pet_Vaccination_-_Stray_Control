@@ -2,6 +2,21 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
 
+// Same rules as the API's signup validation, so mistakes are caught before submitting
+String? validateEmail(String? value) {
+  final v = value?.trim() ?? '';
+  if (v.isEmpty) return 'Required';
+  if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v)) return 'Enter a valid email address';
+  return null;
+}
+
+String? validatePassword(String? value) {
+  final v = value ?? '';
+  if (v.isEmpty) return 'Required';
+  if (v.length < 6) return 'Password must be at least 6 characters';
+  return null;
+}
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -119,9 +134,9 @@ class _SignupScreenState extends State<SignupScreen> {
               
               _buildField("Full Name *", _nameController),
               const SizedBox(height: 16),
-              _buildField("Email *", _emailController, TextInputType.emailAddress),
+              _buildField("Email *", _emailController, TextInputType.emailAddress, false, validateEmail),
               const SizedBox(height: 16),
-              _buildField("Password * (min 6 characters)", _passwordController, TextInputType.text, true),
+              _buildField("Password * (min 6 characters)", _passwordController, TextInputType.text, true, validatePassword),
               const SizedBox(height: 16),
               _buildField("Confirm Password *", _confirmPasswordController, TextInputType.text, true),
               const SizedBox(height: 16),
@@ -156,8 +171,8 @@ class _SignupScreenState extends State<SignupScreen> {
                      : const Text("Sign Up", style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
                 children: [
                   const Text("Already have an account? ", style: TextStyle(color: Color(0xFF5C4033))),
                   GestureDetector(
@@ -174,12 +189,13 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller, [TextInputType type = TextInputType.text, bool obs = false]) {
+  Widget _buildField(String label, TextEditingController controller,
+      [TextInputType type = TextInputType.text, bool obs = false, String? Function(String?)? validator]) {
     return TextFormField(
       controller: controller,
       obscureText: obs,
       keyboardType: type,
-      validator: (v) => v!.isEmpty ? 'Required' : null,
+      validator: validator ?? (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Color(0xFF5C4033), fontSize: 14),

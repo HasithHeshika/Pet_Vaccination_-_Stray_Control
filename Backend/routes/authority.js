@@ -7,6 +7,7 @@ const Vaccination = require('../models/Vaccination');
 const StrayReport = require('../models/StrayReport');
 const LostReport = require('../models/LostReport');
 const BreederLicense = require('../models/BreederLicense');
+const PetMatch = require('../models/PetMatch');
 
 const licenseSelect = '-documents.idProof.previewUrl -documents.facilityImages.previewUrl -documents.certificates.previewUrl';
 
@@ -29,36 +30,21 @@ const calculateVaccinationCompliance = async () => {
   };
 };
 
-const normalizeLostReport = (report, foundReports = []) => {
-  const reportObject = report.toObject ? report.toObject() : report;
-  const possibleMatches = reportObject.status === 'Lost'
-    ? foundReports
-      .filter((found) => {
-        const sameBreed = found.breed?.toLowerCase() === reportObject.breed?.toLowerCase();
-        const sameColor = found.color?.toLowerCase() === reportObject.color?.toLowerCase();
-        return sameBreed || sameColor;
-      })
-      .slice(0, 3)
-      .map((found) => ({
-        _id: found._id,
-        petName: found.petName,
-        location: found.lastSeenLocation,
-        breed: found.breed,
-        color: found.color
-      }))
-    : [];
-
+// Lost & Found card for the dashboard (first photo only). Possible matches are reviewed on /admin/matches.
+const normalizeLostReport = (report) => {
+  const r = report.toObject ? report.toObject() : report;
   return {
-    _id: reportObject._id,
-    petName: reportObject.petName,
-    breed: reportObject.breed,
-    color: reportObject.color,
-    imageUrl: reportObject.imageUrl,
-    location: reportObject.lastSeenLocation,
-    status: reportObject.status,
-    reportedBy: reportObject.reportedBy,
-    createdAt: reportObject.createdAt,
-    possibleMatches
+    _id: r._id,
+    reportType: r.reportType || 'lost',
+    petName: r.petName,
+    species: r.species === 'Other' ? r.speciesOther : r.species,
+    breed: r.breed,
+    color: r.color,
+    imageUrl: (r.images && r.images[0]) || r.imageUrl,
+    location: r.lastSeenLocation,
+    status: r.status,
+    reportedBy: r.reportedBy,
+    createdAt: r.createdAt
   };
 };
 
@@ -89,10 +75,7 @@ router.get('/dashboard', auth, admin, async (req, res) => {
         .populate('owner', 'fullName email phone')
         .sort({ registrationDate: -1 })
         .limit(12),
-      LostReport.find()
-        .populate('reportedBy', 'fullName email phone')
-        .sort({ createdAt: -1 })
-        .limit(30),
+      LostReport.findForList({}, { limit: 30, populate: { path: 'reportedBy', select: 'fullName email phone' } }),
       StrayReport.countDocuments(),
       // Open incidents first, most urgent first; photos are loaded separately per report
       StrayReport.find()
@@ -106,8 +89,9 @@ router.get('/dashboard', auth, admin, async (req, res) => {
       urgency: { $in: ['emergency', 'urgent'] }
     });
 
-    const foundReports = lostFoundReports.filter((report) => report.status === 'Found');
-    const lostFound = lostFoundReports.map((report) => normalizeLostReport(report, foundReports));
+    // Preview photos only (the full photos open from the report itself)
+    const lostFound = lostFoundReports.map((report) => normalizeLostReport(report));
+    const pendingMatches = await PetMatch.countDocuments({ status: 'suggested' });
 
     res.json({
       metrics: {
@@ -117,7 +101,8 @@ router.get('/dashboard', auth, admin, async (req, res) => {
         vaccinationComplianceRate: vaccinationCompliance.complianceRate,
         compliantPets: vaccinationCompliance.compliantPets,
         strayReportsCount,
-        openUrgentIncidents
+        openUrgentIncidents,
+        pendingMatches
       },
       licenses,
       pets,

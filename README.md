@@ -24,7 +24,7 @@ A comprehensive MERN stack application for managing pet ownership records, vacci
 - **Automated Vaccination Reminders**: Background `node-cron` service and `nodemailer` integration to deliver email reminders for upcoming/overdue vaccinations (requires SMTP settings; a reminder is only marked as sent after it is delivered).
 - **Breeder Licensing System**: Full breeder application workflow, status tracking, renewal requests, and municipal authority approval dashboards.
 - **Animal Incident Reporting**: Anyone can report violence or abuse, a sick or injured animal in a public place, a stray, or any other animal incident, with urgency, photos, GPS location and optional contact details. Urgent reports are emailed to the authority and listed first on the authority dashboard.
-- **Lost & Found**: Public lost pet feed with reporter-managed status.
+- **Lost & Found**: Lost and found reports (species, up to 2 photos, GPS, collar-tag Pet ID). Found reports are matched against open lost reports and registered pets; the authority reviews each suggested match and, on confirmation, the owner and finder are emailed. An AI photo check can be plugged in later (`Backend/services/matching/aiProviders/`).
 
 ---
 
@@ -122,6 +122,8 @@ make dev-up
 | `CORS_ORIGINS` | Comma-separated browser origins allowed to call the API |
 | `ACS_EMAIL_CONNECTION_STRING`, `ACS_EMAIL_SENDER` | Outgoing email through Azure Communication Services (used in production) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | Alternative: outgoing email through any SMTP server. With neither ACS nor SMTP set, emails are only logged |
+| `MATCH_MAX_KM`, `MATCH_MAX_DAYS`, `MATCH_MIN_SCORE` | Optional Lost & Found matching limits (defaults 15 km, 30 days, score 40) |
+| `MATCH_AI_PROVIDER` | Optional AI photo check for matches; default `none` (no provider implemented yet) |
 | `REMINDER_CRON` | Schedule for the daily reminder check (default `0 9 * * *`) |
 | `AUTHORITY_ALERT_EMAILS` | Comma-separated addresses emailed about urgent or emergency animal incidents (default: all administrator accounts) |
 
@@ -129,16 +131,33 @@ After changing `FRONTEND_URL`, re-issue existing QR codes with `cd Backend && np
 
 ## 🧪 Tests
 
-```bash
-# Backend end-to-end API tests (needs a MongoDB; the test database is dropped first)
-docker run -d --rm --name pet-test-mongo -p 27077:27017 mongo:7
-cd Backend && TEST_MONGODB_URI=mongodb://127.0.0.1:27077/pet_management_test npm test
+The full Software Testing & QA results are in the QA report (`qa/` holds the raw coverage, load-test and live smoke-test results).
 
-# Frontend tests
-cd Frontend && CI=true npm test -- --watchAll=false
+```bash
+# A throwaway MongoDB for the backend and end-to-end tests (test databases are dropped first)
+docker run -d --rm --name pet-test-mongo -p 27077:27017 mongo:7
+
+# Backend: unit tests + API tests (61 tests); add :coverage for a coverage report
+cd Backend && TEST_MONGODB_URI=mongodb://127.0.0.1:27077/pet_management_test npm test
+cd Backend && TEST_MONGODB_URI=mongodb://127.0.0.1:27077/pet_management_test npm run test:coverage
+
+# Web frontend: component and unit tests (99 tests)
+cd Frontend && CI=true npm test -- --watchAll=false --coverage
+
+# Mobile app: unit and widget tests (65 tests)
+cd Mobileapp && flutter test --coverage
+
+# End-to-end browser tests (Playwright, 27 tests incl. accessibility and phone layout)
+cd e2e && npm install && npx playwright install chromium
+npm run build:web      # once after frontend changes
+npm test
+
+# Load test of the API (local) and smoke test of the live Azure deployment
+node scripts/load-test.js
+LIVE_ADMIN_EMAIL=... LIVE_ADMIN_PASSWORD=... node scripts/live-smoke.js
 ```
 
-Both suites run automatically in GitHub Actions (`.github/workflows/ci.yml`).
+The backend and frontend suites run automatically in GitHub Actions (`.github/workflows/ci.yml`).
 
 ---
 
@@ -172,8 +191,17 @@ Admins can also email a user a reset link with `POST /api/users/:id/send-passwor
 - `PATCH /:id/status` - Update report progress (*Admin Only*)
 
 ### Lost & Found (`/api/lost-and-found`)
-- `POST /` - Submit a lost pet report (*Private*)
-- `GET /` - Public lost and found feed
+- `POST /` - Submit a lost or found report, `reportType: lost|found` (*Private*)
+- `GET /?type=lost|found` - Public feed (first photo of each report only)
+- `GET /:id` - One report with all photos
+- `PUT /:id`, `DELETE /:id` - Edit or delete a report (*reporter or Admin*)
 - `PATCH /:id/status` - Update report status (*reporter or Admin*)
+
+### Lost & Found matches (`/api/matches`)
+- `GET /mine` - Confirmed matches for my reports and registered pets (*Private*)
+- `GET /?status=suggested|confirmed|rejected` - Matches to review, highest score first (*Admin Only*)
+- `GET /:id` - Both sides in full, score breakdown and AI result (*Admin Only*)
+- `PATCH /:id` - `{decision: confirm|reject, note}`; confirming emails the owner and finder (*Admin Only*)
+- `POST /rerun/:reportId` - Run matching again for one report (*Admin Only*)
 
 ---

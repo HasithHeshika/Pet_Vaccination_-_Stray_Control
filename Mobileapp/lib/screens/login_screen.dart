@@ -212,8 +212,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 24),
                       
                       // Sign Up linkage
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
                         children: [
                           const Text("Don't have an account? ", style: TextStyle(color: Color(0xFF5C4033))),
                           GestureDetector(

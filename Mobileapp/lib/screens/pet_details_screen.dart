@@ -368,6 +368,8 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
             backgroundColor: AppTheme.primaryBrown,
             foregroundColor: Colors.white,
             flexibleSpace: FlexibleSpaceBar(
+              // Keep the name above the tab bar (default padding puts it behind the tabs)
+              titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: kTextTabBarHeight + 14),
               title: Text(
                 name,
                 style: const TextStyle(
@@ -389,7 +391,8 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black54],
+                        colors: [Colors.transparent, Colors.black26, Colors.black87],
+                        stops: [0.4, 0.65, 1.0],
                       ),
                     ),
                   ),

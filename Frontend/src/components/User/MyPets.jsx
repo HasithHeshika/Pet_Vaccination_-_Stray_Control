@@ -248,9 +248,10 @@ const MyPets = () => {
               )}
             </div>
 
-            {(selectedPet.medicalHistory.allergies || 
-              selectedPet.medicalHistory.existingConditions || 
-              selectedPet.medicalHistory.specialNotes) && (
+            {/* medicalHistory is omitted by the API when it is empty */}
+            {(selectedPet.medicalHistory?.allergies ||
+              selectedPet.medicalHistory?.existingConditions ||
+              selectedPet.medicalHistory?.specialNotes) && (
               <div style={{ marginTop: '20px' }}>
                 <h3>Medical History</h3>
                 {selectedPet.medicalHistory.allergies && (

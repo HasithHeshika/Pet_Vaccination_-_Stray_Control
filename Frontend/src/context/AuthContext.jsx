@@ -107,6 +107,12 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
   };
 
+  // A password change signs out all older sessions; the server returns a fresh token for this one
+  const updateToken = (newToken) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+  };
+
   const refreshUser = async () => {
     try {
       const response = await axios.get('/api/auth/me');
@@ -125,6 +131,7 @@ export const AuthProvider = ({ children }) => {
     socialLogin,
     logout,
     refreshUser,
+    updateToken,
     role: user?.role || (user?.isAdmin ? 'admin' : 'user'),
     isAuthenticated: !!user,
     isAdmin: user?.isAdmin || user?.role === 'admin',

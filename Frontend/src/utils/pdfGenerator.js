@@ -1,5 +1,5 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 import { formatDate } from './dateFormat';
 
 export const generatePetPDF = (pet) => {
@@ -43,7 +43,7 @@ export const generatePetPDF = (pet) => {
   
   petData.push(['Registration Date', formatDate(pet.registrationDate)]);
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: yPosition,
     head: [['Field', 'Value']],
     body: petData,
@@ -68,7 +68,7 @@ export const generatePetPDF = (pet) => {
   if (pet.owner?.email) ownerData.push(['Email', pet.owner.email]);
   if (pet.owner?.phone) ownerData.push(['Phone', pet.owner.phone]);
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: yPosition,
     head: [['Field', 'Value']],
     body: ownerData,
@@ -105,7 +105,7 @@ export const generatePetPDF = (pet) => {
       medicalData.push(['Special Notes', pet.medicalHistory.specialNotes]);
     }
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: yPosition,
       head: [['Field', 'Information']],
       body: medicalData,

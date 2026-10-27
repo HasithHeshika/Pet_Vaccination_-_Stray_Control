@@ -10,6 +10,7 @@ import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetPassword from './components/Auth/ResetPassword';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import AuthorityDashboard from './components/Admin/AuthorityDashboard';
+import MatchReview from './components/Admin/MatchReview';
 import VeterinarianDashboard from './components/Admin/VeterinarianDashboard';
 import UserList from './components/Admin/UserList';
 import AllPets from './components/Admin/AllPets';
@@ -200,6 +201,14 @@ function AppContent() {
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminBreederLicenses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/matches"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <MatchReview />
               </ProtectedRoute>
             }
           />

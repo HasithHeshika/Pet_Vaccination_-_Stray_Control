@@ -109,16 +109,23 @@ const authUserPayload = (user) => {
 // @route   POST /api/auth/signup
 // @desc    Register a new user
 // @access  Public
+// Required text field. isString() first, so objects such as {"$regex": ...} can't reach a database query
+const requiredText = (field, message) => body(field).isString().withMessage(message).bail().trim().notEmpty().withMessage(message);
+const optionalText = (field, message) => body(field).optional().isString().withMessage(message).bail().trim();
+
 router.post('/signup', [
-  body('fullName').trim().notEmpty().withMessage('Full name is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('phone').notEmpty().withMessage('Phone number is required'),
-  body('nicNumber').notEmpty().withMessage('NIC number is required'),
-  body('address.street').notEmpty().withMessage('Street address is required'),
-  body('address.city').notEmpty().withMessage('City is required'),
-  body('address.province').notEmpty().withMessage('Province is required'),
-  body('address.postalCode').notEmpty().withMessage('Postal code is required')
+  requiredText('fullName', 'Full name is required'),
+  body('email').isString().bail().trim().toLowerCase().isEmail().withMessage('Valid email is required'),
+  body('password').isString().withMessage('Password must be at least 6 characters').bail()
+    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  requiredText('phone', 'Phone number is required'),
+  requiredText('nicNumber', 'NIC number is required'),
+  requiredText('address.street', 'Street address is required'),
+  requiredText('address.city', 'City is required'),
+  requiredText('address.province', 'Province is required'),
+  requiredText('address.postalCode', 'Postal code is required'),
+  optionalText('vetLicenseNumber', 'Licence number must be text'),
+  optionalText('clinicName', 'Clinic name must be text')
 ], async (req, res) => {
   try {
     // Validate input
@@ -276,8 +283,8 @@ router.post('/oauth/:provider', [
 // @desc    Login user
 // @access  Public
 router.post('/login', [
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('password').notEmpty().withMessage('Password is required')
+  body('email').isString().bail().trim().toLowerCase().isEmail().withMessage('Valid email is required'),
+  body('password').isString().withMessage('Password is required').bail().notEmpty().withMessage('Password is required')
 ], async (req, res) => {
   try {
     // Validate input

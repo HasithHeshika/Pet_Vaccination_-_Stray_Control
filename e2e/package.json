@@ -1,0 +1,15 @@
+{
+  "name": "pet-control-e2e",
+  "private": true,
+  "description": "End-to-end browser tests for the web app (Playwright) against a local API and throwaway MongoDB",
+  "scripts": {
+    "build:web": "node scripts/build-web.js",
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.55.0",
+    "autocannon": "^7.15.0"
+  }
+}

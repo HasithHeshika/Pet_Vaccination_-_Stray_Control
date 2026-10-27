@@ -57,7 +57,17 @@ class AuthService {
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
     }
-    throw Exception('Failed to signup: ${response.body}');
+    // Show the server's message (e.g. "User already exists"), not the raw JSON body
+    String message = 'Failed to sign up. Please try again.';
+    try {
+      final body = jsonDecode(response.body);
+      if (body is Map && body['message'] != null) {
+        message = body['message'].toString();
+      } else if (body is Map && body['errors'] is List && (body['errors'] as List).isNotEmpty) {
+        message = (body['errors'] as List).first['msg']?.toString() ?? message;
+      }
+    } catch (_) {}
+    throw Exception(message);
   }
 
   // Emails a password reset link; the link opens the web app to set the new password.
