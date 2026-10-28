@@ -25,6 +25,11 @@ const reportLimiter = rateLimit({
   max: 10,
   message: 'Too many reports from this connection. Please try again later.'
 });
+const reportReadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  message: 'Too many report queries from this connection. Please try again later.'
+});
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -68,12 +73,12 @@ router.post(
 // @route   GET /api/stray-reports
 // @desc    Get all incident/stray reports (supports ?category=&status= filters)
 // @access  Private/Admin
-router.get('/', auth, admin, getStrayReports);
+router.get('/', reportReadLimiter, auth, admin, getStrayReports);
 
 // @route   GET /api/stray-reports/:id
 // @desc    Get a single incident/stray report
 // @access  Private/Admin
-router.get('/:id', auth, admin, validateObjectId(), getStrayReportById);
+router.get('/:id', reportReadLimiter, auth, admin, validateObjectId(), getStrayReportById);
 
 // @route   PATCH /api/stray-reports/:id/status
 // @desc    Update report status (admin only)
