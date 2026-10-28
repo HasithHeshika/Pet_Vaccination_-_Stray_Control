@@ -3,24 +3,56 @@ import '../theme/app_theme.dart';
 import '../services/lost_and_found_service.dart';
 
 class ReportLostScreen extends StatefulWidget {
-  const ReportLostScreen({super.key});
+  final String? initialPetName;
+  final String? initialBreed;
+  final String? initialColor;
+  final String? initialImageUrl;
+
+  const ReportLostScreen({
+    super.key,
+    this.initialPetName,
+    this.initialBreed,
+    this.initialColor,
+    this.initialImageUrl,
+  });
 
   @override
   State<ReportLostScreen> createState() => _ReportLostScreenState();
 }
 
 class _ReportLostScreenState extends State<ReportLostScreen> {
-  final _petNameController = TextEditingController();
-  final _breedController = TextEditingController();
-  final _colorController = TextEditingController();
+  late final TextEditingController _petNameController;
+  late final TextEditingController _breedController;
+  late final TextEditingController _colorController;
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _imageController = TextEditingController();
+  late final TextEditingController _imageController;
   final _contactController = TextEditingController();
   
-  DateTime? _lastSeenDate;
+  DateTime? _lastSeenDate = DateTime.now();
   String _type = 'Lost';
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _petNameController = TextEditingController(text: widget.initialPetName ?? '');
+    _breedController = TextEditingController(text: widget.initialBreed ?? '');
+    _colorController = TextEditingController(text: widget.initialColor ?? '');
+    _imageController = TextEditingController(text: widget.initialImageUrl ?? '');
+  }
+
+  @override
+  void dispose() {
+    _petNameController.dispose();
+    _breedController.dispose();
+    _colorController.dispose();
+    _locationController.dispose();
+    _descriptionController.dispose();
+    _imageController.dispose();
+    _contactController.dispose();
+    super.dispose();
+  }
 
   void _submitReport() async {
     if (_petNameController.text.isEmpty ||
@@ -101,10 +133,10 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
               child: Text(
                 "Please provide as much detail as possible to help identify the pet.",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppTheme.primaryBrown, fontSize: 15),
+                style: TextStyle(color: AppTheme.primaryBrown, fontSize: 14),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -113,7 +145,7 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
                 _buildToggleButton('Found'),
               ],
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
             _buildLabel("Pet Name (or \"Unknown\" if found)"),
             TextField(
               controller: _petNameController,
@@ -160,7 +192,7 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
             GestureDetector(
               onTap: _pickDate,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -175,7 +207,7 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
                           ? "${_lastSeenDate!.month}/${_lastSeenDate!.day}/${_lastSeenDate!.year}"
                           : "mm/dd/yyyy",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         color: _lastSeenDate != null ? Colors.black87 : Colors.black54,
                       ),
                     ),
@@ -187,7 +219,7 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
             _buildLabel("Additional Description"),
             TextField(
               controller: _descriptionController,
-              maxLines: 4,
+              maxLines: 3,
               decoration: _buildInputDecoration("Describe any collar, tags, behaviors, etc.", null),
             ),
             const SizedBox(height: 16),
@@ -202,33 +234,33 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
               controller: _contactController,
               decoration: _buildInputDecoration("Phone number or email", Icons.contact_phone),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 36),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: AppTheme.primaryBrown, width: 2),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: AppTheme.primaryBrown, width: 1.8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text("Cancel", style: TextStyle(color: AppTheme.primaryBrown, fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: const Text("Cancel", style: TextStyle(color: AppTheme.primaryBrown, fontSize: 15, fontWeight: FontWeight.bold)),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   flex: 2,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _submitReport,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent.shade700,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
+                      backgroundColor: const Color(0xFF8B5A2B),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                     child: _isLoading 
                         ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                        : const Text("Submit Report", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                        : const Text("Broadcast Alert", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                   ),
                 ),
               ],
@@ -241,13 +273,13 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8, left: 4),
+      padding: const EdgeInsets.only(bottom: 6, left: 4),
       child: Text(
         text,
         style: const TextStyle(
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF333333),
+          color: Color(0xFF5C4033),
         ),
       ),
     );
@@ -258,39 +290,40 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
     return GestureDetector(
       onTap: () => setState(() => _type = type),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? (type == 'Lost' ? const Color(0xFF8B3A3A) : const Color(0xFF5C4033)) : Colors.transparent,
-          border: Border.all(color: const Color(0xFF5C4033), width: 2),
-          borderRadius: BorderRadius.circular(24),
+          color: isSelected ? const Color(0xFF8B5A2B) : Colors.transparent,
+          border: Border.all(color: const Color(0xFF8B5A2B), width: 2),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           type.toUpperCase(),
           style: TextStyle(
             color: isSelected ? Colors.white : const Color(0xFF5C4033),
-            fontWeight: FontWeight.bold
-          )
-        )
-      )
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
+      ),
     );
   }
 
   InputDecoration _buildInputDecoration(String hintText, IconData? icon) {
     return InputDecoration(
       hintText: hintText,
-      hintStyle: const TextStyle(color: Colors.black45, fontSize: 14),
-      prefixIcon: icon != null ? Icon(icon, color: AppTheme.primaryBrown, size: 20) : null,
+      hintStyle: const TextStyle(color: Colors.black45, fontSize: 13),
+      prefixIcon: icon != null ? Icon(icon, color: AppTheme.primaryBrown, size: 19) : null,
       filled: true,
       fillColor: Colors.white,
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: Color(0xFFDECAAE), width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: Color(0xFF5C4033), width: 2.0),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
     );
   }
 }

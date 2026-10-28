@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    // Artificial delay to show the beautiful splash screen
+    // Artificial delay to show the splash screen
     await Future.delayed(const Duration(seconds: 2));
     
     final prefs = await SharedPreferences.getInstance();
@@ -32,37 +32,51 @@ class _SplashScreenState extends State<SplashScreen> {
     
     if (mounted) {
       if (token != null && token.isNotEmpty) {
-        String role = prefs.getString('role') ?? '';
-        
-        // Critical: If role is empty (e.g. they logged in BEFORE we added roles to memory), manually fetch it so Admins don't get stuck on the User screen!
-        if (role.isEmpty) {
-           try {
-             final meData = await AuthService().getMe();
-             role = meData?['user']?['role'] ?? 'pet_owner';
-             await prefs.setString('role', role); // Cache for next time
-           } catch (_) {
-             role = 'pet_owner'; // Safe fallback if offline
-           }
+        // Validate token with server to prevent expired/invalid session (401)
+        Map<String, dynamic>? meData;
+        try {
+          meData = await AuthService().getMe();
+        } catch (_) {
+          meData = null;
         }
+
+        if (meData == null) {
+          // Token is expired or invalid on the server (401)
+          await AuthService().logout();
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+            );
+          }
+          return;
+        }
+
+        String role = meData['user']?['role'] ?? prefs.getString('role') ?? 'pet_owner';
+        await prefs.setString('role', role);
         
         Widget target = const HomeScreen();
-        if (role == 'admin') target = const AdminDashboard();
-        else if (role == 'veterinarian') target = const VetDashboard();
-        else if (role == 'breeder') target = const BreederDashboard();
+        if (role == 'admin') {
+          target = const AdminDashboard();
+        } else if (role == 'veterinarian') {
+          target = const VetDashboard();
+        } else if (role == 'breeder') {
+          target = const BreederDashboard();
+        }
 
         if (mounted) {
-           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => target));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => target));
         }
       } else {
         // If not logged in, check if they've seen the onboarding screen
         final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
         
         if (mounted) {
-           if (!hasSeenOnboarding) {
-             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const GetStartedScreen()));
-           } else {
-             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-           }
+          if (!hasSeenOnboarding) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const GetStartedScreen()));
+          } else {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+          }
         }
       }
     }
@@ -76,64 +90,55 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Spacer(),
-            // Clean Gold Native Icon instead of image
+            // Circular Dog Illustration
             Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
+              width: 170,
+              height: 170,
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFD4A373), width: 3),
+                color: Color(0xFFDEC49B), // Soft Gold
               ),
-              child: const Icon(
-                Icons.pets,
-                size: 80,
-                color: Color(0xFFD4A373),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/puppy.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.pets, size: 80, color: Color(0xFF5C4033)),
+                ),
               ),
             ),
-            const SizedBox(height: 32),
-            // Title
+            const SizedBox(height: 36),
+            
+            // App Title Matching Brand
             const Text(
-              "PETNEXUS",
+              "PetNexus",
               style: TextStyle(
-                fontSize: 36,
+                fontFamily: 'serif',
+                fontSize: 44,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 4.0,
-                color: Color(0xFFD4A373), // Gold Color AppTheme.secondaryGold equivalent
+                color: Color(0xFFDEC49B),
+                letterSpacing: 1.5,
               ),
             ),
-            const SizedBox(height: 8),
-            // Subtitle
+            const SizedBox(height: 12),
+            
+            // Subtitle Tagline
             const Text(
-              "INTEGRATED PET PLATFORM",
+              "Vaccinations & Stray Control",
               style: TextStyle(
-                fontSize: 14,
-                letterSpacing: 2.0,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Colors.white70,
+                letterSpacing: 0.8,
               ),
             ),
+            
             const SizedBox(height: 48),
-            // Features list
-            const Text("Secure QR Vaccination Records", style: TextStyle(color: Color(0xFFD4A373), fontSize: 13)),
-            const SizedBox(height: 8),
-            const Text("Community Stray Reporting", style: TextStyle(color: Color(0xFFD4A373), fontSize: 13)),
-            const SizedBox(height: 8),
-            const Text("Pet & Authority Registry", style: TextStyle(color: Color(0xFFD4A373), fontSize: 13)),
-            const Spacer(),
-            // Loading Indicator
+            // Sleek Loading Indicator
             const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD4A373)),
-            ),
-            const Spacer(),
-            // Footer
-            const Text(
-              "© 2026 PetNexus Central",
-              style: TextStyle(
-                color: Colors.white54,
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 32),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFDEC49B)),
+              strokeWidth: 3,
+            )
           ],
         ),
       ),

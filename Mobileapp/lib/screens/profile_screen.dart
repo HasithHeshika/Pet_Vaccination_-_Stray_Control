@@ -25,14 +25,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _fetchProfile() async {
     try {
       final data = await AuthService().getMe();
-      if (mounted && data != null) {
+      if (mounted) {
+        if (data != null && data['user'] != null) {
+          setState(() {
+            _user = data['user'];
+            _isLoading = false;
+          });
+        } else {
+          // Token is expired / null data (401 Unauthorized)
+          setState(() {
+            _user = null;
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
-          _user = data['user'];
+          _user = null;
           _isLoading = false;
         });
       }
-    } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -71,56 +84,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
      bool isSaving = false;
 
      showDialog(
-       context: context,
-       builder: (ctx) => StatefulBuilder(
-         builder: (context, setStateModal) {
-           return AlertDialog(
-              backgroundColor: const Color(0xFFF9EED9),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text("Edit Profile Details", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.bold)),
-              content: SingleChildScrollView(
-                child: Column(
-                   mainAxisSize: MainAxisSize.min,
-                   children: [
-                     TextField(controller: nameController, decoration: const InputDecoration(labelText: "Full Name")),
-                     const SizedBox(height: 16),
-                     TextField(controller: phoneController, decoration: const InputDecoration(labelText: "Phone Number"), keyboardType: TextInputType.phone),
-                     const SizedBox(height: 16),
-                     TextField(controller: nicController, decoration: const InputDecoration(labelText: "NIC Number")),
-                   ]
-                ),
-              ),
-              actions: [
-                 TextButton(child: const Text("CANCEL", style: TextStyle(color: Color(0xFF9E6D4E))), onPressed: () => Navigator.pop(ctx)),
-                 ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF5C4033), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                    child: isSaving 
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                        : const Text("SAVE", style: TextStyle(color: Colors.white)),
-                    onPressed: isSaving ? null : () async {
-                       setStateModal(() => isSaving = true);
-                       try {
-                         await UserService().updateProfile({
-                           'fullName': nameController.text,
-                           'phone': phoneController.text,
-                           'nicNumber': nicController.text
-                         });
-                         if (mounted) {
-                           Navigator.pop(ctx);
-                           _fetchProfile(); // Refresh screen silently
-                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile details updated successfully!")));
-                         }
-                       } catch (e) {
-                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red));
-                         setStateModal(() => isSaving = false);
-                       }
-                    }
-                 )
-              ]
-           );
-         }
-       )
-     );
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+          builder: (context, setStateModal) {
+            return AlertDialog(
+               backgroundColor: const Color(0xFFF9EED9),
+               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+               title: const Text("Edit Profile Details", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.bold)),
+               content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(controller: nameController, decoration: const InputDecoration(labelText: "Full Name")),
+                    const SizedBox(height: 12),
+                    TextField(controller: phoneController, decoration: const InputDecoration(labelText: "Phone Number")),
+                    const SizedBox(height: 12),
+                    TextField(controller: nicController, decoration: const InputDecoration(labelText: "NIC Number")),
+                  ]
+               ),
+               actions: [
+                  TextButton(child: const Text("CANCEL", style: TextStyle(color: Color(0xFF9E6D4E))), onPressed: () => Navigator.pop(ctx)),
+                  ElevatedButton(
+                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF5C4033), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                     child: isSaving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("SAVE"),
+                     onPressed: isSaving ? null : () async {
+                        setStateModal(() => isSaving = true);
+                        try {
+                          await UserService().updateProfile({
+                            'fullName': nameController.text,
+                            'phone': phoneController.text,
+                            'nicNumber': nicController.text
+                          });
+                          if (mounted) {
+                            Navigator.pop(ctx);
+                            _fetchProfile(); // Refresh screen silently
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile details updated successfully!")));
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red));
+                          setStateModal(() => isSaving = false);
+                        }
+                     }
+                  )
+               ]
+            );
+          }
+        )
+      );
   }
   
   void _showChangePasswordDialog() {
@@ -129,47 +138,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
      bool isChanging = false;
      
      showDialog(
-       context: context,
-       builder: (ctx) => StatefulBuilder(
-         builder: (context, setStateModal) {
-           return AlertDialog(
-              backgroundColor: const Color(0xFFF9EED9),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text("Change Password", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.bold)),
-              content: Column(
-                 mainAxisSize: MainAxisSize.min,
-                 children: [
-                   TextField(controller: currentPasswordController, obscureText: true, decoration: const InputDecoration(labelText: "Current Password")),
-                   const SizedBox(height: 16),
-                   TextField(controller: newPasswordController, obscureText: true, decoration: const InputDecoration(labelText: "New Password")),
-                 ]
-              ),
-              actions: [
-                 TextButton(child: const Text("CANCEL", style: TextStyle(color: Color(0xFF9E6D4E))), onPressed: () => Navigator.pop(ctx)),
-                 ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF5C4033), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                    child: isChanging 
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                        : const Text("SAVE", style: TextStyle(color: Colors.white)),
-                    onPressed: isChanging ? null : () async {
-                       setStateModal(() => isChanging = true);
-                       try {
-                         await UserService().changePassword(currentPasswordController.text, newPasswordController.text);
-                         if (mounted) {
-                           Navigator.pop(ctx);
-                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password updated successfully!")));
-                         }
-                       } catch (e) {
-                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red));
-                         setStateModal(() => isChanging = false);
-                       }
-                    }
-                 )
-              ]
-           );
-         }
-       )
-     );
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+          builder: (context, setStateModal) {
+            return AlertDialog(
+               backgroundColor: const Color(0xFFF9EED9),
+               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+               title: const Text("Change Password", style: TextStyle(color: Color(0xFF5C4033), fontWeight: FontWeight.bold)),
+               content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(controller: currentPasswordController, obscureText: true, decoration: const InputDecoration(labelText: "Current Password")),
+                    const SizedBox(height: 16),
+                    TextField(controller: newPasswordController, obscureText: true, decoration: const InputDecoration(labelText: "New Password")),
+                  ]
+               ),
+               actions: [
+                  TextButton(child: const Text("CANCEL", style: TextStyle(color: Color(0xFF9E6D4E))), onPressed: () => Navigator.pop(ctx)),
+                  ElevatedButton(
+                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF5C4033), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                     child: isChanging ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("UPDATE"),
+                     onPressed: isChanging ? null : () async {
+                        if (currentPasswordController.text.isEmpty || newPasswordController.text.isEmpty) {
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all password fields!")));
+                           return;
+                        }
+                        setStateModal(() => isChanging = true);
+                        try {
+                          await UserService().changePassword(currentPasswordController.text, newPasswordController.text);
+                          if (mounted) {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password updated successfully!")));
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red));
+                          setStateModal(() => isChanging = false);
+                        }
+                     }
+                  )
+               ]
+            );
+          }
+        )
+      );
   }
 
   ImageProvider _getProfileImage() {
@@ -206,11 +217,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF5C4033)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Color(0xFF8B3A3A)),
+            tooltip: "Log Out",
+            onPressed: _logout,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
+             // Session Expired Banner if user data couldn't be loaded
+             if (_user == null)
+               Container(
+                 margin: const EdgeInsets.only(bottom: 24),
+                 padding: const EdgeInsets.all(16),
+                 decoration: BoxDecoration(
+                   color: const Color(0xFFFFEBEE),
+                   borderRadius: BorderRadius.circular(16),
+                   border: Border.all(color: Colors.red.shade300),
+                 ),
+                 child: Row(
+                   children: [
+                     const Icon(Icons.lock_clock, color: Colors.red),
+                     const SizedBox(width: 12),
+                     const Expanded(
+                       child: Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Text(
+                             "Session Expired",
+                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
+                           ),
+                           Text(
+                             "Please log in again to sync your account details.",
+                             style: TextStyle(color: Colors.black87, fontSize: 12),
+                           ),
+                         ],
+                       ),
+                     ),
+                     ElevatedButton(
+                       onPressed: _logout,
+                       style: ElevatedButton.styleFrom(
+                         backgroundColor: Colors.red.shade700,
+                         foregroundColor: Colors.white,
+                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                       ),
+                       child: const Text("Log In", style: TextStyle(fontSize: 12)),
+                     ),
+                   ],
+                 ),
+               ),
+
              // Avatar
              Stack(
                children: [
@@ -230,8 +290,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                ],
              ),
              const SizedBox(height: 16),
-             Text(_user?['fullName'] ?? 'Loading...', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
-             Text(_user?['email'] ?? '', style: const TextStyle(fontSize: 16, color: Color(0xFF9E6D4E))),
+             Text(_user?['fullName'] ?? 'Pet Lover', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF5C4033))),
+             Text(_user?['email'] ?? 'Session Expired', style: const TextStyle(fontSize: 16, color: Color(0xFF9E6D4E))),
              const SizedBox(height: 32),
              
              // Info Section
