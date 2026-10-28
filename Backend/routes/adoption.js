@@ -13,6 +13,7 @@ const {
 
 const router = express.Router();
 const auth = require('../middleware/auth');
+const optionalAuth = require('../middleware/optionalAuth');
 
 const handleValidation = (req, res, next) => {
   const errors = validationResult(req);
@@ -32,7 +33,7 @@ router.get('/', getAllListings);
 // @route   GET /api/adoptions/:id
 // @desc    Get single adoption listing
 // @access  Public
-router.get('/:id', getListingById);
+router.get('/:id', optionalAuth, getListingById);
 
 // ── Protected routes ────────────────────────────────────────────────────────
 

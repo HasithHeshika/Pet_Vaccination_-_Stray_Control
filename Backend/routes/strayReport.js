@@ -22,7 +22,8 @@ const rateLimit = require('../middleware/rateLimit');
 // Public form: limit spam submissions per IP
 const reportLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 10,
+  // Configurable so automated tests (which all run from one address) can submit more than 10
+  max: Number(process.env.MAX_INCIDENT_REPORTS_PER_HOUR) || 10,
   message: 'Too many reports from this connection. Please try again later.'
 });
 
@@ -54,26 +55,30 @@ router.post(
     body('coordinates.lng').optional().isFloat({ min: -180, max: 180 }).withMessage('Invalid longitude'),
     body('description').trim().notEmpty().withMessage('Description is required')
       .isLength({ max: 2000 }).withMessage('Description is too long'),
-    body('image').optional({ values: 'falsy' }).isString().withMessage('Image link must be a string'),
+    body('image').optional({ values: 'falsy' }).isURL({ protocols: ['http', 'https'], require_protocol: true })
+      .withMessage('Image link must be a web address'),
     body('images').optional().isArray({ max: MAX_IMAGES }).withMessage('You can attach a maximum of two photos'),
     body('images.*').custom(validateUploadedImage),
     body('reporterName').optional().trim().isLength({ max: 100 }).withMessage('Name is too long'),
     body('reporterContact').optional().trim().isLength({ max: 150 }).withMessage('Contact details are too long'),
-    body('category').optional().isString().withMessage('Category must be a string')
+    body('category').optional().isString().withMessage('Category must be a string'),
+    body('isPublic').optional().isBoolean().withMessage('isPublic must be true or false')
   ],
   handleValidation,
   createStrayReport
 );
 
 // @route   GET /api/stray-reports
-// @desc    Get all incident/stray reports (Public community feed, supports ?category=&status= filters)
-// @access  Public
-router.get('/', getStrayReports);
+// @desc    Administrators: every report with full details (open and most urgent first).
+//          Everyone else: the community feed of public reports, without the reporter's identity,
+//          contact details, exact location, photos or internal notes. Supports ?category=&status=
+// @access  Public (login optional)
+router.get('/', optionalAuth, getStrayReports);
 
 // @route   GET /api/stray-reports/:id
-// @desc    Get a single incident/stray report
-// @access  Public
-router.get('/:id', validateObjectId(), getStrayReportById);
+// @desc    One report: full details for administrators, the public view of a public report otherwise
+// @access  Public (login optional)
+router.get('/:id', optionalAuth, validateObjectId(), getStrayReportById);
 
 // @route   PATCH /api/stray-reports/:id/status
 // @desc    Update report status (admin only)
@@ -100,7 +105,7 @@ router.post('/:id/support', auth, validateObjectId(), toggleSupport);
 // @route   GET /api/stray-reports/:id/comments
 // @desc    Get all comments for a stray report
 // @access  Public
-router.get('/:id/comments', validateObjectId(), getComments);
+router.get('/:id/comments', optionalAuth, validateObjectId(), getComments);
 
 // @route   POST /api/stray-reports/:id/comments
 // @desc    Add a comment to a stray report
@@ -110,7 +115,9 @@ router.post(
   auth,
   validateObjectId(),
   [
-    body('text').trim().notEmpty().withMessage('Comment text is required')
+    body('text').isString().withMessage('Comment text is required').bail()
+      .trim().notEmpty().withMessage('Comment text is required')
+      .isLength({ max: 1000 }).withMessage('Comment is too long')
   ],
   handleValidation,
   addComment

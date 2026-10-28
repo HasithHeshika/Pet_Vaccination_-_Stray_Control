@@ -150,9 +150,11 @@ const strayReportSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
+  // Shown in the community feed (without the reporter's details). Reports sent through the
+  // incident form are for the authority only, so the default is private.
   isPublic: {
     type: Boolean,
-    default: true
+    default: false
   }
 }, {
   timestamps: true

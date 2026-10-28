@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AdoptionListing = require('../models/AdoptionListing');
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -84,7 +85,7 @@ exports.getAllListings = async (req, res) => {
     const total = await AdoptionListing.countDocuments(query);
     const listings = await AdoptionListing.find(query)
       .select(publicListingFields)
-      .populate('listedBy', 'fullName email phone')
+      .populate('listedBy', 'fullName phone')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit));
@@ -108,8 +109,11 @@ exports.getAllListings = async (req, res) => {
 // ────────────────────────────────────────────────────────────────────────────
 exports.getListingById = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ message: 'Adoption listing not found' });
+    }
     const listing = await AdoptionListing.findById(req.params.id)
-      .populate('listedBy', 'fullName email phone')
+      .populate('listedBy', 'fullName phone')
       .populate('applications.applicant', 'fullName email');
 
     if (!listing) {
@@ -119,7 +123,14 @@ exports.getListingById = async (req, res) => {
     // Increment view count (fire and forget)
     AdoptionListing.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } }).exec();
 
-    return res.json({ listing });
+    // Applicants' details are for the lister and administrators only
+    const data = listing.toObject();
+    const canSeeApplications = req.user && (req.user.isAdmin || String(listing.listedBy?._id) === String(req.user._id));
+    if (!canSeeApplications) {
+      data.applicationCount = (data.applications || []).length;
+      delete data.applications;
+    }
+    return res.json({ listing: data });
   } catch (error) {
     console.error('Get adoption listing error:', error);
     return res.status(500).json({ message: 'Server error while fetching adoption listing' });

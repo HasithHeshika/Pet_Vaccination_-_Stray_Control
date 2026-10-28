@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const BreedingListing = require('../models/BreedingListing');
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -84,7 +85,7 @@ exports.getAllListings = async (req, res) => {
     const total = await BreedingListing.countDocuments(query);
     const listings = await BreedingListing.find(query)
       .select('-inquiries')  // Hide inquiries in list view
-      .populate('owner', 'fullName email phone')
+      .populate('owner', 'fullName phone')
       .populate('breederLicense', 'licenseId breederName status')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -109,8 +110,11 @@ exports.getAllListings = async (req, res) => {
 // ────────────────────────────────────────────────────────────────────────────
 exports.getListingById = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ message: 'Breeding listing not found' });
+    }
     const listing = await BreedingListing.findById(req.params.id)
-      .populate('owner', 'fullName email phone')
+      .populate('owner', 'fullName phone')
       .populate('breederLicense', 'licenseId breederName animalTypes status issueDate expiryDate')
       .populate('inquiries.inquirer', 'fullName email');
 
@@ -121,7 +125,14 @@ exports.getListingById = async (req, res) => {
     // Increment view count (fire and forget)
     BreedingListing.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } }).exec();
 
-    return res.json({ listing });
+    // Enquirers' details are for the owner and administrators only
+    const data = listing.toObject();
+    const canSeeInquiries = req.user && (req.user.isAdmin || String(listing.owner?._id) === String(req.user._id));
+    if (!canSeeInquiries) {
+      data.inquiryCount = (data.inquiries || []).length;
+      delete data.inquiries;
+    }
+    return res.json({ listing: data });
   } catch (error) {
     console.error('Get breeding listing error:', error);
     return res.status(500).json({ message: 'Server error while fetching breeding listing' });
