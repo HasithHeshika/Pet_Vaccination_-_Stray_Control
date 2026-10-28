@@ -83,6 +83,7 @@ before(async () => {
       SMTP_USER: '',
       ACS_EMAIL_CONNECTION_STRING: '',
       ACS_EMAIL_SENDER: '',
+      MAX_INCIDENT_REPORTS_PER_HOUR: '100',
       NODE_ENV: 'test'
     },
     stdio: process.env.TEST_VERBOSE ? ['inherit', 'inherit', 'inherit', 'ipc'] : ['ignore', 'ignore', 'ignore', 'ipc']
@@ -284,8 +285,109 @@ test('animal incidents: types, default urgency, photos, location and reporter co
   assert.equal(dashboard.status, 200);
   assert.ok(dashboard.data.metrics.openUrgentIncidents >= 2);
 
+  // Reports sent through the incident form go to the authority only: not in the community feed
   const publicList = await api('GET', '/api/incidents');
-  assert.equal(publicList.status, 401, 'incident reports (and reporter contacts) are not public');
+  assert.equal(publicList.status, 200);
+  assert.equal(publicList.data.reports.some((r) => r._id === violence.data.report._id), false);
+  assert.doesNotMatch(JSON.stringify(publicList.data), /0771112223|Kamal/, 'no reporter details in the public feed');
+  assert.equal((await api('GET', `/api/incidents/${violence.data.report._id}`)).status, 404);
+});
+
+test('community feed: public posts hide the reporter; private reports, spoofed fields and emails stay out', async () => {
+  const tinyPng = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  // A logged-in user posts to the community hub (with a category), trying to set authority-only fields
+  const post = await api('POST', '/api/stray-reports', {
+    token: ctx.owner.token,
+    body: {
+      category: 'Stray Dog Pack', location: 'Galle Fort ramparts', description: 'Pack of five dogs near the lighthouse',
+      coordinates: { lat: 6.0247, lng: 80.2193 }, images: [tinyPng], reporterName: 'Nimal', reporterContact: '0779990000',
+      status: 'resolved', authorityNotes: 'fake note', assignedTo: 'nobody', reportedBy: ctx.other.id
+    }
+  });
+  assert.equal(post.status, 201, JSON.stringify(post.data));
+  assert.equal(post.data.report.status, 'pending');
+  assert.equal(post.data.report.authorityNotes, undefined);
+  assert.equal(post.data.report.reportedBy._id, ctx.owner.id, 'reporter comes from the token, not the body');
+  const id = post.data.report._id;
+
+  // Guests see it, without who reported it, where exactly, photos or notes
+  const feed = await api('GET', '/api/stray-reports');
+  assert.equal(feed.status, 200);
+  const item = feed.data.reports.find((r) => r._id === id);
+  assert.ok(item, 'community posts are public');
+  for (const field of ['reportedBy', 'reporterName', 'reporterContact', 'coordinates', 'images', 'authorityNotes', 'assignedTo']) {
+    assert.equal(item[field], undefined, `${field} is not public`);
+  }
+  assert.equal(item.category, 'Stray Dog Pack');
+  assert.equal(item.imageCount, 1);
+  assert.doesNotMatch(JSON.stringify(feed.data), /0779990000|owner@test\.local/);
+  assert.equal((await api('GET', `/api/stray-reports/${id}`)).data.report.reporterContact, undefined);
+
+  // Supporting: needs a login; the feed only says whether *you* supported it
+  assert.equal((await api('POST', `/api/stray-reports/${id}/support`)).status, 401);
+  const support = await api('POST', `/api/stray-reports/${id}/support`, { token: ctx.other.token });
+  assert.equal(support.status, 200);
+  assert.equal(support.data.supportCount, 1);
+  const asOther = (await api('GET', '/api/stray-reports', { token: ctx.other.token })).data.reports.find((r) => r._id === id);
+  assert.deepEqual(asOther.supporters, [ctx.other.id]);
+  assert.equal(asOther.supportedByMe, true);
+  const asGuest = (await api('GET', '/api/stray-reports')).data.reports.find((r) => r._id === id);
+  assert.deepEqual(asGuest.supporters, []);
+  assert.equal(asGuest.supportCount, 1);
+
+  // Comments show the commenter's name, never an email address or account id
+  const comment = await api('POST', `/api/stray-reports/${id}/comments`, { token: ctx.other.token, body: { text: 'Saw them too this morning' } });
+  assert.equal(comment.status, 201, JSON.stringify(comment.data));
+  assert.equal(comment.data.comment.author, undefined);
+  const comments = await api('GET', `/api/stray-reports/${id}/comments`);
+  assert.equal(comments.data.comments[0].authorName, 'Other Person');
+  assert.doesNotMatch(JSON.stringify(comments.data), /@test\.local/);
+  assert.equal((await api('POST', `/api/stray-reports/${id}/comments`, { token: ctx.other.token, body: { text: { $ne: '' } } })).status, 400);
+
+  // Private reports (sent through the incident form) can't be seen, supported or commented on by the public
+  const priv = await api('POST', '/api/incidents', { body: { incidentType: 'violence', location: 'Back lane', description: 'Private report' } });
+  const privId = priv.data.report._id;
+  assert.equal((await api('GET', `/api/stray-reports/${privId}/comments`)).status, 404);
+  assert.equal((await api('POST', `/api/stray-reports/${privId}/support`, { token: ctx.other.token })).status, 404);
+  assert.equal((await api('POST', `/api/stray-reports/${privId}/comments`, { token: ctx.other.token, body: { text: 'hi' } })).status, 404);
+
+  // Administrators still get every report with the reporter's details
+  const adminList = await api('GET', '/api/stray-reports', { token: ctx.adminToken });
+  const adminItem = adminList.data.reports.find((r) => r._id === id);
+  assert.equal(adminItem.reporterContact, '0779990000');
+  assert.deepEqual(adminItem.coordinates, { lat: 6.0247, lng: 80.2193 });
+  assert.ok(adminList.data.reports.some((r) => r._id === privId));
+
+  // Adoption listings: the lister's phone is the public contact, but never their email,
+  // and applicants' details are only for the lister and administrators
+  const listing = await api('POST', '/api/adoptions', {
+    token: ctx.owner.token,
+    body: { petName: 'Bella', species: 'Dog', breed: 'Mixed', age: '1 year', gender: 'Female', description: 'Friendly puppy', city: 'Galle' }
+  });
+  assert.equal(listing.status, 201, JSON.stringify(listing.data));
+  const listingId = (listing.data.listing || listing.data)._id;
+  const apply = await api('POST', `/api/adoptions/${listingId}/inquire`, {
+    token: ctx.other.token, body: { message: 'We have a big garden', contactPhone: '0715556666' }
+  });
+  assert.ok([200, 201].includes(apply.status), JSON.stringify(apply.data));
+  const asPublic = await api('GET', `/api/adoptions/${listingId}`);
+  assert.equal(asPublic.status, 200);
+  assert.equal(asPublic.data.listing.applications, undefined);
+  assert.equal(asPublic.data.listing.applicationCount, 1);
+  assert.equal(asPublic.data.listing.listedBy.email, undefined);
+  assert.doesNotMatch(JSON.stringify(asPublic.data), /0715556666|other@test\.local|owner@test\.local/);
+  assert.doesNotMatch(JSON.stringify((await api('GET', '/api/adoptions')).data), /@test\.local/);
+  const asLister = await api('GET', `/api/adoptions/${listingId}`, { token: ctx.owner.token });
+  assert.equal(asLister.data.listing.applications.length, 1);
+  assert.equal(asLister.data.listing.applications[0].applicant.email, 'other@test.local');
+  assert.equal((await api('GET', '/api/adoptions/not-an-id')).status, 404);
+  assert.equal((await api('GET', '/api/breeding-matches/not-an-id')).status, 404);
+  assert.doesNotMatch(JSON.stringify((await api('GET', '/api/breeding-matches')).data), /@test\.local/);
+
+  // Odd paging values and link "photos" are handled cleanly
+  assert.equal((await api('GET', '/api/stray-reports?page=-1&limit=abc')).status, 200);
+  const badImage = await api('POST', '/api/stray-reports', { body: { location: 'X', description: 'Y', image: 'javascript:alert(1)' } });
+  assert.equal(badImage.status, 400);
 });
 
 test('incident review fixes: no link photos, pending listed before in-progress, no automatic name', async () => {
@@ -584,7 +686,7 @@ test('forgot / reset password: no account discovery, one-time token, old session
 
 test('access control matrix: admin-only endpoints reject guests (401) and normal users (403)', async () => {
   const adminOnly = [
-    '/api/users', '/api/pets', '/api/stray-reports', '/api/licenses', '/api/authority/dashboard',
+    '/api/users', '/api/pets', '/api/licenses', '/api/authority/dashboard',
     '/api/matches', '/api/vaccinations/upcoming', '/api/vaccinations/overdue'
   ];
   for (const url of adminOnly) {
