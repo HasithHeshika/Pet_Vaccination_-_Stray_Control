@@ -66,14 +66,14 @@ router.post(
 );
 
 // @route   GET /api/stray-reports
-// @desc    Get all incident/stray reports (Public community feed, supports ?category=&status= filters)
-// @access  Public
-router.get('/', getStrayReports);
+// @desc    Get all incident/stray reports (supports ?category=&status= filters)
+// @access  Private/Admin
+router.get('/', auth, admin, getStrayReports);
 
 // @route   GET /api/stray-reports/:id
 // @desc    Get a single incident/stray report
-// @access  Public
-router.get('/:id', validateObjectId(), getStrayReportById);
+// @access  Private/Admin
+router.get('/:id', auth, admin, validateObjectId(), getStrayReportById);
 
 // @route   PATCH /api/stray-reports/:id/status
 // @desc    Update report status (admin only)

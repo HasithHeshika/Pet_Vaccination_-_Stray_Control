@@ -124,11 +124,11 @@ exports.createStrayReport = async (req, res) => {
       images,
       reporterName,
       reporterContact,
-      status: allowedStatuses.includes(status) ? status : 'pending',
+      status: req.user?.isAdmin && allowedStatuses.includes(status) ? status : 'pending',
       assignedTo,
       authorityNotes,
       category: resolvedCategory,
-      reportedBy: req.user?._id || req.body.reportedBy
+      reportedBy: req.user?._id
     });
 
     await strayReport.save();
