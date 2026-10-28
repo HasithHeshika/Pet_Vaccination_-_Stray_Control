@@ -161,6 +161,8 @@ app.use('/api/lost-and-found', require('./routes/lostReport'));
 app.use('/api/matches', require('./routes/match'));
 app.use('/api/licenses', require('./routes/license'));
 app.use('/api/authority', require('./routes/authority'));
+app.use('/api/adoptions', require('./routes/adoption'));
+app.use('/api/breeding-matches', require('./routes/breeding'));
 
 // Health check route
 app.get('/', (req, res) => {

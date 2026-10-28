@@ -1,9 +1,19 @@
+const mongoose = require('mongoose');
 const StrayReport = require('../models/StrayReport');
 const User = require('../models/User');
 const { sendIncidentAlertEmail } = require('../services/notificationService');
 
 const { DEFAULT_URGENCY } = StrayReport;
 const allowedStatuses = ['pending', 'in-progress', 'resolved'];
+const allowedCategories = [
+  'Aggressive Stray Alert',
+  'Injured Animal in Need',
+  'Stray Dog Pack',
+  'Rabies Suspect & Welfare',
+  'Noise Disturbance',
+  'Animal Cruelty / Abuse',
+  'Other'
+];
 
 // Photos are large (base64); lists only report how many there are, the detail view returns them
 const LIST_EXCLUDE = '-images';
@@ -68,6 +78,9 @@ const alertAuthority = async (report) => {
   }
 };
 
+// ────────────────────────────────────────────────────────────────────────────
+// Create Incident / Stray Report
+// ────────────────────────────────────────────────────────────────────────────
 exports.createStrayReport = async (req, res) => {
   try {
     const {
@@ -80,10 +93,24 @@ exports.createStrayReport = async (req, res) => {
       image,
       images = [],
       reporterName,
-      reporterContact
+      reporterContact,
+      category,
+      status,
+      assignedTo,
+      authorityNotes
     } = req.body;
 
-    // Status, assignment and notes are set by the authority; the reporter account comes from the login token
+    // Parse category from request body or fall back to parsing from description
+    let resolvedCategory = 'Other';
+    if (category && allowedCategories.includes(category)) {
+      resolvedCategory = category;
+    } else if (description) {
+      const match = description.match(/^\[([^\]]+)\]/);
+      if (match && allowedCategories.includes(match[1])) {
+        resolvedCategory = match[1];
+      }
+    }
+
     const strayReport = new StrayReport({
       incidentType,
       otherIncidentType: incidentType === 'other' ? otherIncidentType : undefined,
@@ -95,17 +122,18 @@ exports.createStrayReport = async (req, res) => {
       description,
       image,
       images,
-      // Only what the reporter typed; a logged-in report is still linked to the account via reportedBy
       reporterName,
       reporterContact,
-      status: 'pending',
-      reportedBy: req.user?._id
+      status: allowedStatuses.includes(status) ? status : 'pending',
+      assignedTo,
+      authorityNotes,
+      category: resolvedCategory,
+      reportedBy: req.user?._id || req.body.reportedBy
     });
 
     await strayReport.save();
 
     if (strayReport.urgency === 'emergency' || strayReport.urgency === 'urgent') {
-      // Don't make the reporter wait for email delivery
       alertAuthority(strayReport);
     }
 
@@ -127,17 +155,40 @@ exports.createStrayReport = async (req, res) => {
   }
 };
 
+// ────────────────────────────────────────────────────────────────────────────
+// Get Stray / Incident Reports (with filter & pagination)
+// ────────────────────────────────────────────────────────────────────────────
 exports.getStrayReports = async (req, res) => {
   try {
-    // Open reports first, then most urgent, then newest
-    const reports = await StrayReport.find()
+    const { category, status, isPublic, page = 1, limit = 50 } = req.query;
+    const query = {};
+
+    if (category && allowedCategories.includes(category)) {
+      query.category = category;
+    }
+    if (status && allowedStatuses.includes(status)) {
+      query.status = status;
+    }
+    if (isPublic !== 'false') {
+      query.isPublic = true;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+    const total = await StrayReport.countDocuments(query);
+
+    const reports = await StrayReport.find(query)
       .select(LIST_EXCLUDE)
       .populate('reportedBy', 'fullName email')
-      .sort(StrayReport.QUEUE_SORT);
+      .sort(StrayReport.QUEUE_SORT)
+      .skip(skip)
+      .limit(Number(limit));
 
     return res.json({
       reports: reports.map(normalizeReport),
-      count: reports.length
+      count: reports.length,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / Number(limit))
     });
   } catch (error) {
     console.error('Get stray reports error:', error);
@@ -147,7 +198,9 @@ exports.getStrayReports = async (req, res) => {
 
 exports.getStrayReportById = async (req, res) => {
   try {
-    const report = await StrayReport.findById(req.params.id).populate('reportedBy', 'fullName email');
+    const report = await StrayReport.findById(req.params.id)
+      .populate('reportedBy', 'fullName email')
+      .populate('supporters', 'fullName');
 
     if (!report) {
       return res.status(404).json({ message: 'Report not found' });
@@ -199,5 +252,106 @@ exports.updateStrayReportStatus = async (req, res) => {
   } catch (error) {
     console.error('Update stray report status error:', error);
     return res.status(500).json({ message: 'Server error while updating report status' });
+  }
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// NEW — Community engagement: Support (upvote) toggle
+// @route   POST /api/stray-reports/:id/support
+// @access  Private (auth)
+// ────────────────────────────────────────────────────────────────────────────
+exports.toggleSupport = async (req, res) => {
+  try {
+    const report = await StrayReport.findById(req.params.id);
+
+    if (!report) {
+      return res.status(404).json({ message: 'Stray report not found' });
+    }
+
+    const userId = new mongoose.Types.ObjectId(req.user.id || req.user._id);
+    const alreadySupported = report.supporters.some(id => id.equals(userId));
+
+    if (alreadySupported) {
+      report.supporters = report.supporters.filter(id => !id.equals(userId));
+      report.supportCount = Math.max(0, report.supportCount - 1);
+    } else {
+      report.supporters.push(userId);
+      report.supportCount = report.supporters.length;
+    }
+
+    await report.save();
+
+    return res.json({
+      message: alreadySupported ? 'Support removed' : 'Support added',
+      supported: !alreadySupported,
+      supportCount: report.supportCount
+    });
+  } catch (error) {
+    console.error('Toggle support error:', error);
+    return res.status(500).json({ message: 'Server error while toggling support' });
+  }
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// NEW — Community engagement: Add a comment to a report
+// @route   POST /api/stray-reports/:id/comments
+// @access  Private (auth)
+// ────────────────────────────────────────────────────────────────────────────
+exports.addComment = async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: 'Comment text is required' });
+    }
+
+    const report = await StrayReport.findById(req.params.id);
+
+    if (!report) {
+      return res.status(404).json({ message: 'Stray report not found' });
+    }
+
+    const comment = {
+      author: req.user.id || req.user._id,
+      authorName: req.user.fullName || req.user.email || 'Community Member',
+      text: text.trim(),
+      createdAt: new Date()
+    };
+
+    report.comments.push(comment);
+    await report.save();
+
+    const addedComment = report.comments[report.comments.length - 1];
+
+    return res.status(201).json({
+      message: 'Comment added successfully',
+      comment: addedComment
+    });
+  } catch (error) {
+    console.error('Add comment error:', error);
+    return res.status(500).json({ message: 'Server error while adding comment' });
+  }
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// NEW — Get all comments for a stray report
+// @route   GET /api/stray-reports/:id/comments
+// @access  Public
+// ────────────────────────────────────────────────────────────────────────────
+exports.getComments = async (req, res) => {
+  try {
+    const report = await StrayReport.findById(req.params.id).select('comments');
+
+    if (!report) {
+      return res.status(404).json({ message: 'Stray report not found' });
+    }
+
+    return res.json({
+      comments: report.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+      count: report.comments.length
+    });
+  } catch (error) {
+    console.error('Get comments error:', error);
+    return res.status(500).json({ message: 'Server error while fetching comments' });
   }
 };

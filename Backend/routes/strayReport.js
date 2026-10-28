@@ -4,7 +4,10 @@ const {
   createStrayReport,
   getStrayReports,
   getStrayReportById,
-  updateStrayReportStatus
+  updateStrayReportStatus,
+  toggleSupport,
+  addComment,
+  getComments
 } = require('../controllers/strayReportController');
 const { INCIDENT_TYPES, URGENCY_LEVELS } = require('../models/StrayReport');
 const { MAX_IMAGES, validateUploadedImage } = require('../utils/imageValidation');
@@ -32,7 +35,7 @@ const handleValidation = (req, res, next) => {
 };
 
 // @route   POST /api/stray-reports  (also /api/incidents)
-// @desc    Report an animal incident: violence/abuse, sick or injured animal, stray sighting, or other
+// @desc    Report an animal incident: violence/abuse, sick or injured animal, stray sighting, or community complaint
 // @access  Public (login optional)
 router.post(
   '/',
@@ -51,29 +54,29 @@ router.post(
     body('coordinates.lng').optional().isFloat({ min: -180, max: 180 }).withMessage('Invalid longitude'),
     body('description').trim().notEmpty().withMessage('Description is required')
       .isLength({ max: 2000 }).withMessage('Description is too long'),
-    body('image').optional({ values: 'falsy' }).isURL({ protocols: ['http', 'https'], require_protocol: true })
-      .withMessage('Image link must be a web address'),
+    body('image').optional({ values: 'falsy' }).isString().withMessage('Image link must be a string'),
     body('images').optional().isArray({ max: MAX_IMAGES }).withMessage('You can attach a maximum of two photos'),
     body('images.*').custom(validateUploadedImage),
     body('reporterName').optional().trim().isLength({ max: 100 }).withMessage('Name is too long'),
-    body('reporterContact').optional().trim().isLength({ max: 150 }).withMessage('Contact details are too long')
+    body('reporterContact').optional().trim().isLength({ max: 150 }).withMessage('Contact details are too long'),
+    body('category').optional().isString().withMessage('Category must be a string')
   ],
   handleValidation,
   createStrayReport
 );
 
 // @route   GET /api/stray-reports
-// @desc    Get all incident reports (open and most urgent first, without photos)
-// @access  Private/Admin
-router.get('/', auth, admin, getStrayReports);
+// @desc    Get all incident/stray reports (Public community feed, supports ?category=&status= filters)
+// @access  Public
+router.get('/', getStrayReports);
 
 // @route   GET /api/stray-reports/:id
-// @desc    Get a single incident report, including photos
-// @access  Private/Admin
-router.get('/:id', auth, admin, validateObjectId(), getStrayReportById);
+// @desc    Get a single incident/stray report
+// @access  Public
+router.get('/:id', validateObjectId(), getStrayReportById);
 
 // @route   PATCH /api/stray-reports/:id/status
-// @desc    Update report status
+// @desc    Update report status (admin only)
 // @access  Private/Admin
 router.patch(
   '/:id/status',
@@ -85,6 +88,32 @@ router.patch(
   ],
   handleValidation,
   updateStrayReportStatus
+);
+
+// ── New community engagement routes ─────────────────────────────────────────
+
+// @route   POST /api/stray-reports/:id/support
+// @desc    Toggle support (upvote) on a stray report
+// @access  Private (auth)
+router.post('/:id/support', auth, validateObjectId(), toggleSupport);
+
+// @route   GET /api/stray-reports/:id/comments
+// @desc    Get all comments for a stray report
+// @access  Public
+router.get('/:id/comments', validateObjectId(), getComments);
+
+// @route   POST /api/stray-reports/:id/comments
+// @desc    Add a comment to a stray report
+// @access  Private (auth)
+router.post(
+  '/:id/comments',
+  auth,
+  validateObjectId(),
+  [
+    body('text').trim().notEmpty().withMessage('Comment text is required')
+  ],
+  handleValidation,
+  addComment
 );
 
 module.exports = router;

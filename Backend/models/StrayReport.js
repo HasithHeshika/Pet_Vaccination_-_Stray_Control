@@ -106,6 +106,53 @@ const strayReportSchema = new mongoose.Schema({
   reportedAt: {
     type: Date,
     default: Date.now
+  },
+
+  // ── Community engagement fields (added for Community Hub feature) ──
+  category: {
+    type: String,
+    enum: [
+      'Aggressive Stray Alert',
+      'Injured Animal in Need',
+      'Stray Dog Pack',
+      'Rabies Suspect & Welfare',
+      'Noise Disturbance',
+      'Animal Cruelty / Abuse',
+      'Other'
+    ],
+    default: 'Other'
+  },
+  supportCount: {
+    type: Number,
+    default: 0
+  },
+  supporters: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  comments: [{
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    authorName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    text: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  isPublic: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true
@@ -123,6 +170,7 @@ strayReportSchema.pre('validate', function setUrgencyRank(next) {
 strayReportSchema.index({ status: 1, reportedAt: -1 });
 strayReportSchema.index({ reportedAt: -1 });
 strayReportSchema.index({ statusRank: 1, urgencyRank: 1, reportedAt: -1 });
+strayReportSchema.index({ category: 1, reportedAt: -1 });
 
 const StrayReport = mongoose.model('StrayReport', strayReportSchema);
 
