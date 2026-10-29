@@ -11,13 +11,12 @@ class AdoptionService {
 
   final ApiClient _client = ApiClient();
 
-  // ── Pastel colour palette for cards (used when building CommunityListing) ──
   static const List<Color> _pastelColors = [
-    Color(0xFFFDE8E1), // Soft peach
-    Color(0xFFE6F4EA), // Soft mint
-    Color(0xFFFEF7E0), // Butter yellow
-    Color(0xFFF3E8FD), // Soft lavender
-    Color(0xFFE8F0FE), // Soft sky blue
+    Color(0xFFFDE8E1),
+    Color(0xFFE6F4EA),
+    Color(0xFFFEF7E0),
+    Color(0xFFF3E8FD),
+    Color(0xFFE8F0FE),
   ];
 
   static const Map<String, String> _speciesEmoji = {
@@ -29,7 +28,6 @@ class AdoptionService {
   };
 
   /// Fetch all available adoption listings from the backend.
-  /// Falls back to an empty list on error so the UI can show local mock data.
   Future<List<CommunityListing>> getAdoptionListings({
     String? species,
     String? city,
@@ -150,6 +148,7 @@ class AdoptionService {
 
     final ageStr = _buildAgeString(age);
     final isFree = data['isFree'] as bool? ?? true;
+    final status = data['status'] as String? ?? 'Available';
     final tags = <String>[
       if (isFree) 'FREE',
       if (data['isVaccinated'] == true) 'Vaccinated',
@@ -176,6 +175,7 @@ class AdoptionService {
       isHealthVerified: healthRecords.isNotEmpty,
       healthRecords: healthRecords,
       isFree: isFree,
+      listingStatus: status,
     );
   }
 

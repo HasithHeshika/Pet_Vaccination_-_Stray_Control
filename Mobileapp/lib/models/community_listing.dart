@@ -40,7 +40,7 @@ class CommunityListing {
   final String petName;
   final String breed;
   final String category; // 'Adoption' or 'Breeding Match'
-  final List<String> tags; // e.g., 'FREE', 'Mixed', 'Purebred', 'Vaccinated'
+  final List<String> tags;
   final String age;
   final String gender;
   final String city;
@@ -55,6 +55,9 @@ class CommunityListing {
   final bool isHealthVerified;
   final List<HealthRecordItem> healthRecords;
   final bool isFree;
+  // Listing lifecycle status (Available/Pending/Adopted/Cancelled for adoption;
+  // Active/Mated/Paused for breeding)
+  final String listingStatus;
 
   CommunityListing({
     required this.id,
@@ -76,6 +79,7 @@ class CommunityListing {
     this.isHealthVerified = true,
     this.healthRecords = const [],
     this.isFree = true,
+    this.listingStatus = 'Available',
   });
 
   CommunityListing copyWith({
@@ -98,6 +102,7 @@ class CommunityListing {
     bool? isHealthVerified,
     List<HealthRecordItem>? healthRecords,
     bool? isFree,
+    String? listingStatus,
   }) {
     return CommunityListing(
       id: id ?? this.id,
@@ -119,6 +124,7 @@ class CommunityListing {
       isHealthVerified: isHealthVerified ?? this.isHealthVerified,
       healthRecords: healthRecords ?? this.healthRecords,
       isFree: isFree ?? this.isFree,
+      listingStatus: listingStatus ?? this.listingStatus,
     );
   }
 }

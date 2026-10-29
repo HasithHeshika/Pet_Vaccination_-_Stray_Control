@@ -12,11 +12,11 @@ class BreedingService {
   final ApiClient _client = ApiClient();
 
   static const List<Color> _pastelColors = [
-    Color(0xFFE8F0FE), // Soft sky blue
-    Color(0xFFF3E8FD), // Soft lavender
-    Color(0xFFFDE8E1), // Soft peach
-    Color(0xFFE6F4EA), // Soft mint
-    Color(0xFFFEF7E0), // Butter yellow
+    Color(0xFFE8F0FE),
+    Color(0xFFF3E8FD),
+    Color(0xFFFDE8E1),
+    Color(0xFFE6F4EA),
+    Color(0xFFFEF7E0),
   ];
 
   static const Map<String, String> _speciesEmoji = {
@@ -91,6 +91,21 @@ class BreedingService {
     }
   }
 
+  /// Update the status of a breeding listing (owner only).
+  /// Valid statuses: 'Active', 'Mated', 'Paused'
+  Future<void> updateStatus(
+      String listingId, String status, String token) async {
+    final response = await _client.put(
+      '/api/breeding-matches/$listingId',
+      body: {'status': status},
+      token: token,
+    );
+    if (response.statusCode != 200) {
+      final err = jsonDecode(response.body);
+      throw Exception(err['message'] ?? 'Failed to update listing status');
+    }
+  }
+
   /// Delete a breeding listing (owner or admin).
   Future<void> deleteListing(String listingId, String token) async {
     final response = await _client.delete(
@@ -131,6 +146,7 @@ class BreedingService {
     final photos = (data['photos'] as List?)?.cast<String>() ?? [];
     final license = data['breederLicense'] as Map<String, dynamic>?;
     final healthClearances = data['healthClearances'] as List? ?? [];
+    final status = data['status'] as String? ?? 'Active';
 
     final healthRecords = healthClearances
         .map((h) {
@@ -177,6 +193,7 @@ class BreedingService {
       isHealthVerified: healthRecords.isNotEmpty,
       healthRecords: healthRecords,
       isFree: false,
+      listingStatus: status,
     );
   }
 

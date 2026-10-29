@@ -11,7 +11,10 @@ import '../services/adoption_service.dart';
 import '../services/breeding_service.dart';
 
 class ListingFormScreen extends StatefulWidget {
-  const ListingFormScreen({super.key});
+  /// Pre-selects 'Adoption' or 'Breeding Match' based on which screen launched this form.
+  final String initialCategory;
+
+  const ListingFormScreen({super.key, this.initialCategory = 'Adoption'});
 
   @override
   State<ListingFormScreen> createState() => _ListingFormScreenState();
@@ -29,9 +32,10 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
   final TextEditingController _phoneController = TextEditingController();
 
   // State values
-  String _listingType = 'Adoption'; // 'Adoption' or 'Breeding Match'
+  late String _listingType; // initialized from widget.initialCategory
   bool _isFree = true;
   String _selectedGender = 'Male';
+  bool _isSubmitting = false;
 
   // Pre-registered pets
   List<Map<String, dynamic>> _availablePets = [];
@@ -49,6 +53,7 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
   @override
   void initState() {
     super.initState();
+    _listingType = widget.initialCategory;
     _loadPreRegisteredPets();
   }
 
@@ -65,7 +70,6 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
 
   Future<void> _loadPreRegisteredPets() async {
     setState(() => _loadingPets = true);
-    final samplePets = CommunityListingService().getSampleRegisteredPets();
     List<Map<String, dynamic>> userPets = [];
 
     try {
@@ -83,31 +87,29 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
               'photoUrl': p['photoUrl'] ?? (p['photoUrls'] is List && (p['photoUrls'] as List).isNotEmpty ? p['photoUrls'][0] : null),
               'emoji': '🐾',
               'city': p['city'] ?? 'Colombo',
-              'vaccinations': [
-                {
-                  'title': 'Core Registration Vaccinations',
-                  'date': 'Recent',
-                  'status': 'Verified',
-                  'clinic': 'Verified Vet Partner',
-                }
-              ],
+              'vaccinations': (p['vaccinations'] is List)
+                  ? p['vaccinations']
+                  : [
+                      {
+                        'title': 'Core Registration Vaccinations',
+                        'date': 'Recent',
+                        'status': 'Verified',
+                        'clinic': 'Verified Vet Partner',
+                      }
+                    ],
             });
           }
         }
       }
     } catch (_) {
-      // Fallback seamlessly to sample pets
+      // Network error — leave userPets empty
     }
-
-    final combined = [...userPets, ...samplePets];
 
     if (mounted) {
       setState(() {
-        _availablePets = combined;
+        _availablePets = userPets;
         _loadingPets = false;
-        if (combined.isNotEmpty) {
-          _onSelectPet(combined.first);
-        }
+        if (userPets.isNotEmpty) _onSelectPet(userPets.first);
       });
     }
   }
@@ -253,97 +255,88 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
     );
   }
 
-  void _submitListing() {
-    if (!_formKey.currentState!.validate()) {
+  void _submitListing() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_isSubmitting) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to publish a listing.'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
-    final tags = <String>[];
-    if (_isFree) {
-      tags.add('FREE');
-    }
-    tags.add(_listingType);
-    if (_breedController.text.toLowerCase().contains('mix') || _breedController.text.toLowerCase().contains('cross')) {
-      tags.add('Mixed');
-    } else {
-      tags.add('Purebred');
-    }
-    tags.add('Verified Health');
+    setState(() => _isSubmitting = true);
 
-    final newListing = CommunityListing(
-      id: 'list-${DateTime.now().millisecondsSinceEpoch}',
-      petName: _nameController.text.trim(),
-      breed: _breedController.text.trim(),
-      category: _listingType,
-      tags: tags,
-      age: _ageController.text.trim().isNotEmpty ? _ageController.text.trim() : '1 Year',
-      gender: _selectedGender,
-      city: _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : 'Colombo',
-      timestamp: 'Just now',
-      description: _descriptionController.text.trim(),
-      ownerName: 'You (Pet Owner)',
-      ownerPhone: _phoneController.text.trim(),
-      originalPhotoUrl: _recentImageFile == null ? _originalPhotoUrl : null,
-      localImageFile: _recentImageFile,
-      emoji: _selectedRegisteredPet?['emoji'] ?? '🐾',
-      pastelColor: _listingType == 'Adoption' ? const Color(0xFFE8F5E9) : const Color(0xFFF3E8FD),
-      isHealthVerified: _pulledVaccinations.isNotEmpty,
-      healthRecords: _pulledVaccinations,
-      isFree: _isFree,
-    );
-
-    CommunityListingService().addListing(newListing);
-
-    // Asynchronously sync with backend if authenticated
-    SharedPreferences.getInstance().then((prefs) {
-      final token = prefs.getString('token');
-      if (token != null && token.isNotEmpty) {
-        if (_listingType == 'Adoption') {
-          AdoptionService().createListing({
-            'petName': _nameController.text.trim(),
-            'species': _selectedRegisteredPet?['species'] ?? 'Dog',
-            'breed': _breedController.text.trim(),
-            'gender': _selectedGender,
-            'isFree': _isFree,
-            'city': _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : 'Colombo',
-            'description': _descriptionController.text.trim(),
-            'isVaccinated': _pulledVaccinations.isNotEmpty,
-            'photos': _originalPhotoUrl != null ? [_originalPhotoUrl!] : [],
-          }, token).catchError((_) => <String, dynamic>{});
-        } else {
-          BreedingService().createListing({
-            'petName': _nameController.text.trim(),
-            'species': _selectedRegisteredPet?['species'] ?? 'Dog',
-            'breed': _breedController.text.trim(),
-            'gender': _selectedGender,
-            'city': _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : 'Colombo',
-            'pedigreeDetails': _descriptionController.text.trim(),
-            'photos': _originalPhotoUrl != null ? [_originalPhotoUrl!] : [],
-          }, token).catchError((_) => <String, dynamic>{});
-        }
+    try {
+      if (_listingType == 'Adoption') {
+        await AdoptionService().createListing({
+          'petName': _nameController.text.trim(),
+          'species': _selectedRegisteredPet?['species'] ?? 'Dog',
+          'breed': _breedController.text.trim(),
+          'gender': _selectedGender,
+          'isFree': _isFree,
+          'city': _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : 'Colombo',
+          'description': _descriptionController.text.trim(),
+          'isVaccinated': _pulledVaccinations.isNotEmpty,
+          'contactPhone': _phoneController.text.trim(),
+          'photos': _originalPhotoUrl != null && _originalPhotoUrl!.startsWith('http')
+              ? [_originalPhotoUrl!]
+              : [],
+        }, token);
+      } else {
+        await BreedingService().createListing({
+          'petName': _nameController.text.trim(),
+          'species': _selectedRegisteredPet?['species'] ?? 'Dog',
+          'breed': _breedController.text.trim(),
+          'gender': _selectedGender,
+          'city': _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : 'Colombo',
+          'pedigreeDetails': _descriptionController.text.trim(),
+          'photos': _originalPhotoUrl != null && _originalPhotoUrl!.startsWith('http')
+              ? [_originalPhotoUrl!]
+              : [],
+        }, token);
       }
-    });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                "🎉 ${_nameController.text} listed for $_listingType successfully!",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    '🎉 ${_nameController.text} listed for $_listingType successfully!',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF2E7D32),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-
-    Navigator.pop(context, true);
+            backgroundColor: const Color(0xFF2E7D32),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to publish listing: ${e.toString().replaceAll("Exception: ", "")}'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -537,6 +530,34 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
 
   /// Screen 2 Requirement: Dropdown to select a pre-registered pet,
   /// automatically pulling their existing breed and vaccination records from the database.
+  /// Show empty state when the user has no registered pets yet
+  Widget _buildNoPetsState() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFDEC49B), width: 1.2),
+      ),
+      child: Column(
+        children: [
+          const Text('🐾', style: TextStyle(fontSize: 36)),
+          const SizedBox(height: 8),
+          const Text(
+            'No registered pets found',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF5C4033)),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Register a pet in the Pets section first to use this form.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildRegisteredPetDropdown() {
     if (_loadingPets) {
       return Container(
@@ -555,6 +576,8 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
         ),
       );
     }
+
+    if (_availablePets.isEmpty) return _buildNoPetsState();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -1111,44 +1134,55 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF8B5A2B), Color(0xFF5C4033)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: _isSubmitting
+            ? null
+            : const LinearGradient(
+                colors: [Color(0xFF8B5A2B), Color(0xFF5C4033)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        color: _isSubmitting ? Colors.grey.shade400 : null,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF8B5A2B).withOpacity(0.35),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        boxShadow: _isSubmitting
+            ? null
+            : [
+                BoxShadow(
+                  color: const Color(0xFF8B5A2B).withOpacity(0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 5),
+                ),
+              ],
       ),
       child: ElevatedButton(
-        onPressed: _submitListing,
+        onPressed: _isSubmitting ? null : _submitListing,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.publish_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Text(
-              "Publish $_listingType Listing",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 0.3,
+        child: _isSubmitting
+            ? const SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.publish_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Publish $_listingType Listing',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
