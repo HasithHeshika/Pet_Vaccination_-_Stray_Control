@@ -29,17 +29,18 @@ const handleValidation = (req, res, next) => {
 // @access  Public
 router.get('/', getAllListings);
 
-// @route   GET /api/breeding-matches/:id
-// @desc    Get a single breeding listing
-// @access  Public
-router.get('/:id', optionalAuth, getListingById);
-
 // ── Protected routes ────────────────────────────────────────────────────────
 
 // @route   GET /api/breeding-matches/user/my-listings
 // @desc    Get listings created by the logged-in user
 // @access  Private
+// IMPORTANT: must be declared BEFORE /:id so Express doesn't treat 'user' as an id
 router.get('/user/my-listings', auth, getMyListings);
+
+// @route   GET /api/breeding-matches/:id
+// @desc    Get a single breeding listing
+// @access  Public
+router.get('/:id', optionalAuth, getListingById);
 
 // @route   POST /api/breeding-matches
 // @desc    Create a new breeding listing
