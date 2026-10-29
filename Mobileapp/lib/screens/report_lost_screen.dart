@@ -7,6 +7,7 @@ class ReportLostScreen extends StatefulWidget {
   final String? initialBreed;
   final String? initialColor;
   final String? initialImageUrl;
+  final String? initialType;
 
   const ReportLostScreen({
     super.key,
@@ -14,6 +15,7 @@ class ReportLostScreen extends StatefulWidget {
     this.initialBreed,
     this.initialColor,
     this.initialImageUrl,
+    this.initialType,
   });
 
   @override
@@ -30,12 +32,13 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
   final _contactController = TextEditingController();
   
   DateTime? _lastSeenDate = DateTime.now();
-  String _type = 'Lost';
+  late String _type;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _type = _capitalize(widget.initialType ?? 'Lost');
     _petNameController = TextEditingController(text: widget.initialPetName ?? '');
     _breedController = TextEditingController(text: widget.initialBreed ?? '');
     _colorController = TextEditingController(text: widget.initialColor ?? '');
@@ -53,6 +56,8 @@ class _ReportLostScreenState extends State<ReportLostScreen> {
     _contactController.dispose();
     super.dispose();
   }
+
+  String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1).toLowerCase();
 
   void _submitReport() async {
     if (_petNameController.text.isEmpty ||
